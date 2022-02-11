@@ -25,7 +25,7 @@ export default {
   expose: ['isOpen', 'close', 'open'],
   data() {
     return {
-      isOpen: true,
+      isOpen: false,
     };
   },
   methods: {
@@ -41,18 +41,6 @@ export default {
 
 <style scoped>
 .content {
-  /* position: absolute;
-  border-radius: 8px;
-  background-color: var(--modal-content-bg);
-  color: var(--color-tone-1);
-  box-shadow: 0 4px 23px 0 rgb(0 0 0 / 20%);
-  width: 90%;
-  max-height: 90%;
-  overflow-y: auto;
-  animation: SlideIn 200ms;
-  max-width: var(--game-max-width);
-  padding: 16px;
-  box-sizing: border-box; */
   position: absolute;
   display: flex;
   justify-content: center;
