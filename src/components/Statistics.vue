@@ -16,7 +16,7 @@ defineProps<{
       </div>
 
       <div class="statistic-container">
-        <div class="statistic">{{ stats.winPercentage }}</div>
+        <div class="statistic">{{ (stats.gamesWon / stats.gamesPlayed) * 100 }}</div>
         <div class="label">Win %</div>
       </div>
 

@@ -122,6 +122,8 @@ function completeRow() {
 
     allowInput = false;
     if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
+      setStats(stats, currentRowIndex);
+      this.statsModal.open();
       // yay!
       setTimeout(() => {
         grid = genResultGrid();
@@ -135,6 +137,7 @@ function completeRow() {
         allowInput = true;
       }, 1600);
     } else {
+      setStats(stats, currentRowIndex);
       // game over :(
       setTimeout(() => {
         showMessage(answer.toUpperCase(), -1);
@@ -252,7 +255,11 @@ export default {
       isOpen: true,
     };
   },
-  methods: {},
+  methods: {
+    // openStatsModal() {
+    //   this.$refs.statsModal.open();
+    // },
+  },
   mounted: function () {
     // this.stats = getStats();
   },
