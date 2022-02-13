@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
-import { getWordOfTheDay, allWords } from './words';
+import { getWordOfTheDay, getAllWords } from './words';
+import { getStats, setStats, AllGameStats } from './getStatistics';
 import Keyboard from './Keyboard.vue';
 import { LetterState } from './types';
 import getSuggestion from './suggestion';
-import { maoriWords } from './maoriWords';
 // Get word of the day
-const answer = getWordOfTheDay();
-
+const currentLanguage = 'eng';
+const allWords = getAllWords(currentLanguage);
+const answer = getWordOfTheDay(currentLanguage);
+const stats = getStats();
 // Board state. Each tile is represented as { letter, state }
 const board = $ref(
   Array.from({ length: 6 }, () =>
@@ -74,7 +76,7 @@ function clearTile() {
 function completeRow() {
   if (currentRow.every((tile) => tile.letter)) {
     const guess = currentRow.map((tile) => tile.letter).join('');
-    if (!maoriWords.includes(guess) && guess !== answer) {
+    if (!allWords.includes(guess) && guess !== answer) {
       shake();
       // console.log(guess);
       // let guesses = board.map((item) => {
@@ -184,7 +186,7 @@ function genResultGrid() {
   </Transition>
 
   <Modal ref="statsModal">
-    <Statistics />
+    <Statistics :stats="stats" />
   </Modal>
 
   <div class="gameWrapper">
@@ -234,7 +236,7 @@ function genResultGrid() {
         </div>
       </div>
     </div>
-    <Keyboard class="keyboard" @key="onKey" :letter-states="letterStates" />
+    <Keyboard class="keyboard" @key="onKey" :letter-states="letterStates" :language="currentLanguage" />
   </div>
 </template>
 
@@ -249,6 +251,9 @@ export default {
     };
   },
   methods: {},
+  mounted: function () {
+    // this.stats = getStats();
+  },
 };
 </script>
 

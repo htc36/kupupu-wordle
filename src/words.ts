@@ -1,6 +1,6 @@
 const defaultMessage = ' Using word of the day instead.';
 import { maoriWords } from './maoriWords';
-export function getWordOfTheDay() {
+export function getWordOfTheDay(language: string) {
   if (location.search) {
     try {
       const query = atob(location.search.slice(1));
@@ -18,12 +18,15 @@ export function getWordOfTheDay() {
   const start = new Date(2022, 0, 0);
   const diff = Number(now) - Number(start);
   let day = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const wordList = maoriWords;
+  const wordList = language == 'maori' ? maoriWords : allWords;
   while (day > wordList.length) {
     day -= wordList.length;
   }
   console.log(wordList[day]);
   return wordList[day];
+}
+export function getAllWords(language: string) {
+  return language === 'maori' ? maoriWords : allWords;
 }
 
 // copied from Wordle source
@@ -13005,4 +13008,4 @@ const allowedGuesses = [
   'zymic',
 ];
 
-export const allWords = [...answers, ...allowedGuesses];
+const allWords = [...answers, ...allowedGuesses];

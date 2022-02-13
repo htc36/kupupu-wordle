@@ -3,24 +3,26 @@ import { LetterState } from './types';
 
 defineProps<{
   letterStates: Record<string, LetterState>;
+  language: string;
 }>();
 
 defineEmits<{
   (e: 'key', key: string): void;
 }>();
-
-const rows = ['qwertyuiop'.split(''), 'asdfghjkl'.split(''), ['Enter', ...'zxcvbnm'.split(''), 'Backspace']];
+const englishKeys = ['qwertyuiop'.split(''), 'asdfghjkl'.split(''), ['Enter', ...'zxcvbnm'.split(''), 'Backspace']];
 const maoriKeys = [
   ['a', 'ā', 'e', 'ē', 'h', 'i', 'ī'],
   ['k', 'm', 'n', 'g', 'o', 'ō', 'p', 'r'],
   ['Enter', 't', 'u', 'ū', 'w', 'q', 'Backspace'],
 ];
-const keyboard = maoriKeys;
+function getKeyboard(language: string) {
+  return language === 'maori' ? maoriKeys : englishKeys;
+}
 </script>
 
 <template>
   <div id="keyboard">
-    <div class="row" v-for="(row, i) in keyboard">
+    <div class="row" v-for="(row, i) in getKeyboard(language)">
       <div class="spacer" v-if="i === 1"></div>
       <button v-for="key in row" :class="[key.length > 1 && 'big', letterStates[key]]" @click="$emit('key', key)">
         <span v-if="key !== 'Backspace'">{{ key }}</span>

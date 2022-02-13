@@ -1,81 +1,59 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { AllGameStats, Guesses } from '../getStatistics';
+defineProps<{
+  stats: AllGameStats;
+}>();
+var countDownDate = new Date('Jan 5, 2024 15:37:25').getTime();
+
+// Update the count down every 1 second
+var x = setInterval(function () {
+  // Get today's date and time
+  var now = new Date().getTime();
+
+  // Find the distance between now and the count down date
+  var distance = countDownDate - now;
+
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+}, 1000);
+</script>
 
 <template>
   <div class="container">
+    <!-- <h1>{{ JSON.stringify(stats) }}</h1> -->
     <h1>Statistics</h1>
     <div id="statistics">
       <div class="statistic-container">
-        <div class="statistic">2</div>
+        <div class="statistic">{{ stats.gamesPlayed }}</div>
         <div class="label">Played</div>
       </div>
 
       <div class="statistic-container">
-        <div class="statistic">100</div>
+        <div class="statistic">{{ stats.winPercentage }}</div>
         <div class="label">Win %</div>
       </div>
 
       <div class="statistic-container">
-        <div class="statistic">2</div>
+        <div class="statistic">{{ stats.currentStreak }}</div>
         <div class="label">Current Streak</div>
       </div>
 
       <div class="statistic-container">
-        <div class="statistic">2</div>
+        <div class="statistic">{{ stats.maxStreak }}</div>
         <div class="label">Max Streak</div>
       </div>
     </div>
     <h1>Guess Distribution</h1>
     <div id="guess-distribution">
-      <div class="graph-container">
-        <div class="guess">1</div>
+      <div v-for="(amount, guessNum) in stats.guesses" class="graph-container">
+        <div class="guess">{{ guessNum }}</div>
         <div class="graph">
-          <div class="graph-bar" style="width: 7%">
-            <div class="num-guesses">0</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="graph-container">
-        <div class="guess">2</div>
-        <div class="graph">
-          <div class="graph-bar" style="width: 7%">
-            <div class="num-guesses">0</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="graph-container">
-        <div class="guess">3</div>
-        <div class="graph">
-          <div class="graph-bar" style="width: 7%">
-            <div class="num-guesses">0</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="graph-container">
-        <div class="guess">4</div>
-        <div class="graph">
-          <div class="graph-bar align-right highlight" style="width: 100%">
-            <div class="num-guesses">2</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="graph-container">
-        <div class="guess">5</div>
-        <div class="graph">
-          <div class="graph-bar" style="width: 7%">
-            <div class="num-guesses">0</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="graph-container">
-        <div class="guess">6</div>
-        <div class="graph">
-          <div class="graph-bar" style="width: 7%">
-            <div class="num-guesses">0</div>
+          <!-- <div class="graph-bar" :style="`width: ${getWidth(stats.guess, guessNum, amount)}%`"> -->
+          <div class="graph-bar" :style="`width: ${getWidth(stats.guesses, guessNum, amount)}`">
+            <div class="num-guesses">{{ amount }}</div>
           </div>
         </div>
       </div>
@@ -104,10 +82,43 @@ export default {
       isOpen: true,
     };
   },
-  //   methods: {
-  //     close(): void {
-  //       this.isOpen = false;
-  //     },
+  methods: {
+    getWidth(guesses: Guesses, guessNum: string, guessAmount: number): string {
+      if (guessAmount === 0) {
+        return '7%';
+      }
+      const guessMap = Object.values(guesses);
+      const topAmount = Math.max(...guessMap);
+      const percentage = (guessAmount / topAmount) * 100;
+      return percentage.toString() + '%';
+    },
+    getTimeLeft() {
+      var countDownDate = new Date('Jan 5, 2024 15:37:25').getTime();
+      // Update the count down every 1 second
+      var x = setInterval(function () {
+        // Get today's date and time
+        var now = new Date().getTime();
+
+        // Find the distance between now and the count down date
+        var distance = countDownDate - now;
+
+        // Time calculations for days, hours, minutes and seconds
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Display the result in the element with id="demo"
+        document.getElementById('demo').innerHTML = days + 'd ' + hours + 'h ' + minutes + 'm ' + seconds + 's ';
+
+        // If the count down is finished, write some text
+        if (distance < 0) {
+          clearInterval(x);
+          document.getElementById('demo').innerHTML = 'EXPIRED';
+        }
+      }, 1000);
+    },
+  },
   //     open(): void {
   //       this.isOpen = true;
   //     },
