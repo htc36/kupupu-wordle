@@ -29,6 +29,35 @@ export function getAllWords(language: string) {
   return language === 'maori' ? maoriWords : allWords;
 }
 
+const animals = [
+  'cigar',
+  'rebut',
+  'sissy',
+  'humph',
+  'awake',
+  'blush',
+  'focal',
+  'evade',
+  'naval',
+  'serve',
+  'heath',
+  'dwarf',
+  'model',
+  'karma',
+  'stink',
+  'grade',
+  'quiet',
+  'bench',
+  'abate',
+  'feign',
+  'major',
+  'death',
+  'fresh',
+  'crust',
+  'stool',
+  'colon',
+];
+
 // copied from Wordle source
 const answers = [
   'cigar',

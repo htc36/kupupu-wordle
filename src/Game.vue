@@ -6,7 +6,7 @@ import Keyboard from './Keyboard.vue';
 import { LetterState } from './types';
 import getSuggestion from './suggestion';
 // Get word of the day
-const currentLanguage = 'eng';
+const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
 const answer = getWordOfTheDay(currentLanguage);
 const stats = getStats();
@@ -74,6 +74,8 @@ function clearTile() {
 }
 
 function completeRow() {
+  console.log(currentRow);
+  console.log(board);
   if (currentRow.every((tile) => tile.letter)) {
     const guess = currentRow.map((tile) => tile.letter).join('');
     if (!allWords.includes(guess) && guess !== answer) {
