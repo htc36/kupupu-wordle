@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
 import { getWordOfTheDay, getAllWords } from './words';
-import { getStats, setStats, AllGameStats } from './getStatistics';
+import { getStats, setStats, AllGameStats, getGameState, Board, GameState, setGameState } from './getStatistics';
 import Keyboard from './Keyboard.vue';
 import { LetterState } from './types';
 import getSuggestion from './suggestion';
@@ -11,27 +11,21 @@ const allWords = getAllWords(currentLanguage);
 const answer = getWordOfTheDay(currentLanguage);
 const stats = getStats();
 // Board state. Each tile is represented as { letter, state }
-const board = $ref(
-  Array.from({ length: 6 }, () =>
-    Array.from({ length: 5 }, () => ({
-      letter: '',
-      state: LetterState.INITIAL,
-    })),
-  ),
-);
+const gameState: GameState = $ref(getGameState(answer));
+
+const board: Board[][] = $ref(gameState.board);
+const letterStates: Record<string, LetterState> = $ref(gameState.letterState);
 
 // Current active row.
-let currentRowIndex = $ref(0);
+let currentRowIndex = $ref(gameState.currentRowIndex);
 const currentRow = $computed(() => board[currentRowIndex]);
 
 // Feedback state: message and shake
+let statsModal = $ref();
 let message = $ref('');
 let grid = $ref('');
 let shakeRowIndex = $ref(-1);
 let success = $ref(false);
-
-// Keep track of revealed letters for the virtual keyboard
-const letterStates: Record<string, LetterState> = $ref({});
 
 // Handle keyboard input.
 let allowInput = true;
@@ -74,8 +68,6 @@ function clearTile() {
 }
 
 function completeRow() {
-  console.log(currentRow);
-  console.log(board);
   if (currentRow.every((tile) => tile.letter)) {
     const guess = currentRow.map((tile) => tile.letter).join('');
     if (!allWords.includes(guess) && guess !== answer) {
@@ -123,11 +115,12 @@ function completeRow() {
     allowInput = false;
     if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
       setStats(stats, currentRowIndex);
-      this.statsModal.open();
+      gameState.isGameFinished = true;
+      if (statsModal) statsModal.open();
       // yay!
       setTimeout(() => {
         grid = genResultGrid();
-        showMessage(['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][currentRowIndex], -1);
+        showMessage(['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][currentRowIndex], 1000);
         success = true;
       }, 1600);
     } else if (currentRowIndex < board.length - 1) {
@@ -138,11 +131,17 @@ function completeRow() {
       }, 1600);
     } else {
       setStats(stats, currentRowIndex);
+      if (statsModal) statsModal.open();
+      gameState.isGameFinished = true;
       // game over :(
       setTimeout(() => {
-        showMessage(answer.toUpperCase(), -1);
+        showMessage(answer.toUpperCase(), 2000);
       }, 1600);
     }
+    gameState.board = board;
+    gameState.currentRowIndex = currentRowIndex;
+    gameState.letterState = letterStates;
+    setGameState(gameState);
   } else {
     shake();
     showMessage('Not enough letters');
@@ -256,13 +255,14 @@ export default {
     };
   },
   methods: {
-    // openStatsModal() {
-    //   this.$refs.statsModal.open();
-    // },
+    openStatsModal(): void {
+      this.$refs.statsModal.open();
+    },
   },
   mounted: function () {
     // this.stats = getStats();
   },
+  watch: {},
 };
 </script>
 

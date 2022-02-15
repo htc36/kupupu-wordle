@@ -1,3 +1,16 @@
+import { LetterState } from './types';
+export interface Board {
+  letter: string;
+  state: LetterState;
+}
+export interface GameState {
+  solution: string;
+  lastCompleted: string | null;
+  isGameFinished: Boolean;
+  board: Board[][];
+  letterState: Record<string, LetterState>;
+  currentRowIndex: number;
+}
 interface AllGameStats {
   currentStreak: number;
   maxStreak: number;
@@ -26,14 +39,10 @@ const defaultStats: AllGameStats = {
   averageGuesses: 0,
 };
 function getStats(): AllGameStats {
-  console.log('inside get stats');
   const statsString = window.localStorage.getItem('wordleStats');
-  console.log('LOCAL STATS STRING', statsString);
   return statsString ? JSON.parse(statsString) : defaultStats;
 }
 function setStats(statsObj: AllGameStats, guessLine: number) {
-  console.log(statsObj);
-  console.log(guessLine);
   if (guessLine < 5) {
     console.log('Has won the game');
     statsObj.currentStreak += 1;
@@ -48,4 +57,30 @@ function setStats(statsObj: AllGameStats, guessLine: number) {
   console.log('Setting new stats', statsObj);
   window.localStorage.setItem('wordleStats', JSON.stringify(statsObj));
 }
-export { getStats, setStats, AllGameStats };
+
+function getGameState(solution: string) {
+  const existingGameState: GameState = JSON.parse(window.localStorage.getItem('gameState') as string);
+  if (existingGameState && existingGameState.solution === solution) {
+    return JSON.parse(window.localStorage.getItem('gameState') as string) as GameState;
+  }
+  const defaultBoard = Array.from({ length: 6 }, () =>
+    Array.from({ length: 5 }, () => ({
+      letter: '',
+      state: LetterState.INITIAL,
+    })),
+  );
+  const gameState: GameState = {
+    solution: solution,
+    lastCompleted: null,
+    isGameFinished: false,
+    board: defaultBoard,
+    letterState: {},
+    currentRowIndex: 0,
+  };
+  return gameState;
+}
+
+function setGameState(gameState: GameState) {
+  window.localStorage.setItem('gameState', JSON.stringify(gameState));
+}
+export { getStats, setStats, getGameState, AllGameStats, setGameState };
