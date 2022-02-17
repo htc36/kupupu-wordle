@@ -1,4 +1,6 @@
-export const maoriWords = [
+import { assetMapping } from './assetMapping';
+export const maoriWords = Object.keys(assetMapping);
+export const maoriWordsLong = [
   'aaawa',
   'aahua',
   'aeaea',

@@ -22,6 +22,7 @@ const currentRow = $computed(() => board[currentRowIndex]);
 
 // Feedback state: message and shake
 let statsModal = $ref();
+let wordDefinitionModal = $ref();
 let message = $ref('');
 let grid = $ref('');
 let shakeRowIndex = $ref(-1);
@@ -39,13 +40,15 @@ onUnmounted(() => {
 });
 
 function onKey(key: string) {
+  console.log('hey');
   if (!allowInput) return;
-  if (/^[a-zA-Z]$/.test(key)) {
-    fillTile(key.toLowerCase());
-  } else if (key === 'Backspace') {
+  // if (/^[a-zA-Z]$/.test(key)) {
+  if (key === 'Backspace') {
     clearTile();
   } else if (key === 'Enter') {
     completeRow();
+  } else {
+    fillTile(key.toLowerCase());
   }
 }
 
@@ -72,15 +75,11 @@ function completeRow() {
     const guess = currentRow.map((tile) => tile.letter).join('');
     if (!allWords.includes(guess) && guess !== answer) {
       shake();
-      // console.log(guess);
-      // let guesses = board.map((item) => {
-      //   return item.map((letterObj) => letterObj.letter).join('');
-      // });
-      // console.log(guesses);
-      // console.log(currentRowIndex);
-      // console.log(answer);
-      // const suggestion = getSuggestion(answer, guesses, currentRowIndex, maoriWords);
-      // showMessage(`Not in word list try ${suggestion}`);
+      let guesses = board.map((item) => {
+        return item.map((letterObj) => letterObj.letter).join('');
+      });
+      const suggestion = getSuggestion(answer, guesses, currentRowIndex, allWords);
+      showMessage(`Not in word list try ${suggestion}`, 2000);
       return;
     }
 
@@ -193,6 +192,10 @@ function genResultGrid() {
     <Statistics :stats="stats" />
   </Modal>
 
+  <Modal ref="wordDefinitionModal">
+    <WordDefinition word="ngeru" />
+  </Modal>
+
   <div class="gameWrapper">
     <header>
       <div style="">
@@ -245,6 +248,7 @@ function genResultGrid() {
 </template>
 
 <script lang="ts">
+import WordDefinition from './components/WordDefinition.vue';
 import Statistics from './components/Statistics.vue';
 import Modal from './components/Modal.vue';
 export default {
@@ -254,12 +258,9 @@ export default {
       isOpen: true,
     };
   },
-  methods: {
-    openStatsModal(): void {
-      this.$refs.statsModal.open();
-    },
-  },
+  methods: {},
   mounted: function () {
+    this.$refs.wordDefinitionModal.open();
     // this.stats = getStats();
   },
   watch: {},
