@@ -6,9 +6,9 @@ defineProps<{
 
 <template>
   <div class="container">
-    <img :src="`../../assets/${wordAssets.image}`" />
+    <img :src="`/assets/${wordAssets.image}`" />
     <figure>
-      <audio controls :src="`../../assets/${wordAssets.sound}`">
+      <audio controls :src="`/assets/${wordAssets.sound}`">
         Your browser does not support the
         <code>audio</code> element.
       </audio>
