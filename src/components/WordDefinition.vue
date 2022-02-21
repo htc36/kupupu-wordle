@@ -14,7 +14,8 @@ defineProps<{
       </audio>
     </figure>
     <div class="share">
-      <button id="share-button">Lesson</button>
+      <button id="share-button" @click="openLesson()">Lesson</button>
+      <button id="next-button" @click="$emit('hasSelectedNext')">Next</button>
     </div>
   </div>
 </template>
@@ -30,7 +31,9 @@ export default {
     };
   },
   methods: {
-    getTimeLeft() {},
+    openLesson() {
+      window.open('https://whanau.tv/', '_blank');
+    },
   },
   mounted() {},
 };
@@ -148,11 +151,29 @@ export default {
   width: 50%;
 }
 .share {
-  width: 50%;
+  width: 80%;
   height: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+#next-button {
+  background-color: var(--green);
+  color: var(--key-evaluated-text-color);
+  font-family: inherit;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  display: flex;
   justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
+  width: 40%;
+  font-size: 20px;
+  height: 52px;
 }
 #share-button {
   background-color: var(--red);
@@ -168,7 +189,7 @@ export default {
   align-items: center;
   text-transform: uppercase;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
-  width: 80%;
+  width: 40%;
   font-size: 20px;
   height: 52px;
 }

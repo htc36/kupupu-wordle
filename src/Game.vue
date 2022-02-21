@@ -40,13 +40,13 @@ onUnmounted(() => {
 });
 
 function onKey(key: string) {
-  console.log('hey');
   if (!allowInput) return;
-  // if (/^[a-zA-Z]$/.test(key)) {
   if (key === 'Backspace') {
     clearTile();
   } else if (key === 'Enter') {
     completeRow();
+  } else if (key.length > 1) {
+    return;
   } else {
     fillTile(key.toLowerCase());
   }
@@ -115,12 +115,12 @@ function completeRow() {
     if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
       setStats(stats, currentRowIndex);
       gameState.isGameFinished = true;
-      if (statsModal) statsModal.open();
       // yay!
       setTimeout(() => {
         grid = genResultGrid();
         showMessage(['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][currentRowIndex], 1000);
         success = true;
+        if (wordDefinitionModal) wordDefinitionModal.open();
       }, 1600);
     } else if (currentRowIndex < board.length - 1) {
       // go the next row
@@ -178,6 +178,10 @@ function genResultGrid() {
     })
     .join('\n');
 }
+function wordDefHasSelectedNext() {
+  statsModal.open();
+  wordDefinitionModal.close();
+}
 </script>
 
 <template>
@@ -188,15 +192,14 @@ function genResultGrid() {
     </div>
   </Transition>
 
-  <Modal ref="statsModal">
-    <Statistics :stats="stats" />
-  </Modal>
-
-  <Modal ref="wordDefinitionModal">
-    <WordDefinition word="ngeru" />
-  </Modal>
-
   <div class="gameWrapper">
+    <Modal ref="statsModal">
+      <Statistics :stats="stats" />
+    </Modal>
+
+    <Modal ref="wordDefinitionModal">
+      <WordDefinition :word="gameState.solution" @hasSelectedNext="wordDefHasSelectedNext()" />
+    </Modal>
     <header>
       <div style="">
         <!-- <a id="source-link" href="https://github.com/yyx990803/vue-wordle" target="_blank">Source</a> -->
@@ -226,8 +229,12 @@ function genResultGrid() {
       </div>
     </header>
     <div id="board">
-      <div v-for="(row, index) in board" :class="['row', shakeRowIndex === index && 'shake', success && currentRowIndex === index && 'jump']">
-        <div v-for="(tile, index) in row" :class="['tile', tile.letter && 'filled', tile.state && 'revealed']">
+      <div
+        v-for="(row, index) in board"
+        :class="['row', shakeRowIndex === index && 'shake', success && currentRowIndex === index && 'jump']"
+        v-bind:key="row[0].letter + row[1].letter"
+      >
+        <div v-for="(tile, index) in row" :class="['tile', tile.letter && 'filled', tile.state && 'revealed']" v-bind:key="tile.letter">
           <div class="front" :style="{ transitionDelay: `${index * 300}ms` }">
             {{ tile.letter }}
           </div>
@@ -260,10 +267,18 @@ export default {
   },
   methods: {},
   mounted: function () {
-    this.$refs.wordDefinitionModal.open();
     // this.stats = getStats();
   },
-  watch: {},
+  computed: {
+    isWordDefinitionOpen: function () {
+      return this.$refs.wordDefinitionModal.isOpen;
+    },
+  },
+  watch: {
+    // isWordDefinitionOpen: function () {
+    //   console.log('hey');
+    // },
+  },
 };
 </script>
 
@@ -318,13 +333,21 @@ header {
   color: #fff;
   background-color: rgba(0, 0, 0, 0.85);
   padding: 16px 20px;
-  z-index: 2;
+  z-index: 4;
   border-radius: 4px;
   transform: translateX(-50%);
   transition: opacity 0.3s ease-out;
   font-weight: 600;
 }
 .message.v-leave-to {
+  opacity: 0;
+}
+.easeModal {
+  z-index: 9;
+  transform: translateX(-50%);
+  transition: opacity 0.3s ease-out;
+}
+.easeModal.v-leave-to {
   opacity: 0;
 }
 .row {

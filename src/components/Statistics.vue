@@ -32,7 +32,7 @@ defineProps<{
     </div>
     <h1>Guess Distribution</h1>
     <div id="guess-distribution">
-      <div v-for="(amount, guessNum) in stats.guesses" class="graph-container">
+      <div v-for="(amount, guessNum) in stats.guesses" class="graph-container" v-bind:key="guessNum">
         <div class="guess">{{ guessNum }}</div>
         <div class="graph">
           <!-- <div class="graph-bar" :style="`width: ${getWidth(stats.guess, guessNum, amount)}%`"> -->

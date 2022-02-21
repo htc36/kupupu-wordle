@@ -14,15 +14,16 @@ export function getWordOfTheDay(language: string) {
     }
   }
 
-  const now = new Date();
+  let now = new Date();
+  now.setDate(now.getDate() + 6);
   const start = new Date(2022, 0, 0);
   const diff = Number(now) - Number(start);
   let day = Math.floor(diff / (1000 * 60 * 60 * 24));
   const wordList = language == 'maori' ? maoriWords : allWords;
-  while (day > wordList.length) {
+  while (day >= wordList.length) {
     day -= wordList.length;
   }
-  console.log(wordList[day]);
+  console.log('SOLUTION ', wordList[day]);
   return wordList[day];
 }
 export function getAllWords(language: string) {
