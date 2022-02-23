@@ -21,7 +21,7 @@ defineProps<{
 </template>
 
 <script lang="ts">
-import { assetMapping } from '../assetMapping';
+import { assetMapping } from '../helpers/assetMapping';
 export default {
   //   expose: ['isOpen', 'close', 'open'],
   props: ['word'],

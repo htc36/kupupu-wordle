@@ -1,35 +1,5 @@
-import { LetterState } from './types';
-export interface Board {
-  letter: string;
-  state: LetterState;
-}
-export interface GameState {
-  solution: string;
-  lastCompleted: string | null;
-  isGameFinished: Boolean;
-  board: Board[][];
-  letterState: Record<string, LetterState>;
-  currentRowIndex: number;
-}
-interface AllGameStats {
-  currentStreak: number;
-  maxStreak: number;
-  guesses: Guesses;
-  gamesPlayed: number;
-  gamesWon: number;
-  averageGuesses: number;
-}
-export interface Guesses {
-  [key: string]: number;
-  1: number;
-  2: number;
-  3: number;
-  4: number;
-  5: number;
-  6: number;
-  F: number;
-}
-
+import { LetterState } from '../types';
+import { AllGameStats, GameState } from '../types';
 const defaultStats: AllGameStats = {
   currentStreak: 0,
   maxStreak: 0,
@@ -83,4 +53,4 @@ function getGameState(solution: string) {
 function setGameState(gameState: GameState) {
   window.localStorage.setItem('gameState', JSON.stringify(gameState));
 }
-export { getStats, setStats, getGameState, AllGameStats, setGameState };
+export { getStats, setStats, getGameState, setGameState };
