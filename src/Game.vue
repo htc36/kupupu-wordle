@@ -2,9 +2,8 @@
 import { onUnmounted } from 'vue';
 import { getWordOfTheDay, getAllWords } from './words';
 import { getStats, setStats, getGameState, setGameState } from './helpers/localStorage';
-import { Board, GameState } from './types';
 import Keyboard from './components/Keyboard.vue';
-import { LetterState } from './types';
+import { LetterState, Board, GameState } from './types';
 import getSuggestion from './helpers/suggestion';
 import { ref } from 'vue';
 import Navbar from './components/Navbar.vue';
@@ -40,6 +39,10 @@ onUnmounted(() => {
   window.removeEventListener('keyup', onKeyup);
 });
 
+/**
+ * Handles when the user either clicks on a letter or types one in
+ * @param key
+ */
 function onKey(key: string) {
   if (!allowInput) return;
   if (key === 'Backspace') {
@@ -71,84 +74,103 @@ function clearTile() {
   }
 }
 
+/**
+ * Mark correct/present/absent rows
+ * @param tile current board tile
+ * @param answerLetters a list of the answer letters, if its null, its already correct
+ * @param index coloumn index of the current row
+ */
+function markCorrectRows(tile: Board, answerLetters: (string | null)[], index: number) {
+  if (answerLetters[index] === tile.letter) {
+    tile.state = letterStates[tile.letter] = LetterState.CORRECT;
+    answerLetters[index] = null;
+  }
+}
+function markPresentRows(tile: Board, answerLetters: (string | null)[]) {
+  if (!tile.state && answerLetters.includes(tile.letter)) {
+    tile.state = LetterState.PRESENT;
+    answerLetters[answerLetters.indexOf(tile.letter)] = null;
+    if (!letterStates[tile.letter]) {
+      letterStates[tile.letter] = LetterState.PRESENT;
+    }
+  }
+}
+function markAbsentRows(tile: Board) {
+  if (!tile.state) {
+    tile.state = LetterState.ABSENT;
+    if (!letterStates[tile.letter]) {
+      letterStates[tile.letter] = LetterState.ABSENT;
+    }
+  }
+}
+
+/**
+ * Checks if the word is part of the main word list
+ * @returns boolean weather or not word is valid
+ */
+function isValidWord() {
+  const guess = currentRow.map((tile) => tile.letter).join('');
+  if (!allWords.includes(guess) && guess !== answer) {
+    shake();
+    let guesses = board.map((item) => {
+      return item.map((letterObj) => letterObj.letter).join('');
+    });
+    const suggestion = getSuggestion(answer, guesses, currentRowIndex, allWords);
+    showMessage(`Not in word list try ${suggestion}`, 2000);
+    return false;
+  }
+  return true;
+}
+
 function completeRow() {
-  if (currentRow.every((tile) => tile.letter)) {
-    const guess = currentRow.map((tile) => tile.letter).join('');
-    console.log(guess);
-    console.log(allWords.includes(guess));
-    if (!allWords.includes(guess) && guess !== answer) {
-      shake();
-      let guesses = board.map((item) => {
-        return item.map((letterObj) => letterObj.letter).join('');
-      });
-      const suggestion = getSuggestion(answer, guesses, currentRowIndex, allWords);
-      showMessage(`Not in word list try ${suggestion}`, 2000);
-      return;
-    }
-
-    const answerLetters: (string | null)[] = answer.split('');
-    // first pass: mark correct ones
-    currentRow.forEach((tile, i) => {
-      if (answerLetters[i] === tile.letter) {
-        tile.state = letterStates[tile.letter] = LetterState.CORRECT;
-        answerLetters[i] = null;
-      }
-    });
-    // second pass: mark the present
-    currentRow.forEach((tile) => {
-      if (!tile.state && answerLetters.includes(tile.letter)) {
-        tile.state = LetterState.PRESENT;
-        answerLetters[answerLetters.indexOf(tile.letter)] = null;
-        if (!letterStates[tile.letter]) {
-          letterStates[tile.letter] = LetterState.PRESENT;
-        }
-      }
-    });
-    // 3rd pass: mark absent
-    currentRow.forEach((tile) => {
-      if (!tile.state) {
-        tile.state = LetterState.ABSENT;
-        if (!letterStates[tile.letter]) {
-          letterStates[tile.letter] = LetterState.ABSENT;
-        }
-      }
-    });
-
-    allowInput = false;
-    if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
-      setStats(stats, currentRowIndex);
-      gameState.isGameFinished = true;
-      // yay!
-      setTimeout(() => {
-        grid = genResultGrid();
-        showMessage(['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][currentRowIndex], 1000);
-        success = true;
-        navbar.value?.toggleWordDefModal(true);
-        // wordDefinitionModal.value?.open();
-      }, 1600);
-    } else if (currentRowIndex < board.length - 1) {
-      // go the next row
-      currentRowIndex++;
-      setTimeout(() => {
-        allowInput = true;
-      }, 1600);
-    } else {
-      setStats(stats, currentRowIndex);
-      navbar.value?.toggleWordDefModal(true);
-      gameState.isGameFinished = true;
-      // game over :(
-      setTimeout(() => {
-        showMessage(answer.toUpperCase(), 2000);
-      }, 1600);
-    }
-    gameState.board = board;
-    gameState.currentRowIndex = currentRowIndex;
-    gameState.letterState = letterStates;
-    setGameState(gameState);
-  } else {
+  if (!currentRow.every((tile) => tile.letter)) {
+    // The row is not filled out
     shake();
     showMessage('Not enough letters');
+    return;
   }
+  if (!isValidWord()) return;
+
+  let answerLetters: (string | null)[] = answer.split('');
+
+  // Mark correct/present/absent letters
+  currentRow.forEach((tile, i) => {
+    markCorrectRows(tile, answerLetters, i);
+    markPresentRows(tile, answerLetters);
+    markAbsentRows(tile);
+  });
+
+  allowInput = false;
+  if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
+    setStats(stats, currentRowIndex);
+    gameState.isGameFinished = true;
+    // yay!
+    setTimeout(() => {
+      grid = genResultGrid();
+      showMessage(['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][currentRowIndex], 1000);
+      success = true;
+      navbar.value?.toggleWordDefModal(true);
+      // wordDefinitionModal.value?.open();
+    }, 1600);
+  } else if (currentRowIndex < board.length - 1) {
+    // go the next row
+    currentRowIndex++;
+    setTimeout(() => {
+      allowInput = true;
+    }, 1600);
+  } else {
+    setStats(stats, currentRowIndex);
+    navbar.value?.toggleWordDefModal(true);
+    gameState.isGameFinished = true;
+    // game over :(
+    setTimeout(() => {
+      showMessage(answer.toUpperCase(), 2000);
+    }, 1600);
+  }
+  gameState.board = board;
+  gameState.currentRowIndex = currentRowIndex;
+  gameState.letterState = letterStates;
+  setGameState(gameState);
 }
 
 function showMessage(msg: string, time = 1000) {
