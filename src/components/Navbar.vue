@@ -1,3 +1,4 @@
+<!-- This component is not used yet -->
 <template>
   <header>
     <div class="menu">
@@ -24,13 +25,6 @@ export default {
       isOpen: true,
     };
   },
-  methods: {
-    close(): void {
-      this.isOpen = false;
-    },
-    open(): void {
-      this.isOpen = true;
-    },
-  },
+  methods: {},
 };
 </script>

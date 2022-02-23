@@ -5,6 +5,11 @@ import { getStats, setStats, AllGameStats, getGameState, Board, GameState, setGa
 import Keyboard from './Keyboard.vue';
 import { LetterState } from './types';
 import getSuggestion from './suggestion';
+import Modal from './components/Modal.vue';
+import { ref } from 'vue';
+import WordDefinition from './components/WordDefinition.vue';
+import Statistics from './components/Statistics.vue';
+import Settings from './components/Settings.vue';
 // Get word of the day
 const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
@@ -20,9 +25,11 @@ const letterStates: Record<string, LetterState> = $ref(gameState.letterState);
 let currentRowIndex = $ref(gameState.currentRowIndex);
 const currentRow = $computed(() => board[currentRowIndex]);
 
-// Feedback state: message and shake
-let statsModal = $ref();
-let wordDefinitionModal = $ref();
+// Define Modals
+const statsModal = ref<InstanceType<typeof Modal> | null>(null);
+const settingsModal = ref<InstanceType<typeof Modal> | null>(null);
+const wordDefinitionModal = ref<InstanceType<typeof Modal> | null>(null);
+// let statsModal = $ref();
 let message = $ref('');
 let grid = $ref('');
 let shakeRowIndex = $ref(-1);
@@ -73,6 +80,8 @@ function clearTile() {
 function completeRow() {
   if (currentRow.every((tile) => tile.letter)) {
     const guess = currentRow.map((tile) => tile.letter).join('');
+    console.log(guess);
+    console.log(allWords.includes(guess));
     if (!allWords.includes(guess) && guess !== answer) {
       shake();
       let guesses = board.map((item) => {
@@ -120,7 +129,7 @@ function completeRow() {
         grid = genResultGrid();
         showMessage(['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][currentRowIndex], 1000);
         success = true;
-        if (wordDefinitionModal) wordDefinitionModal.open();
+        wordDefinitionModal.value?.open();
       }, 1600);
     } else if (currentRowIndex < board.length - 1) {
       // go the next row
@@ -130,7 +139,7 @@ function completeRow() {
       }, 1600);
     } else {
       setStats(stats, currentRowIndex);
-      if (statsModal) statsModal.open();
+      statsModal.value?.open();
       gameState.isGameFinished = true;
       // game over :(
       setTimeout(() => {
@@ -179,8 +188,8 @@ function genResultGrid() {
     .join('\n');
 }
 function wordDefHasSelectedNext() {
-  statsModal.open();
-  wordDefinitionModal.close();
+  wordDefinitionModal.value?.close();
+  statsModal.value?.open();
 }
 </script>
 
@@ -193,6 +202,10 @@ function wordDefHasSelectedNext() {
   </Transition>
 
   <div class="gameWrapper">
+    <Modal ref="settingsModal" height="100%" width="100%" boxShadow="0 0px">
+      <Settings />
+    </Modal>
+
     <Modal ref="statsModal">
       <Statistics :stats="stats" />
     </Modal>
@@ -213,13 +226,13 @@ function wordDefHasSelectedNext() {
       <h1 class="title">kupupu</h1>
       <div style="">
         <!-- <a id="source-link" href="https://github.com/yyx990803/vue-wordle" target="_blank">Source</a> -->
-        <button class="navbarButton" @click="() => $refs.statsModal.open()">
+        <button class="navbarButton" @click="() => statsModal?.open()">
           <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
             <path fill="var(--color-tone-3)" d="M16,11V3H8v6H2v12h20V11H16z M10,5h4v14h-4V5z M4,11h4v8H4V11z M20,19h-4v-6h4V19z"></path>
           </svg>
         </button>
         <button class="navbarButton" style="margin-left: 2px">
-          <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+          <svg xmlns="http://www.w3.org/2000/svg" @click="() => settingsModal?.open()" height="24" viewBox="0 0 24 24" width="24">
             <path
               fill="var(--color-tone-3)"
               d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
@@ -253,34 +266,6 @@ function wordDefHasSelectedNext() {
     <Keyboard class="keyboard" @key="onKey" :letter-states="letterStates" :language="currentLanguage" />
   </div>
 </template>
-
-<script lang="ts">
-import WordDefinition from './components/WordDefinition.vue';
-import Statistics from './components/Statistics.vue';
-import Modal from './components/Modal.vue';
-export default {
-  components: { Modal, Statistics },
-  data() {
-    return {
-      isOpen: true,
-    };
-  },
-  methods: {},
-  mounted: function () {
-    // this.stats = getStats();
-  },
-  computed: {
-    isWordDefinitionOpen: function () {
-      return this.$refs.wordDefinitionModal.isOpen;
-    },
-  },
-  watch: {
-    // isWordDefinitionOpen: function () {
-    //   console.log('hey');
-    // },
-  },
-};
-</script>
 
 <style scoped>
 .keyboard {

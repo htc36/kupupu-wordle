@@ -1,14 +1,29 @@
 <script setup lang="ts">
-// import { LetterState } from './types';
+import { ref } from 'vue';
+const props = defineProps<{
+  height?: string;
+  width?: string;
+  boxShadow?: string;
+}>();
+const styleObject = ref({
+  width: props.width,
+  height: props.height,
+  boxShadow: props.boxShadow,
+});
 
-// defineProps<{
-//   letterStates: Record<string, LetterState>;
-// }>();
+const isContentShown = ref(false);
+const open = () => (isContentShown.value = true);
+const close = () => (isContentShown.value = false);
+
+defineExpose({
+  open,
+  close,
+});
 </script>
 
 <template>
-  <div class="content" v-if="isOpen">
-    <div class="help-modal-content">
+  <div class="content" v-if="isContentShown">
+    <div class="help-modal-content" :style="styleObject">
       <svg class="close-btn" @click="close()" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
         <path
           fill="var(--color-tone-3)"
@@ -19,25 +34,6 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-export default {
-  expose: ['isOpen', 'close', 'open'],
-  data() {
-    return {
-      isOpen: false,
-    };
-  },
-  methods: {
-    close(): void {
-      this.isOpen = false;
-    },
-    open(): void {
-      this.isOpen = true;
-    },
-  },
-};
-</script>
 
 <style scoped>
 .content {
@@ -66,6 +62,7 @@ export default {
   scrollbar-color: #d2d2d280 #fff0;
 }
 .close-btn {
+  z-index: 5;
   position: absolute;
   top: 24px;
   right: 24px;
