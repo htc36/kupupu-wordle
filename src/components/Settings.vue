@@ -1,10 +1,5 @@
 <script setup lang="ts">
 import Switch from '../utils/Switch.vue';
-// import { LetterState } from './types';
-
-// defineProps<{
-//   letterStates: Record<string, LetterState>;
-// }>();
 </script>
 
 <template>

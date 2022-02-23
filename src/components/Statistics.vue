@@ -36,7 +36,7 @@ defineProps<{
         <div class="guess">{{ guessNum }}</div>
         <div class="graph">
           <!-- <div class="graph-bar" :style="`width: ${getWidth(stats.guess, guessNum, amount)}%`"> -->
-          <div class="graph-bar" :style="`width: ${getWidth(stats.guesses, guessNum, amount)}`">
+          <div class="graph-bar" :style="`width: ${getWidth(stats.guesses, amount)}`">
             <div class="num-guesses">{{ amount }}</div>
           </div>
         </div>
@@ -68,7 +68,7 @@ export default {
     };
   },
   methods: {
-    getWidth(guesses: Guesses, guessNum: string, guessAmount: number): string {
+    getWidth(guesses: Guesses, guessAmount: number): string {
       if (guessAmount === 0) {
         return '7%';
       }
