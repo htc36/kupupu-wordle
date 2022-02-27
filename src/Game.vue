@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
 import { getWordOfTheDay, getAllWords } from './words';
-import { getStats, setStats, getGameState, setGameState } from './helpers/localStorage';
+import {
+  getStats,
+  setStats,
+  getGameState,
+  setGameState,
+  setGameSettings,
+} from './helpers/localStorage';
+import { defaultGameSettings } from './helpers/localStorage';
+
 import Keyboard from './components/Keyboard.vue';
 import { LetterState, Board, GameState } from './types';
 import getSuggestion from './helpers/suggestion';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import Navbar from './components/Navbar.vue';
 // Get word of the day
 const currentLanguage = 'maori';
@@ -17,7 +25,6 @@ const stats = getStats();
 const gameState: GameState = $ref(getGameState(answer));
 const board: Board[][] = $ref(gameState.board);
 const letterStates: Record<string, LetterState> = $ref(gameState.letterState);
-
 // Current active row.
 let currentRowIndex = $ref(gameState.currentRowIndex);
 const currentRow = $computed(() => board[currentRowIndex]);
@@ -27,7 +34,12 @@ let message = $ref('');
 let grid = $ref('');
 let shakeRowIndex = $ref(-1);
 let success = $ref(false);
-
+onMounted(() => {
+  const existingSettings = JSON.parse(
+    window.localStorage.getItem('gameSettings') as string
+  );
+  if (!existingSettings) setGameSettings(defaultGameSettings);
+});
 // Handle keyboard input.
 let allowInput = true;
 
@@ -80,7 +92,11 @@ function clearTile() {
  * @param answerLetters a list of the answer letters, if its null, its already correct
  * @param index coloumn index of the current row
  */
-function markCorrectRows(tile: Board, answerLetters: (string | null)[], index: number) {
+function markCorrectRows(
+  tile: Board,
+  answerLetters: (string | null)[],
+  index: number
+) {
   if (answerLetters[index] === tile.letter) {
     tile.state = letterStates[tile.letter] = LetterState.CORRECT;
     answerLetters[index] = null;
@@ -115,7 +131,12 @@ function isValidWord() {
     let guesses = board.map((item) => {
       return item.map((letterObj) => letterObj.letter).join('');
     });
-    const suggestion = getSuggestion(answer, guesses, currentRowIndex, allWords);
+    const suggestion = getSuggestion(
+      answer,
+      guesses,
+      currentRowIndex,
+      allWords
+    );
     showMessage(`Not in word list try ${suggestion}`, 2000);
     return false;
   }
@@ -147,7 +168,12 @@ function completeRow() {
     // yay!
     setTimeout(() => {
       grid = genResultGrid();
-      showMessage(['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][currentRowIndex], 1000);
+      showMessage(
+        ['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][
+          currentRowIndex
+        ],
+        1000
+      );
       success = true;
       navbar.value?.toggleWordDefModal(true);
       // wordDefinitionModal.value?.open();
@@ -219,10 +245,18 @@ function genResultGrid() {
     <div id="board">
       <div
         v-for="(row, index) in board"
-        :class="['row', shakeRowIndex === index && 'shake', success && currentRowIndex === index && 'jump']"
+        :class="[
+          'row',
+          shakeRowIndex === index && 'shake',
+          success && currentRowIndex === index && 'jump',
+        ]"
         v-bind:key="row[0].letter + row[1].letter"
       >
-        <div v-for="(tile, index) in row" :class="['tile', tile.letter && 'filled', tile.state && 'revealed']" v-bind:key="tile.letter">
+        <div
+          v-for="(tile, index) in row"
+          :class="['tile', tile.letter && 'filled', tile.state && 'revealed']"
+          v-bind:key="tile.letter"
+        >
           <div class="front" :style="{ transitionDelay: `${index * 300}ms` }">
             {{ tile.letter }}
           </div>
@@ -238,7 +272,12 @@ function genResultGrid() {
         </div>
       </div>
     </div>
-    <Keyboard class="keyboard" @key="onKey" :letter-states="letterStates" :language="currentLanguage" />
+    <Keyboard
+      class="keyboard"
+      @key="onKey"
+      :letter-states="letterStates"
+      :language="currentLanguage"
+    />
   </div>
 </template>
 

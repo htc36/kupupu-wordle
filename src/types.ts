@@ -11,10 +11,14 @@ export interface Board {
 export interface GameState {
   solution: string;
   lastCompleted: string | null;
-  isGameFinished: Boolean;
+  isGameFinished: boolean;
   board: Board[][];
   letterState: Record<string, LetterState>;
   currentRowIndex: number;
+}
+export interface GameSettings {
+  shouldPlaySound: boolean;
+  shouldShowImage: boolean;
 }
 export interface AllGameStats {
   currentStreak: number;
