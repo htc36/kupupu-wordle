@@ -1,7 +1,19 @@
 <script setup lang="ts">
 import Switch from '../utils/Switch.vue';
+import { ref } from 'vue';
+import { GameSettings } from '../types';
+import { setGameSettings, getGameSettings } from '../helpers/localStorage';
+const settings = ref<GameSettings>(getGameSettings());
+const toggleSwitch = (settingName: keyof GameSettings) => {
+  settings.value[settingName] = !settings.value[settingName];
+  const existingSettings = getGameSettings();
+  const settingsToSave = {
+    ...existingSettings,
+    ...{ [settingName]: settings.value[settingName] },
+  };
+  setGameSettings(settingsToSave);
+};
 </script>
-
 <template>
   <div class="sections">
     <h1>Settings</h1>
@@ -12,7 +24,11 @@ import Switch from '../utils/Switch.vue';
         </div>
         <div class="control">
           <!-- <game-switch id="dark-theme" name="dark-theme"></game-switch> -->
-          <Switch checked></Switch>
+          <Switch
+            setting-name="shouldPlaySound"
+            :toggleSwitch="toggleSwitch"
+            :isChecked="settings.shouldPlaySound"
+          />
         </div>
       </div>
       <div class="setting">
@@ -20,15 +36,11 @@ import Switch from '../utils/Switch.vue';
           <div class="title">Show Image</div>
         </div>
         <div class="control">
-          <Switch></Switch>
-        </div>
-      </div>
-      <div class="setting">
-        <div class="text">
-          <div class="title">Play Sound</div>
-        </div>
-        <div class="control">
-          <Switch></Switch>
+          <Switch
+            setting-name="shouldShowImage"
+            :toggleSwitch="toggleSwitch"
+            :isChecked="settings.shouldShowImage"
+          />
         </div>
       </div>
     </section>
@@ -51,7 +63,12 @@ import Switch from '../utils/Switch.vue';
           <div class="title">Community</div>
         </div>
         <div class="control">
-          <a href="https://twitter.com/NYTGames" target="blank" title="@NYTGames">Twitter</a>
+          <a
+            href="https://twitter.com/NYTGames"
+            target="blank"
+            title="@NYTGames"
+            >Twitter</a
+          >
         </div>
       </div>
       <div class="setting">
@@ -59,7 +76,9 @@ import Switch from '../utils/Switch.vue';
           <div class="title">Questions?</div>
         </div>
         <div class="control">
-          <a href="https://help.nytimes.com/hc/en-us/articles/360029050872-Word-Games-and-Logic-Puzzles#h_01FVGCB2Z00ZQMDMCYWBPWJNXB" target="blank"
+          <a
+            href="https://help.nytimes.com/hc/en-us/articles/360029050872-Word-Games-and-Logic-Puzzles#h_01FVGCB2Z00ZQMDMCYWBPWJNXB"
+            target="blank"
             >FAQ</a
           >
         </div>
@@ -75,6 +94,7 @@ export default {
   data() {
     return {
       isOpen: false,
+      isChecked: true,
     };
   },
   methods: {
@@ -83,6 +103,9 @@ export default {
     },
     open(): void {
       this.isOpen = true;
+    },
+    toggleSwitch(): void {
+      this.isChecked = !this.isChecked;
     },
   },
 };

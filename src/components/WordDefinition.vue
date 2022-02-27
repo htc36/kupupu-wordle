@@ -1,13 +1,24 @@
 <script setup lang="ts">
-defineProps<{
+import { ref } from 'vue';
+import { assetMapping } from '../helpers/assetMapping';
+import { getGameSettings } from '../helpers/localStorage';
+const props = defineProps<{
   word: string;
 }>();
+const gameSettings = ref(getGameSettings());
+const wordAssets = ref(assetMapping[props.word]);
+function openLesson() {
+  window.open('https://whanau.tv/', '_blank');
+}
 </script>
 
 <template>
   <div class="container">
-    <img :src="`/assets/${wordAssets.image}`" />
-    <figure>
+    <img
+      v-show="gameSettings.shouldShowImage"
+      :src="`/assets/${wordAssets.image}`"
+    />
+    <figure v-show="gameSettings.shouldPlaySound">
       <audio controls :src="`/assets/${wordAssets.sound}`">
         Your browser does not support the
         <code>audio</code> element.
@@ -20,24 +31,6 @@ defineProps<{
   </div>
 </template>
 
-<script lang="ts">
-import { assetMapping } from '../helpers/assetMapping';
-export default {
-  //   expose: ['isOpen', 'close', 'open'],
-  props: ['word'],
-  data() {
-    return {
-      wordAssets: assetMapping[this.word],
-    };
-  },
-  methods: {
-    openLesson() {
-      window.open('https://whanau.tv/', '_blank');
-    },
-  },
-  mounted() {},
-};
-</script>
 <style scoped>
 .container {
   color: black;
