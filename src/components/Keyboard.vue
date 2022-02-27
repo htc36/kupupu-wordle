@@ -11,9 +11,9 @@ defineEmits<{
 }>();
 const englishKeys = ['qwertyuiop'.split(''), 'asdfghjkl'.split(''), ['Enter', ...'zxcvbnm'.split(''), 'Backspace']];
 const maoriKeys = [
-  ['a', 'ā', 'e', 'ē', 'h', 'i', 'ī'],
-  ['k', 'm', 'n', 'g', 'o', 'ō', 'p', 'r'],
-  ['Enter', 't', 'u', 'ū', 'w', 'q', 'Backspace'],
+  ['a', 'ā', 'e', 'ē', 'i', 'ī', 'o'],
+  ['ō', 'u', 'ū', 'g', 'h', 'k', 'm'],
+  ['Enter', 'n', 'p', 'r', 't', 'w', 'Backspace'],
 ];
 function getKeyboard(language: string) {
   return language === 'maori' ? maoriKeys : englishKeys;
