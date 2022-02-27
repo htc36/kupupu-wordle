@@ -31,7 +31,6 @@ function openLesson() {
   </div>
 </template>
 
-<script lang="ts"></script>
 <style scoped>
 .container {
   color: black;

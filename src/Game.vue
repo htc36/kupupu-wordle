@@ -9,7 +9,6 @@ import {
   setGameSettings,
 } from './helpers/localStorage';
 import { defaultGameSettings } from './helpers/localStorage';
-
 import Keyboard from './components/Keyboard.vue';
 import { LetterState, Board, GameState } from './types';
 import getSuggestion from './helpers/suggestion';
