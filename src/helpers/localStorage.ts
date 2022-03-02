@@ -1,35 +1,5 @@
-import { LetterState } from './types';
-export interface Board {
-  letter: string;
-  state: LetterState;
-}
-export interface GameState {
-  solution: string;
-  lastCompleted: string | null;
-  isGameFinished: Boolean;
-  board: Board[][];
-  letterState: Record<string, LetterState>;
-  currentRowIndex: number;
-}
-interface AllGameStats {
-  currentStreak: number;
-  maxStreak: number;
-  guesses: Guesses;
-  gamesPlayed: number;
-  gamesWon: number;
-  averageGuesses: number;
-}
-export interface Guesses {
-  [key: string]: number;
-  1: number;
-  2: number;
-  3: number;
-  4: number;
-  5: number;
-  6: number;
-  F: number;
-}
-
+import { LetterState } from '../types';
+import { AllGameStats, GameState, GameSettings } from '../types';
 const defaultStats: AllGameStats = {
   currentStreak: 0,
   maxStreak: 0,
@@ -38,16 +8,23 @@ const defaultStats: AllGameStats = {
   gamesWon: 0,
   averageGuesses: 0,
 };
-function getStats(): AllGameStats {
+export const defaultGameSettings: GameSettings = {
+  shouldPlaySound: true,
+  shouldShowImage: true,
+};
+export function getStats(): AllGameStats {
   const statsString = window.localStorage.getItem('wordleStats');
   return statsString ? JSON.parse(statsString) : defaultStats;
 }
-function setStats(statsObj: AllGameStats, guessLine: number) {
+export function setStats(statsObj: AllGameStats, guessLine: number) {
   if (guessLine < 5) {
     console.log('Has won the game');
     statsObj.currentStreak += 1;
     statsObj.guesses[guessLine + 1] += 1;
-    statsObj.maxStreak = statsObj.maxStreak < statsObj.currentStreak ? statsObj.currentStreak : statsObj.maxStreak;
+    statsObj.maxStreak =
+      statsObj.maxStreak < statsObj.currentStreak
+        ? statsObj.currentStreak
+        : statsObj.maxStreak;
     statsObj.gamesWon += 1;
   } else {
     statsObj.currentStreak = 0;
@@ -58,16 +35,20 @@ function setStats(statsObj: AllGameStats, guessLine: number) {
   window.localStorage.setItem('wordleStats', JSON.stringify(statsObj));
 }
 
-function getGameState(solution: string) {
-  const existingGameState: GameState = JSON.parse(window.localStorage.getItem('gameState') as string);
+export function getGameState(solution: string) {
+  const existingGameState: GameState = JSON.parse(
+    window.localStorage.getItem('gameState') as string
+  );
   if (existingGameState && existingGameState.solution === solution) {
-    return JSON.parse(window.localStorage.getItem('gameState') as string) as GameState;
+    return JSON.parse(
+      window.localStorage.getItem('gameState') as string
+    ) as GameState;
   }
   const defaultBoard = Array.from({ length: 6 }, () =>
     Array.from({ length: 5 }, () => ({
       letter: '',
       state: LetterState.INITIAL,
-    })),
+    }))
   );
   const gameState: GameState = {
     solution: solution,
@@ -80,7 +61,17 @@ function getGameState(solution: string) {
   return gameState;
 }
 
-function setGameState(gameState: GameState) {
+export function setGameSettings(gameSettingsObj: GameSettings) {
+  window.localStorage.setItem('gameSettings', JSON.stringify(gameSettingsObj));
+}
+
+export function getGameSettings() {
+  const existingSettings = JSON.parse(
+    window.localStorage.getItem('gameSettings') as string
+  );
+  if (!existingSettings) return defaultGameSettings;
+  return existingSettings;
+}
+export function setGameState(gameState: GameState) {
   window.localStorage.setItem('gameState', JSON.stringify(gameState));
 }
-export { getStats, setStats, getGameState, AllGameStats, setGameState };

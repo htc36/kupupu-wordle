@@ -1,40 +1,44 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
 import { getWordOfTheDay, getAllWords } from './words';
-import { getStats, setStats, AllGameStats, getGameState, Board, GameState, setGameState } from './getStatistics';
-import Keyboard from './Keyboard.vue';
-import { LetterState } from './types';
-import getSuggestion from './suggestion';
-import Modal from './components/Modal.vue';
-import { ref } from 'vue';
-import WordDefinition from './components/WordDefinition.vue';
-import Statistics from './components/Statistics.vue';
-import Settings from './components/Settings.vue';
+import {
+  getStats,
+  setStats,
+  getGameState,
+  setGameState,
+  setGameSettings,
+} from './helpers/localStorage';
+import { defaultGameSettings } from './helpers/localStorage';
+import Keyboard from './components/Keyboard.vue';
+import { LetterState, Board, GameState } from './types';
+import getSuggestion from './helpers/suggestion';
+import { ref, onMounted } from 'vue';
+import Navbar from './components/Navbar.vue';
 // Get word of the day
 const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
 const answer = getWordOfTheDay(currentLanguage);
 const stats = getStats();
+
 // Board state. Each tile is represented as { letter, state }
 const gameState: GameState = $ref(getGameState(answer));
-
 const board: Board[][] = $ref(gameState.board);
 const letterStates: Record<string, LetterState> = $ref(gameState.letterState);
-
 // Current active row.
 let currentRowIndex = $ref(gameState.currentRowIndex);
 const currentRow = $computed(() => board[currentRowIndex]);
 
-// Define Modals
-const statsModal = ref<InstanceType<typeof Modal> | null>(null);
-const settingsModal = ref<InstanceType<typeof Modal> | null>(null);
-const wordDefinitionModal = ref<InstanceType<typeof Modal> | null>(null);
-// let statsModal = $ref();
+const navbar = ref<InstanceType<typeof Navbar> | null>(null);
 let message = $ref('');
 let grid = $ref('');
 let shakeRowIndex = $ref(-1);
 let success = $ref(false);
-
+onMounted(() => {
+  const existingSettings = JSON.parse(
+    window.localStorage.getItem('gameSettings') as string
+  );
+  if (!existingSettings) setGameSettings(defaultGameSettings);
+});
 // Handle keyboard input.
 let allowInput = true;
 
@@ -46,6 +50,10 @@ onUnmounted(() => {
   window.removeEventListener('keyup', onKeyup);
 });
 
+/**
+ * Handles when the user either clicks on a letter or types one in
+ * @param key
+ */
 function onKey(key: string) {
   if (!allowInput) return;
   if (key === 'Backspace') {
@@ -77,83 +85,117 @@ function clearTile() {
   }
 }
 
+/**
+ * Mark correct/present/absent rows
+ * @param tile current board tile
+ * @param answerLetters a list of the answer letters, if its null, its already correct
+ * @param index coloumn index of the current row
+ */
+function markCorrectRows(
+  tile: Board,
+  answerLetters: (string | null)[],
+  index: number
+) {
+  if (answerLetters[index] === tile.letter) {
+    tile.state = letterStates[tile.letter] = LetterState.CORRECT;
+    answerLetters[index] = null;
+  }
+}
+function markPresentRows(tile: Board, answerLetters: (string | null)[]) {
+  if (!tile.state && answerLetters.includes(tile.letter)) {
+    tile.state = LetterState.PRESENT;
+    answerLetters[answerLetters.indexOf(tile.letter)] = null;
+    if (!letterStates[tile.letter]) {
+      letterStates[tile.letter] = LetterState.PRESENT;
+    }
+  }
+}
+function markAbsentRows(tile: Board) {
+  if (!tile.state) {
+    tile.state = LetterState.ABSENT;
+    if (!letterStates[tile.letter]) {
+      letterStates[tile.letter] = LetterState.ABSENT;
+    }
+  }
+}
+
+/**
+ * Checks if the word is part of the main word list
+ * @returns boolean weather or not word is valid
+ */
+function isValidWord() {
+  const guess = currentRow.map((tile) => tile.letter).join('');
+  if (!allWords.includes(guess) && guess !== answer) {
+    shake();
+    let guesses = board.map((item) => {
+      return item.map((letterObj) => letterObj.letter).join('');
+    });
+    const suggestion = getSuggestion(
+      answer,
+      guesses,
+      currentRowIndex,
+      allWords
+    );
+    showMessage(`Not in word list try ${suggestion}`, 2000);
+    return false;
+  }
+  return true;
+}
+
 function completeRow() {
-  if (currentRow.every((tile) => tile.letter)) {
-    const guess = currentRow.map((tile) => tile.letter).join('');
-    console.log(guess);
-    console.log(allWords.includes(guess));
-    if (!allWords.includes(guess) && guess !== answer) {
-      shake();
-      let guesses = board.map((item) => {
-        return item.map((letterObj) => letterObj.letter).join('');
-      });
-      const suggestion = getSuggestion(answer, guesses, currentRowIndex, allWords);
-      showMessage(`Not in word list try ${suggestion}`, 2000);
-      return;
-    }
-
-    const answerLetters: (string | null)[] = answer.split('');
-    // first pass: mark correct ones
-    currentRow.forEach((tile, i) => {
-      if (answerLetters[i] === tile.letter) {
-        tile.state = letterStates[tile.letter] = LetterState.CORRECT;
-        answerLetters[i] = null;
-      }
-    });
-    // second pass: mark the present
-    currentRow.forEach((tile) => {
-      if (!tile.state && answerLetters.includes(tile.letter)) {
-        tile.state = LetterState.PRESENT;
-        answerLetters[answerLetters.indexOf(tile.letter)] = null;
-        if (!letterStates[tile.letter]) {
-          letterStates[tile.letter] = LetterState.PRESENT;
-        }
-      }
-    });
-    // 3rd pass: mark absent
-    currentRow.forEach((tile) => {
-      if (!tile.state) {
-        tile.state = LetterState.ABSENT;
-        if (!letterStates[tile.letter]) {
-          letterStates[tile.letter] = LetterState.ABSENT;
-        }
-      }
-    });
-
-    allowInput = false;
-    if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
-      setStats(stats, currentRowIndex);
-      gameState.isGameFinished = true;
-      // yay!
-      setTimeout(() => {
-        grid = genResultGrid();
-        showMessage(['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][currentRowIndex], 1000);
-        success = true;
-        wordDefinitionModal.value?.open();
-      }, 1600);
-    } else if (currentRowIndex < board.length - 1) {
-      // go the next row
-      currentRowIndex++;
-      setTimeout(() => {
-        allowInput = true;
-      }, 1600);
-    } else {
-      setStats(stats, currentRowIndex);
-      statsModal.value?.open();
-      gameState.isGameFinished = true;
-      // game over :(
-      setTimeout(() => {
-        showMessage(answer.toUpperCase(), 2000);
-      }, 1600);
-    }
-    gameState.board = board;
-    gameState.currentRowIndex = currentRowIndex;
-    gameState.letterState = letterStates;
-    setGameState(gameState);
-  } else {
+  if (!currentRow.every((tile) => tile.letter)) {
+    // The row is not filled out
     shake();
     showMessage('Not enough letters');
+    return;
   }
+  if (!isValidWord()) return;
+
+  let answerLetters: (string | null)[] = answer.split('');
+
+  // Mark correct/present/absent letters
+  currentRow.forEach((tile, i) => {
+    markCorrectRows(tile, answerLetters, i);
+    markPresentRows(tile, answerLetters);
+    markAbsentRows(tile);
+  });
+
+  allowInput = false;
+  if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
+    setStats(stats, currentRowIndex);
+    gameState.isGameFinished = true;
+    // yay!
+    setTimeout(() => {
+      grid = genResultGrid();
+      showMessage(
+        ['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][
+          currentRowIndex
+        ],
+        1000
+      );
+      success = true;
+      navbar.value?.toggleWordDefModal(true);
+      // wordDefinitionModal.value?.open();
+    }, 1600);
+  } else if (currentRowIndex < board.length - 1) {
+    // go the next row
+    currentRowIndex++;
+    setTimeout(() => {
+      allowInput = true;
+    }, 1600);
+  } else {
+    setStats(stats, currentRowIndex);
+    navbar.value?.toggleWordDefModal(true);
+    gameState.isGameFinished = true;
+    // game over :(
+    setTimeout(() => {
+      showMessage(answer.toUpperCase(), 2000);
+    }, 1600);
+  }
+  gameState.board = board;
+  gameState.currentRowIndex = currentRowIndex;
+  gameState.letterState = letterStates;
+  setGameState(gameState);
 }
 
 function showMessage(msg: string, time = 1000) {
@@ -187,10 +229,6 @@ function genResultGrid() {
     })
     .join('\n');
 }
-function wordDefHasSelectedNext() {
-  wordDefinitionModal.value?.close();
-  statsModal.value?.open();
-}
 </script>
 
 <template>
@@ -202,52 +240,22 @@ function wordDefHasSelectedNext() {
   </Transition>
 
   <div class="gameWrapper">
-    <Modal ref="settingsModal" height="100%" width="100%" boxShadow="0 0px">
-      <Settings />
-    </Modal>
-
-    <Modal ref="statsModal">
-      <Statistics :stats="stats" />
-    </Modal>
-
-    <Modal ref="wordDefinitionModal">
-      <WordDefinition :word="gameState.solution" @hasSelectedNext="wordDefHasSelectedNext()" />
-    </Modal>
-    <header>
-      <div style="">
-        <!-- <a id="source-link" href="https://github.com/yyx990803/vue-wordle" target="_blank">Source</a> -->
-        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-          <path
-            fill="var(--color-tone-3)"
-            d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"
-          ></path>
-        </svg>
-      </div>
-      <h1 class="title">kupupu</h1>
-      <div style="">
-        <!-- <a id="source-link" href="https://github.com/yyx990803/vue-wordle" target="_blank">Source</a> -->
-        <button class="navbarButton" @click="() => statsModal?.open()">
-          <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
-            <path fill="var(--color-tone-3)" d="M16,11V3H8v6H2v12h20V11H16z M10,5h4v14h-4V5z M4,11h4v8H4V11z M20,19h-4v-6h4V19z"></path>
-          </svg>
-        </button>
-        <button class="navbarButton" style="margin-left: 2px">
-          <svg xmlns="http://www.w3.org/2000/svg" @click="() => settingsModal?.open()" height="24" viewBox="0 0 24 24" width="24">
-            <path
-              fill="var(--color-tone-3)"
-              d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
-            ></path>
-          </svg>
-        </button>
-      </div>
-    </header>
+    <Navbar ref="navbar" :gameState="gameState" :stats="stats" />
     <div id="board">
       <div
         v-for="(row, index) in board"
-        :class="['row', shakeRowIndex === index && 'shake', success && currentRowIndex === index && 'jump']"
+        :class="[
+          'row',
+          shakeRowIndex === index && 'shake',
+          success && currentRowIndex === index && 'jump',
+        ]"
         v-bind:key="row[0].letter + row[1].letter"
       >
-        <div v-for="(tile, index) in row" :class="['tile', tile.letter && 'filled', tile.state && 'revealed']" v-bind:key="tile.letter">
+        <div
+          v-for="(tile, index) in row"
+          :class="['tile', tile.letter && 'filled', tile.state && 'revealed']"
+          v-bind:key="tile.letter"
+        >
           <div class="front" :style="{ transitionDelay: `${index * 300}ms` }">
             {{ tile.letter }}
           </div>
@@ -263,7 +271,12 @@ function wordDefHasSelectedNext() {
         </div>
       </div>
     </div>
-    <Keyboard class="keyboard" @key="onKey" :letter-states="letterStates" :language="currentLanguage" />
+    <Keyboard
+      class="keyboard"
+      @key="onKey"
+      :letter-states="letterStates"
+      :language="currentLanguage"
+    />
   </div>
 </template>
 
@@ -276,29 +289,6 @@ function wordDefHasSelectedNext() {
 .gameWrapper {
   position: relative;
   height: 100vh;
-}
-.navbarButton {
-  background-color: transparent;
-  border: 0px;
-  cursor: pointer;
-}
-header {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.title {
-  text-transform: none;
-  font-weight: 700;
-  font-size: 36px;
-  letter-spacing: 0.2rem;
-  text-align: center;
-  position: absolute;
-  left: 0;
-  right: 0;
-  pointer-events: none;
 }
 #board {
   display: grid;

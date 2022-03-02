@@ -1,13 +1,18 @@
 <script setup lang="ts">
+import { GameSettings } from '../types';
 const props = defineProps<{
-  checked?: boolean;
+  settingName: keyof GameSettings;
+  toggleSwitch: (whichSwitch: keyof GameSettings) => void;
+  isChecked: boolean;
 }>();
-// const propRef = $ref(props);
 </script>
 <template>
   <div class="container">
-    <label><slot></slot></label>
-    <div :class="{ checked: checked, switch: true }">
+    <div
+      @click="props.toggleSwitch(props.settingName)"
+      class="switch"
+      :class="{ checked: props.isChecked }"
+    >
       <span class="knob"></span>
     </div>
   </div>
@@ -16,11 +21,11 @@ const props = defineProps<{
 .container {
   display: flex;
   justify-content: space-between;
+  cursor: pointer;
 }
 .switch {
   height: 20px;
   width: 32px;
-  vertical-align: middle;
   /* not quite right */
   background: var(--color-tone-3);
   border-radius: 999px;
@@ -42,7 +47,7 @@ const props = defineProps<{
 .switch.checked {
   background: var(--color-correct);
 }
-.knob checked {
+.switch.checked > .knob {
   transform: translateX(calc(100% - 4px));
 }
 .switch disabled {

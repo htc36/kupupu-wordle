@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AllGameStats, Guesses } from '../getStatistics';
+import { AllGameStats, Guesses } from '../types';
 defineProps<{
   stats: AllGameStats;
 }>();
@@ -16,7 +16,13 @@ defineProps<{
       </div>
 
       <div class="statistic-container">
-        <div class="statistic">{{ stats.gamesPlayed === 0 ? 0 : ((stats.gamesWon / stats.gamesPlayed) * 100).toFixed(0) }}</div>
+        <div class="statistic">
+          {{
+            stats.gamesPlayed === 0
+              ? 0
+              : ((stats.gamesWon / stats.gamesPlayed) * 100).toFixed(0)
+          }}
+        </div>
         <div class="label">Win %</div>
       </div>
 
@@ -32,11 +38,18 @@ defineProps<{
     </div>
     <h1>Guess Distribution</h1>
     <div id="guess-distribution">
-      <div v-for="(amount, guessNum) in stats.guesses" class="graph-container" v-bind:key="guessNum">
+      <div
+        v-for="(amount, guessNum) in stats.guesses"
+        class="graph-container"
+        v-bind:key="guessNum"
+      >
         <div class="guess">{{ guessNum }}</div>
         <div class="graph">
           <!-- <div class="graph-bar" :style="`width: ${getWidth(stats.guess, guessNum, amount)}%`"> -->
-          <div class="graph-bar" :style="`width: ${getWidth(stats.guesses, amount)}`">
+          <div
+            class="graph-bar"
+            :style="`width: ${getWidth(stats.guesses, amount)}`"
+          >
             <div class="num-guesses">{{ amount }}</div>
           </div>
         </div>
@@ -47,7 +60,11 @@ defineProps<{
         <h1>Next WORDLE</h1>
         <div id="timer">
           <div class="statistic-container">
-            <div class="statistic timer">{{ `${timeToNextGame.hours}:${timeToNextGame.minutes}:${timeToNextGame.seconds}` }}</div>
+            <div class="statistic timer">
+              {{
+                `${timeToNextGame.hours}:${timeToNextGame.minutes}:${timeToNextGame.seconds}`
+              }}
+            </div>
           </div>
         </div>
       </div>
@@ -77,7 +94,6 @@ export default {
       const percentage = (guessAmount / topAmount) * 100;
       return percentage.toString() + '%';
     },
-    getTimeLeft() {},
 
     getTimeToNextGame() {
       const epochMs = new Date('January 1, 2022 00:00:00').valueOf();
@@ -93,19 +109,24 @@ export default {
       var distance = nextday - now;
 
       // Time calculations for days, hours, minutes and seconds
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString();
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString();
+      const hours = Math.floor(
+        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      ).toString();
+      const minutes = Math.floor(
+        (distance % (1000 * 60 * 60)) / (1000 * 60)
+      ).toString();
       const seconds = Math.floor((distance % (1000 * 60)) / 1000).toString();
       this.timeToNextGame.hours = hours.length === 1 ? '0' + hours : hours;
-      this.timeToNextGame.minutes = minutes.length === 1 ? '0' + minutes : minutes;
-      this.timeToNextGame.seconds = seconds.length === 1 ? '0' + seconds : seconds;
+      this.timeToNextGame.minutes =
+        minutes.length === 1 ? '0' + minutes : minutes;
+      this.timeToNextGame.seconds =
+        seconds.length === 1 ? '0' + seconds : seconds;
     },
   },
   mounted() {
-    const self = this;
-    self.getTimeToNextGame();
-    setInterval(function () {
-      self.getTimeToNextGame();
+    this.getTimeToNextGame();
+    setInterval(() => {
+      this.getTimeToNextGame();
     }, 1000);
   },
 };
