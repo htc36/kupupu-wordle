@@ -13,6 +13,7 @@ export const defaultGameSettings: GameSettings = {
   shouldShowImage: true,
 };
 export function getStats(): AllGameStats {
+  console.log('got stats');
   const statsString = window.localStorage.getItem('wordleStats');
   return statsString ? JSON.parse(statsString) : defaultStats;
 }

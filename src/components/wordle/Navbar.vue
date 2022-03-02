@@ -3,7 +3,7 @@ import Modal from './Modal.vue';
 import GameSettings from './GameSettings.vue';
 import WordDefinition from './WordDefinition.vue';
 import Statistics from './GameStatistics.vue';
-import { AllGameStats, GameState } from '../types';
+import { AllGameStats, GameState } from '../../types';
 import { ref } from 'vue';
 
 defineProps<{
@@ -65,7 +65,7 @@ defineExpose({
     <h1 class="title">kupupu</h1>
     <div style="">
       <!-- <a id="source-link" href="https://github.com/yyx990803/vue-wordle" target="_blank">Source</a> -->
-      <button class="navbarButton" @click="() => statsModal?.open()">
+      <button class="navbarButton" @click="() => toggleStats(true)">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="24"

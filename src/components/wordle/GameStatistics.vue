@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AllGameStats, Guesses } from '../types';
+import { AllGameStats, Guesses } from '../../types';
 defineProps<{
   stats: AllGameStats;
 }>();

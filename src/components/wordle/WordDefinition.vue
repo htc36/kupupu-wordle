@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { assetMapping } from '../helpers/assetMapping';
-import { getGameSettings } from '../helpers/localStorage';
+import { assetMapping } from '../../helpers/assetMapping';
+import { getGameSettings } from '../../helpers/localStorage';
 const props = defineProps<{
   word: string;
 }>();

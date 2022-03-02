@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import Game from './Game.vue';
+import App from './App.vue';
 import './globalStyles.css';
 
 // resize for scaling the board size
@@ -12,4 +12,4 @@ function onResize() {
   // document.body.style.setProperty('--vh', window.innerHeight + 'px')
 }
 
-createApp(Game).mount('#app');
+createApp(App).mount('#app');

@@ -9,11 +9,11 @@ import {
   setGameSettings,
 } from './helpers/localStorage';
 import { defaultGameSettings } from './helpers/localStorage';
-import Keyboard from './components/Keyboard.vue';
+import Keyboard from './components/wordle/Keyboard.vue';
 import { LetterState, Board, GameState } from './types';
 import getSuggestion from './helpers/suggestion';
 import { ref, onMounted } from 'vue';
-import Navbar from './components/Navbar.vue';
+import Navbar from './components/wordle/Navbar.vue';
 // Get word of the day
 const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
@@ -27,6 +27,8 @@ const letterStates: Record<string, LetterState> = $ref(gameState.letterState);
 // Current active row.
 let currentRowIndex = $ref(gameState.currentRowIndex);
 const currentRow = $computed(() => board[currentRowIndex]);
+
+const emit = defineEmits(['setStats']);
 
 const navbar = ref<InstanceType<typeof Navbar> | null>(null);
 let message = $ref('');
@@ -161,6 +163,7 @@ function completeRow() {
   });
 
   allowInput = false;
+  console.log(answer);
   if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
     setStats(stats, currentRowIndex);
     gameState.isGameFinished = true;
