@@ -10,8 +10,8 @@ export const cards: CardObj[] = [
     answer: 'whare',
   },
   {
-    sound: '00080 rākau - tree 01.mp3',
-    image: '00080 rākau - tree 01.png',
+    sound: '00080 rakau - tree 01.mp3',
+    image: '00080 rakau - tree 01.png',
     answer: 'rākau',
   },
   {
@@ -25,8 +25,8 @@ export const cards: CardObj[] = [
     answer: 'moana',
   },
   {
-    sound: '00133 hōiho - horse 01.mp3',
-    image: '00133 hōiho - horse 01.png',
+    sound: '00133 hoiho - horse 01.mp3',
+    image: '00133 hoiho - horse 01.png',
     answer: 'hōiho',
   },
   {
