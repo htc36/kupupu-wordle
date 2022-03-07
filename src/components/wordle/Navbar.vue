@@ -1,35 +1,32 @@
 <script setup lang="ts">
 import Modal from './Modal.vue';
 import GameSettings from './GameSettings.vue';
-import WordDefinition from './WordDefinition.vue';
 import Statistics from './GameStatistics.vue';
-import { AllGameStats, GameState } from '../../types';
+import { AllGameStats } from '../../types';
 import { ref } from 'vue';
 
 defineProps<{
   stats: AllGameStats;
-  gameState: GameState;
 }>();
 
 const statsModal = ref<InstanceType<typeof Modal> | null>(null);
 const settingsModal = ref<InstanceType<typeof Modal> | null>(null);
-const wordDefinitionModal = ref<InstanceType<typeof Modal> | null>(null);
 
 function wordDefHasSelectedNext() {
-  wordDefinitionModal.value?.close();
+  // wordDefinitionModal.value?.close();
   statsModal.value?.open();
 }
 function toggleStats(shouldOpen: boolean) {
   shouldOpen ? statsModal.value?.open() : statsModal.value?.close();
 }
-function toggleWordDefModal(shouldOpen: boolean) {
-  shouldOpen
-    ? wordDefinitionModal.value?.open()
-    : wordDefinitionModal.value?.close();
-}
+// function toggleWordDefModal(shouldOpen: boolean) {
+//   shouldOpen
+//     ? wordDefinitionModal.value?.open()
+//     : wordDefinitionModal.value?.close();
+// }
 defineExpose({
   toggleStats,
-  toggleWordDefModal,
+  wordDefHasSelectedNext,
 });
 </script>
 <template>
@@ -41,12 +38,6 @@ defineExpose({
     <Statistics :stats="stats" />
   </Modal>
 
-  <Modal ref="wordDefinitionModal">
-    <WordDefinition
-      :word="gameState.solution"
-      @hasSelectedNext="wordDefHasSelectedNext()"
-    />
-  </Modal>
   <header>
     <div style="">
       <!-- <a id="source-link" href="https://github.com/yyx990803/vue-wordle" target="_blank">Source</a> -->

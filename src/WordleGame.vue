@@ -8,6 +8,8 @@ import {
   setGameState,
   setGameSettings,
 } from './helpers/localStorage';
+import Modal from './components/wordle/Modal.vue';
+import WordDefinition from './components/wordle/WordDefinition.vue';
 import { defaultGameSettings } from './helpers/localStorage';
 import Keyboard from './components/wordle/Keyboard.vue';
 import { LetterState, Board, GameState } from './types';
@@ -30,6 +32,7 @@ const currentRow = $computed(() => board[currentRowIndex]);
 
 const emit = defineEmits(['setStats']);
 
+const wordDefinitionModal = ref<InstanceType<typeof Modal> | null>(null);
 const navbar = ref<InstanceType<typeof Navbar> | null>(null);
 let message = $ref('');
 let grid = $ref('');
@@ -98,6 +101,7 @@ function markCorrectRows(
   answerLetters: (string | null)[],
   index: number
 ) {
+  console.log(answerLetters);
   if (answerLetters[index] === tile.letter) {
     tile.state = letterStates[tile.letter] = LetterState.CORRECT;
     answerLetters[index] = null;
@@ -161,6 +165,7 @@ function completeRow() {
     markPresentRows(tile, answerLetters);
     markAbsentRows(tile);
   });
+  wordDefinitionModal.value?.open();
 
   allowInput = false;
   console.log(answer);
@@ -177,8 +182,7 @@ function completeRow() {
         1000
       );
       success = true;
-      navbar.value?.toggleWordDefModal(true);
-      // wordDefinitionModal.value?.open();
+      wordDefinitionModal.value?.open();
     }, 1600);
   } else if (currentRowIndex < board.length - 1) {
     // go the next row
@@ -188,7 +192,8 @@ function completeRow() {
     }, 1600);
   } else {
     setStats(stats, currentRowIndex);
-    navbar.value?.toggleWordDefModal(true);
+    // navbar.value?.toggleWordDefModal(true);
+    wordDefinitionModal.value?.open();
     gameState.isGameFinished = true;
     // game over :(
     setTimeout(() => {
@@ -235,15 +240,25 @@ function genResultGrid() {
 </script>
 
 <template>
-  <Transition>
-    <div class="message" v-if="message">
-      {{ message }}
-      <pre v-if="grid">{{ grid }}</pre>
-    </div>
-  </Transition>
-
-  <div class="gameWrapper">
-    <Navbar ref="navbar" :gameState="gameState" :stats="stats" />
+  <div>
+    <Transition>
+      <div class="message" v-if="message">
+        {{ message }}
+        <pre v-if="grid">{{ grid }}</pre>
+      </div>
+    </Transition>
+    <Modal ref="wordDefinitionModal">
+      <WordDefinition
+        :word="gameState.solution"
+        @hasSelectedNext="
+          () => {
+            wordDefinitionModal?.close();
+            navbar?.wordDefHasSelectedNext();
+          }
+        "
+      />
+    </Modal>
+    <Navbar ref="navbar" :stats="stats" />
     <div id="board">
       <div
         v-for="(row, index) in board"

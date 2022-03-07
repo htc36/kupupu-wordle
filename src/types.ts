@@ -4,6 +4,12 @@ export const enum LetterState {
   PRESENT = 'present',
   ABSENT = 'absent',
 }
+export interface CardObj {
+  sound?: string;
+  image?: string;
+  answer: string;
+  index?: number;
+}
 export interface Board {
   letter: string;
   state: LetterState;
