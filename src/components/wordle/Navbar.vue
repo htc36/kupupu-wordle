@@ -88,11 +88,14 @@ defineExpose({
 </template>
 <style scoped>
 header {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  /* padding-top: 10px; */
+  /* padding-bottom: 10px; */
+  padding-left: 5px;
+  padding-right: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 5%;
 }
 .title {
   text-transform: none;

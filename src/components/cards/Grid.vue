@@ -71,7 +71,7 @@ function cardClosed(index: number) {
       :answer="card.answer"
       :pictureQuestion="card.image"
       :index="index"
-      style="margin-bottom: 10px"
+      style=""
       @cardOpened="(index) => cardOpened(index)"
       @cardClosed="(index) => cardClosed(index)"
     >
@@ -80,9 +80,11 @@ function cardClosed(index: number) {
 </template>
 <style scoped>
 .gridWrapper {
+  margin-top: 4%;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-around;
+  height: 92%;
 }
 </style>

@@ -68,10 +68,11 @@ img {
   cursor: pointer;
   border-radius: 5px;
   color: #9f2975;
-  width: 200px;
-  height: 180px;
+  width: 45%;
+  height: 19%;
 }
 .flipper {
+  height: 100%;
   font-family: 'Calibri', sans-serif;
   text-align: center;
   cursor: pointer;
@@ -80,6 +81,7 @@ img {
   -webkit-transition: 0.5s;
 }
 .front {
+  height: 100%;
   font-size: 25px;
   display: flex;
   align-items: center;
@@ -96,10 +98,10 @@ img {
   background-color: #ff5e5b;
   z-index: 2;
   transform: rotateY(0);
-  width: 200px;
-  height: 180px;
+  width: 100%;
 }
 .back {
+  height: 100%;
   font-size: 25px;
   display: flex;
   align-items: center;
@@ -116,7 +118,6 @@ img {
   text-align: center;
   vertical-align: middle;
   transform: rotateY(180deg);
-  width: 200px;
-  height: 180px;
+  width: 100%;
 }
 </style>

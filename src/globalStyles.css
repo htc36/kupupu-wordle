@@ -18,7 +18,7 @@ h1 {
 
 header {
   border-bottom: 1px solid #ccc;
-  margin-bottom: 30px;
+  /* margin-bottom: 30px; */
   position: relative;
 }
 
