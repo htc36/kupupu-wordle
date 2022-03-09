@@ -39,7 +39,7 @@ defineExpose({
           }
         "
       >
-        <img src="/assets/card2.jpg" class="cardImage" />
+        <img src="/assets/plainBackground.jpg" class="cardImage" />
       </div>
       <div class="back">
         <div v-if="!pictureQuestion" class="backCardContent">
@@ -65,12 +65,11 @@ defineExpose({
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #9f2975;
+  color: #a11613;
 }
 .backTextCardImage {
-  width: 100%;
   height: 100%;
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 5px 15px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
   border-radius: 10px;
 }
 .backCardContent {
@@ -81,12 +80,12 @@ defineExpose({
   color: white;
 }
 .cardImage {
-  width: 100%;
   height: 100%;
+  border-radius: 10px;
 }
 .backImage {
   height: 100%;
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 5px 15px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
   border-radius: 10px;
 }
 .active {
@@ -103,7 +102,7 @@ defineExpose({
   perspective: 1000px;
   cursor: pointer;
   border-radius: 5px;
-  color: #9f2975;
+  color: #a11613;
   width: 35%;
   height: 19%;
 }
@@ -113,11 +112,12 @@ defineExpose({
   font-family: 'Calibri', sans-serif;
   text-align: center;
   cursor: pointer;
-  color: #9f2975;
+  color: #a11613;
   -webkit-transform-style: preserve-3d;
   -webkit-transition: 0.5s;
 }
 .front {
+  /* background-color: black; */
   height: 100%;
   width: 100%;
   font-size: 25px;
@@ -128,7 +128,7 @@ defineExpose({
   text-align: center;
   cursor: pointer;
   border-radius: 5px;
-  color: #9f2975;
+  color: #a11613;
   -webkit-backface-visibility: hidden;
   position: absolute;
   top: 0;
@@ -147,7 +147,7 @@ defineExpose({
   font-family: 'Calibri', sans-serif;
   cursor: pointer;
   border-radius: 5px;
-  color: #9f2975;
+  color: #a11613;
   -webkit-backface-visibility: hidden;
   position: absolute;
   top: 0;

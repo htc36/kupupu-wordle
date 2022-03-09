@@ -85,6 +85,6 @@ function cardClosed(index: number) {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-evenly;
-  height: 90%;
+  height: 82%;
 }
 </style>
