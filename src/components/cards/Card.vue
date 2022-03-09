@@ -39,19 +39,55 @@ defineExpose({
           }
         "
       >
-        <label>Kupupū</label>
+        <img src="/assets/card2.jpg" class="cardImage" />
       </div>
       <div class="back">
-        <label v-if="!pictureQuestion">{{ answer }}</label>
-        <img v-else :src="`/assets/${pictureQuestion}`" />
+        <div v-if="!pictureQuestion" class="backCardContent">
+          <img
+            class="backTextCardImage"
+            src="/assets/card_text_background.png"
+          />
+          <div class="backCardText">
+            {{ answer }}
+          </div>
+        </div>
+        <img v-else :src="`/assets/${pictureQuestion}`" class="backImage" />
       </div>
     </div>
   </div>
 </template>
 <style scoped>
-img {
+/* img {
+  height: 100%;
+} */
+.backCardText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #9f2975;
+}
+.backTextCardImage {
   width: 100%;
   height: 100%;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 5px 15px;
+  border-radius: 10px;
+}
+.backCardContent {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  text-align: center;
+  color: white;
+}
+.cardImage {
+  width: 100%;
+  height: 100%;
+}
+.backImage {
+  height: 100%;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 5px 15px;
+  border-radius: 10px;
 }
 .active {
   -moz-transform: rotateY(180deg);
@@ -68,11 +104,12 @@ img {
   cursor: pointer;
   border-radius: 5px;
   color: #9f2975;
-  width: 45%;
+  width: 35%;
   height: 19%;
 }
 .flipper {
   height: 100%;
+  width: 100%;
   font-family: 'Calibri', sans-serif;
   text-align: center;
   cursor: pointer;
@@ -82,6 +119,7 @@ img {
 }
 .front {
   height: 100%;
+  width: 100%;
   font-size: 25px;
   display: flex;
   align-items: center;
@@ -95,7 +133,7 @@ img {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: #ff5e5b;
+  /* background-color: #ff5e5b; */
   z-index: 2;
   transform: rotateY(0);
   width: 100%;
@@ -114,7 +152,7 @@ img {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: #00cecb;
+  /* background-color: #00cecb; */
   text-align: center;
   vertical-align: middle;
   transform: rotateY(180deg);

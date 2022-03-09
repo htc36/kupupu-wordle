@@ -84,7 +84,7 @@ function cardClosed(index: number) {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-around;
-  height: 92%;
+  justify-content: space-evenly;
+  height: 90%;
 }
 </style>

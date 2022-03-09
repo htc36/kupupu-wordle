@@ -95,7 +95,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 5%;
+  height: 6%;
 }
 .title {
   text-transform: none;
