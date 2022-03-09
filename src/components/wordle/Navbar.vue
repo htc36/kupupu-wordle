@@ -100,7 +100,7 @@ header {
 .title {
   text-transform: none;
   font-weight: 700;
-  font-size: 36px;
+  font-size: 180%;
   letter-spacing: 0.2rem;
   text-align: center;
   position: absolute;

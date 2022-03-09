@@ -39,7 +39,7 @@ defineExpose({
           }
         "
       >
-        <img src="/assets/plainBackground.jpg" class="cardImage" />
+        <img src="/assets/card3.png" class="cardImage" />
       </div>
       <div class="back">
         <div v-if="!pictureQuestion" class="backCardContent">
@@ -74,7 +74,7 @@ defineExpose({
   border-radius: 10px;
 }
 .backCardContent {
-  width: 100%;
+  /* width: 100%; */
   height: 100%;
   position: relative;
   text-align: center;
@@ -82,12 +82,11 @@ defineExpose({
 }
 .cardImage {
   height: 100%;
-  width: 100%;
   border-radius: 10px;
 }
 .backImage {
   height: 100%;
-  width: 100%;
+  /* width: 100%; */
   box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
   border-radius: 10px;
 }
