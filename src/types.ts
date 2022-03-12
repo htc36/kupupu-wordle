@@ -9,6 +9,9 @@ export interface CardObj {
   image?: string;
   answer: string;
   index?: number;
+  id?: number;
+  isTextCard?: boolean;
+  cardLocked?: boolean;
 }
 export interface Board {
   letter: string;

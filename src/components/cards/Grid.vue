@@ -1,81 +1,77 @@
 <script setup lang="ts">
 import Card from './Card.vue';
+import { shuffleArray } from '../../helpers/randomiseArray';
 import { cards } from '../../helpers/assetMapping';
-import { onBeforeUpdate, onMounted, onUpdated, ref } from 'vue';
+import { ref } from 'vue';
 import { CardObj } from '../../types';
 
-const allCards = ref<CardObj[]>([]);
-// let itemRefs = ref<InstanceType<typeof Card>[]>([]);
-let itemRefs: [] = [];
-let correct = ref<number>(0);
-let selectedCards = ref<CardObj[]>([]);
-// let shuffledCards = ref<CardObj[]>([]);
-
-const setItemRef = (el: any) => {
-  if (el) {
-    itemRefs.push(el);
-  }
-};
-// onBeforeUpdate(() => {
-//   itemRefs = [];
-// });
-onMounted(() => {
-  cards.forEach((element, index) => {
-    allCards.value.push({ ...element, ...{ index: index } });
+//Generating and shuffling cards from the cards array
+function createPlayingCards() {
+  const playingCards: CardObj[] = [];
+  cards.forEach((card) => {
+    playingCards.push({
+      ...card,
+      isTextCard: false,
+    });
+    playingCards.push({
+      ...card,
+      isTextCard: true,
+    });
   });
-});
+  return shuffleArray(playingCards);
+}
+const playingCards = createPlayingCards();
+
+//Calculate height of each card
+//Assume that we gonna have two cards columns and 1 percent as a gap
+const maxCardHeight = (100 / playingCards.length) * 2 - 1 + '%';
+
+const cardsRef = ref<InstanceType<typeof Card>[]>([]);
+type cardsRefType = typeof cardsRef;
+const allCards = ref<CardObj[]>(playingCards);
+let matchedPairs = ref<number>(0);
+let selectedCards: CardObj[] = [];
 
 function cardOpened(index: number) {
-  if (selectedCards.value.length === 2) {
-    console.log('closing the cards as they are not the same');
-    selectedCards.value.forEach((element) => {
-      if (element.index !== undefined) {
-        console.log('closing ', element.index);
-        itemRefs[element.index].close(false);
+  selectedCards.push({ ...allCards.value[index], index });
+  const { answer } = allCards.value[index];
+  if (selectedCards.length === 2) {
+    const firstSelected = selectedCards[0];
+    if (firstSelected.answer === answer) {
+      matchedPairs.value++;
+      if (firstSelected.index !== undefined) {
+        cardsRef.value[firstSelected.index].lockCard();
+        cardsRef.value[index].lockCard();
       }
-    });
-    selectedCards.value = [];
-  }
-  const clickedCard = allCards.value[index];
-  if (selectedCards.value.length == 1) {
-    console.log('2 cards are selected');
-    const card1 = selectedCards.value[0];
-    if (card1.answer === clickedCard.answer) {
-      correct.value += 1;
-      if (card1.index !== undefined) {
-        console.log('cards are the same!');
-        itemRefs[card1.index].lockCard();
-        itemRefs[index].lockCard();
-        selectedCards.value = [];
-      }
-      if (correct.value === allCards.value.length / 2) {
+      if (matchedPairs.value === allCards.value.length / 2) {
         alert('won then game');
       }
       return;
     }
   }
-  console.log('adding new card');
-  selectedCards.value.push({ ...allCards.value[index], ...{ index: index } });
-}
-function cardClosed(index: number) {
-  selectedCards.value = selectedCards.value.filter((obj) => {
-    return obj.index != index;
-  });
+  if (selectedCards.length === 3) {
+    if (
+      selectedCards[0].index !== undefined &&
+      selectedCards[1].index !== undefined
+    ) {
+      cardsRef.value[selectedCards[0].index].close();
+      cardsRef.value[selectedCards[1].index].close();
+    }
+    selectedCards = [{ ...allCards.value[index], index }];
+  }
 }
 </script>
 <template>
   <div class="gridWrapper">
     <Card
-      :ref="setItemRef"
       v-for="(card, index) in allCards"
-      :answer="card.answer"
-      :pictureQuestion="card.image"
+      :key="index"
+      v-bind="card"
+      :max-card-height="maxCardHeight"
+      :ref="(el:cardsRefType) => cardsRef.push(el)"
       :index="index"
-      style=""
-      @cardOpened="(index) => cardOpened(index)"
-      @cardClosed="(index) => cardClosed(index)"
-    >
-    </Card>
+      @card-opened="(index) => cardOpened(index)"
+    />
   </div>
 </template>
 <style scoped>
@@ -85,6 +81,6 @@ function cardClosed(index: number) {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-evenly;
-  height: 82%;
+  height: 82%; /* This height also needs to be calculated */
 }
 </style>
