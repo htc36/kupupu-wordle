@@ -2,161 +2,110 @@
 import { ref } from 'vue';
 const props = defineProps<{
   textQuestion?: string;
-  pictureQuestion?: string;
+  image?: string;
   answer: string;
   index: number;
+  isTextCard?: boolean;
+  maxCardHeight?: string;
 }>();
-const emit = defineEmits(['cardOpened', 'cardClosed']);
-
+const emit = defineEmits(['cardOpened']);
 const isActive = ref(false);
 const isLocked = ref(false);
-function open() {
-  isActive.value = true;
-}
-function close(shoudEmit: boolean) {
+
+function close() {
   if (!isLocked.value) isActive.value = false;
-  if (shoudEmit) emit('cardClosed', props.index);
 }
+
+function clickCard() {
+  if (!isActive.value) {
+    isActive.value = true;
+    emit('cardOpened', props.index);
+  }
+}
+
 function lockCard() {
   isLocked.value = true;
 }
+
 defineExpose({
   isActive,
-  open,
   close,
   lockCard,
 });
 </script>
 <template>
-  <div class="flip-container" data-connection="2">
-    <div :class="[{ active: isActive }, 'flipper']">
-      <div
-        class="front"
-        @click="
-          () => {
-            isActive = true;
-            $emit('cardOpened', index);
-          }
-        "
-      >
-        <img src="/assets/card3.png" class="cardImage" />
+  <div :class="[{ active: isActive }, 'flip-card']" @click="clickCard">
+    <div class="flip-card-inner">
+      <div class="flip-card-front">
+        <img src="/assets/card3.png" alt="Card front" class="card-img" />
       </div>
-      <div class="back">
-        <div v-if="!pictureQuestion" class="backCardContent">
-          <img
-            class="backTextCardImage"
-            src="/assets/card_text_background.png"
-          />
-          <div class="backCardText">
-            {{ answer }}
-          </div>
-        </div>
-        <img v-else :src="`/assets/${pictureQuestion}`" class="backImage" />
+      <div v-if="isTextCard" class="flip-card-back">
+        <p class="card-text">{{ answer }}</p>
+        <img src="/assets/card_text_background.png" class="card-img" />
+      </div>
+      <div v-else class="flip-card-back">
+        <img :src="`/assets/${image}`" class="card-img" />
       </div>
     </div>
   </div>
 </template>
 <style scoped>
-/* img {
-  height: 100%;
-} */
-.backCardText {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #a11613;
+.flip-card {
+  transition: 0.5s;
+  cursor: pointer;
+  background-color: transparent;
+  perspective: 1000px;
+  max-height: v-bind(maxCardHeight);
+  width: 50%;
 }
-.backTextCardImage {
-  height: 100%;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
-  border-radius: 10px;
-}
-.backCardContent {
-  /* width: 100%; */
-  height: 100%;
+
+.flip-card-inner {
   position: relative;
+  width: 100%;
+  height: 100%;
   text-align: center;
-  color: white;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  -webkit-transition: 0.6s;
+  -webkit-transform-style: preserve-3d;
 }
-.cardImage {
-  height: 100%;
-  border-radius: 10px;
-}
-.backImage {
-  height: 100%;
-  /* width: 100%; */
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
-  border-radius: 10px;
-}
-.active {
+
+.active .flip-card-inner {
+  transform: rotateY(180deg);
   -moz-transform: rotateY(180deg);
   -o-transform: rotateY(180deg);
   -ms-transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.flip-card-back {
+  color: white;
   transform: rotateY(180deg);
 }
-.flip-container {
+.card-text {
   font-family: 'Calibri', sans-serif;
-  text-align: center;
-  /* display: inline-block; */
-  perspective: 1000px;
-  cursor: pointer;
-  border-radius: 5px;
-  color: #a11613;
-  width: 35%;
-  height: 19%;
-}
-.flipper {
-  height: 100%;
-  width: 100%;
-  font-family: 'Calibri', sans-serif;
-  text-align: center;
-  cursor: pointer;
-  color: #a11613;
-  -webkit-transform-style: preserve-3d;
-  -webkit-transition: 0.5s;
-}
-.front {
-  /* background-color: black; */
-  height: 100%;
-  width: 100%;
   font-size: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Calibri', sans-serif;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 5px;
   color: #a11613;
-  -webkit-backface-visibility: hidden;
   position: absolute;
-  top: 0;
-  left: 0;
-  /* background-color: #ff5e5b; */
-  z-index: 2;
-  transform: rotateY(0);
-  width: 100%;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+  margin: 0;
 }
-.back {
+
+.card-img {
   height: 100%;
-  font-size: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Calibri', sans-serif;
-  cursor: pointer;
-  border-radius: 5px;
-  color: #a11613;
-  -webkit-backface-visibility: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
-  /* background-color: #00cecb; */
-  text-align: center;
-  vertical-align: middle;
-  transform: rotateY(180deg);
-  width: 100%;
+  width: auto;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
+  border-radius: 5%;
 }
 </style>

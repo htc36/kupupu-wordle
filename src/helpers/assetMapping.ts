@@ -29,21 +29,6 @@ export const cards: CardObj[] = [
     image: '00133 hoiho - horse 01.png',
     answer: 'hōiho',
   },
-  {
-    answer: 'whare',
-  },
-  {
-    answer: 'rākau',
-  },
-  {
-    answer: 'matua',
-  },
-  {
-    answer: 'moana',
-  },
-  {
-    answer: 'hōiho',
-  },
 ];
 export const assetMapping: AssetMapping = {
   whare: {
