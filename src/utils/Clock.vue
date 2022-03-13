@@ -71,11 +71,10 @@ defineExpose({
 }
 .clock-container,
 .current-clock {
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 }
 .clock-wrapper {
-  flex-direction: column;
   align-items: center;
 }
 .clock-container {
@@ -88,5 +87,8 @@ defineExpose({
 }
 .clock-text {
   font-size: 25px;
+}
+.clock-title {
+  margin-right: 10px;
 }
 </style>
