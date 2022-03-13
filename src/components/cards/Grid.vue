@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Card from './Card.vue';
+import Clock from '../../utils/Clock.vue';
 import { shuffleArray } from '../../helpers/randomiseArray';
 import { cards } from '../../helpers/assetMapping';
 import { ref } from 'vue';
@@ -26,13 +27,22 @@ const playingCards = createPlayingCards();
 //Assume that we gonna have two cards columns and 1 percent as a gap
 const maxCardHeight = (100 / playingCards.length) * 2 - 1 + '%';
 
+const gameStarted = ref(false);
+const clockRef = ref<InstanceType<typeof Clock> | null>(null);
 const cardsRef = ref<InstanceType<typeof Card>[]>([]);
 type cardsRefType = typeof cardsRef;
 const allCards = ref<CardObj[]>(playingCards);
-let matchedPairs = ref<number>(0);
+
+const matchedPairs = ref<number>(0);
 let selectedCards: CardObj[] = [];
 
 function cardOpened(index: number) {
+  if (!gameStarted.value) {
+    gameStarted.value = true;
+    if (clockRef.value) {
+      clockRef.value.startClock();
+    }
+  }
   selectedCards.push({ ...allCards.value[index], index });
   const { answer } = allCards.value[index];
   if (selectedCards.length === 2) {
@@ -44,7 +54,12 @@ function cardOpened(index: number) {
         cardsRef.value[index].lockCard();
       }
       if (matchedPairs.value === allCards.value.length / 2) {
-        alert('won then game');
+        if (clockRef.value) {
+          alert(
+            `won then game, you finish it in ${clockRef.value.seconds} seconds`
+          );
+          clockRef.value.stopClock();
+        }
       }
       return;
     }
@@ -62,6 +77,7 @@ function cardOpened(index: number) {
 }
 </script>
 <template>
+  <Clock ref="clockRef" />
   <div class="gridWrapper">
     <Card
       v-for="(card, index) in allCards"
@@ -76,7 +92,6 @@ function cardOpened(index: number) {
 </template>
 <style scoped>
 .gridWrapper {
-  margin-top: 4%;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
