@@ -56,7 +56,7 @@ function cardOpened(index: number) {
       if (matchedPairs.value === allCards.value.length / 2) {
         if (clockRef.value) {
           alert(
-            `won then game, you finish it in ${clockRef.value.seconds} seconds`
+            `won then game, you finish it in ${clockRef.value.minutes} minutes and ${clockRef.value.seconds} seconds`
           );
           clockRef.value.stopClock();
         }

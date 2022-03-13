@@ -20,6 +20,7 @@ function startClock() {
 function stopClock() {
   if (clockIntervalId) {
     seconds.value = 0;
+    minutes.value = 0;
     clearInterval(clockIntervalId);
   }
   // release our clockIntervalId from the variable
@@ -29,6 +30,7 @@ defineExpose({
   startClock,
   stopClock,
   seconds,
+  minutes,
 });
 </script>
 <template>
