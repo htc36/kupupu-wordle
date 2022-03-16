@@ -22,12 +22,12 @@ defineExpose({
 </script>
 
 <template>
-  <div v-if="isContentShown" class="content">
-    <div class="help-modal-content" :style="styleObject">
+  <div v-if="isContentShown" @click="close" class="content">
+    <div class="help-modal-content" @click.prevent.stop :style="styleObject">
       <svg
         class="close-btn"
         xmlns="http://www.w3.org/2000/svg"
-        @click="close()"
+        @click="close"
         height="24"
         viewBox="0 0 24 24"
         width="24"
@@ -45,11 +45,14 @@ defineExpose({
 <style scoped>
 .content {
   position: absolute;
+  background-color: transparent;
+  top: 0;
+  left: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   z-index: 2;
 }
 
