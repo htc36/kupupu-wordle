@@ -78,10 +78,11 @@ defineExpose({
 }
 .clock-wrapper {
   align-items: center;
+  padding: 0 10px;
 }
 .clock-container {
   margin: 10px 0 10px 0;
-  width: 60%;
+  width: 100%;
 }
 @media screen and (max-width: 500px) {
   .clock-container {

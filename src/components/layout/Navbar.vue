@@ -141,6 +141,9 @@ defineExpose({
   font-size: 20px;
   margin: 5px 0;
 }
+.nav-link:hover {
+  color: var(--darkendYellow);
+}
 
 .nav-links-group {
   display: flex;
@@ -164,12 +167,15 @@ defineExpose({
 }
 .nav-menu-pages {
   position: absolute;
-  left: 0px;
+  left: 10px;
   display: flex;
   flex-direction: column;
   top: 50px;
   background: white;
-  padding: 0 20px;
+  padding: 20px 30px;
+  z-index: 2;
+  border-radius: 5%;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
 }
 .line {
   fill: none;

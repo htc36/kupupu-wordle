@@ -14,13 +14,13 @@ const stats = getStats();
   </ViewWrapper>
 </template>
 <style>
-  .game-wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-    max-width: 600px;
-  }
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  max-width: 600px;
+}
 </style>
