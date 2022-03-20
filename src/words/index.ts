@@ -18,7 +18,7 @@ export function getWordOfTheDay(language: string) {
   }
   const maoriSolutions = Object.keys(assetMapping);
 
-  let now = new Date();
+  const now = new Date();
   now.setDate(now.getDate() + 6);
   const start = new Date(2022, 0, 0);
   const diff = Number(now) - Number(start);

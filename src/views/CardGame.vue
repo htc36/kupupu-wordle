@@ -1,5 +1,4 @@
-<template>
-  <div class="gameWrapper">
-    <p>Card</p>
-  </div>
-</template>
+<script setup lang="ts">
+import CardGrid from '../components/cards/CardGrid.vue';
+</script>
+<template><CardGrid /></template>

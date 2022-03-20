@@ -1,19 +1,26 @@
 <script setup lang="ts">
-import Navbar from './components/wordle/Navbar.vue';
+import ViewWrapper from './components/layout/ViewWrapper.vue';
+import Navbar from './components/layout/Navbar.vue';
 import { getStats } from './helpers/localStorage';
 const stats = getStats();
 </script>
 
 <template>
-  <Navbar :stats="stats"></Navbar>
-  <div class="app-container">
-    <router-view />
-  </div>
+  <ViewWrapper>
+    <Navbar :stats="stats"></Navbar>
+    <div class="game-wrapper">
+      <router-view />
+    </div>
+  </ViewWrapper>
 </template>
-
-<style scoped>
-.app-container {
-  max-width: 900px;
-  margin: auto;
-}
+<style>
+  .game-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    max-width: 600px;
+  }
 </style>

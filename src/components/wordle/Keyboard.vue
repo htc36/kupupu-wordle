@@ -55,9 +55,16 @@ function getKeyboard(language: string) {
 
 <style scoped>
 #keyboard {
-  margin: 30x 8px 0;
-  margin-top: auto;
   user-select: none;
+  bottom: 0;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 50px;
+}
+@media screen and (max-width: 500px) {
+  #keyboard {
+    width: 95%;
+  }
 }
 .row {
   display: flex;

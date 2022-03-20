@@ -46,30 +46,31 @@ defineExpose({
 .content {
   position: absolute;
   background-color: transparent;
-  top: 0;
-  left: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
+  width: 90%;
+  max-width: 500px;
+  height: 500px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 50%);
   z-index: 2;
 }
 
 .help-modal-content {
-  width: 90%;
+  width: 100%;
+  height: 100%;
   box-shadow: 0 4px 23px 0 rgb(0 0 0 / 20%);
   position: relative;
   display: flex;
-  align-items: flex-start;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
   padding: 24px;
   background: white;
   border-radius: 8px;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #d2d2d280 #fff0;
 }
 .close-btn {
   z-index: 5;

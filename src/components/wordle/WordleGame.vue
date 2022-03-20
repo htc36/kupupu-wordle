@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
-import { getWordOfTheDay, getAllWords } from './words';
+import { getWordOfTheDay, getAllWords } from '../../words';
 import {
   getStats,
   setStats,
   getGameState,
   setGameState,
   setGameSettings,
-} from './helpers/localStorage';
-import Modal from './components/wordle/Modal.vue';
-import WordDefinition from './components/wordle/WordDefinition.vue';
-import { defaultGameSettings } from './helpers/localStorage';
-import Keyboard from './components/wordle/Keyboard.vue';
-import { LetterState, Board, GameState } from './types';
-import getSuggestion from './helpers/suggestion';
+} from '../../helpers/localStorage';
+import Modal from './Modal.vue';
+import WordDefinition from './WordDefinition.vue';
+import { defaultGameSettings } from '../../helpers/localStorage';
+import Keyboard from './Keyboard.vue';
+import { LetterState, Board, GameState } from '../../types';
+import getSuggestion from '../../helpers/suggestion';
 import { ref, onMounted } from 'vue';
-import Navbar from './components/wordle/Navbar.vue';
+import Navbar from '../layout/Navbar.vue';
 // Get word of the day
 const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
@@ -30,10 +30,10 @@ const letterStates: Record<string, LetterState> = $ref(gameState.letterState);
 let currentRowIndex = $ref(gameState.currentRowIndex);
 const currentRow = $computed(() => board[currentRowIndex]);
 
-const emit = defineEmits(['setStats']);
+defineEmits(['setStats']);
 
 const wordDefinitionModal = ref<InstanceType<typeof Modal> | null>(null);
-const navbar = ref<InstanceType<typeof Navbar> | null>(null);
+// const navbar = ref<InstanceType<typeof Navbar> | null>(null);
 let message = $ref('');
 let grid = $ref('');
 let shakeRowIndex = $ref(-1);
@@ -165,7 +165,6 @@ function completeRow() {
     markPresentRows(tile, answerLetters);
     markAbsentRows(tile);
   });
-  wordDefinitionModal.value?.open();
 
   allowInput = false;
   console.log(answer);
@@ -192,7 +191,6 @@ function completeRow() {
     }, 1600);
   } else {
     setStats(stats, currentRowIndex);
-    // navbar.value?.toggleWordDefModal(true);
     wordDefinitionModal.value?.open();
     gameState.isGameFinished = true;
     // game over :(
@@ -240,74 +238,61 @@ function genResultGrid() {
 </script>
 
 <template>
-  <div>
-    <Transition>
-      <div class="message" v-if="message">
-        {{ message }}
-        <pre v-if="grid">{{ grid }}</pre>
-      </div>
-    </Transition>
-    <Modal ref="wordDefinitionModal">
-      <WordDefinition
-        :word="gameState.solution"
-        @hasSelectedNext="
-          () => {
-            wordDefinitionModal?.close();
-            navbar?.wordDefHasSelectedNext();
-          }
-        "
-      />
-    </Modal>
-    <Navbar ref="navbar" :stats="stats" />
-    <div id="board">
+  <Transition>
+    <div class="message" v-if="message">
+      {{ message }}
+      <pre v-if="grid">{{ grid }}</pre>
+    </div>
+  </Transition>
+  <Modal ref="wordDefinitionModal">
+    <WordDefinition
+      :word="gameState.solution"
+      @hasSelectedNext="
+        () => {
+          wordDefinitionModal?.close();
+          Navbar?.wordDefHasSelectedNext();
+        }
+      "
+    />
+  </Modal>
+  <div id="board">
+    <div
+      v-for="(row, index) in board"
+      :class="[
+        'row',
+        shakeRowIndex === index && 'shake',
+        success && currentRowIndex === index && 'jump',
+      ]"
+      v-bind:key="row[0].letter + row[1].letter"
+    >
       <div
-        v-for="(row, index) in board"
-        :class="[
-          'row',
-          shakeRowIndex === index && 'shake',
-          success && currentRowIndex === index && 'jump',
-        ]"
-        v-bind:key="row[0].letter + row[1].letter"
+        v-for="(tile, index) in row"
+        :class="['tile', tile.letter && 'filled', tile.state && 'revealed']"
+        v-bind:key="tile.letter"
       >
+        <div class="front" :style="{ transitionDelay: `${index * 300}ms` }">
+          {{ tile.letter }}
+        </div>
         <div
-          v-for="(tile, index) in row"
-          :class="['tile', tile.letter && 'filled', tile.state && 'revealed']"
-          v-bind:key="tile.letter"
+          :class="['back', tile.state]"
+          :style="{
+            transitionDelay: `${index * 300}ms`,
+            animationDelay: `${index * 100}ms`,
+          }"
         >
-          <div class="front" :style="{ transitionDelay: `${index * 300}ms` }">
-            {{ tile.letter }}
-          </div>
-          <div
-            :class="['back', tile.state]"
-            :style="{
-              transitionDelay: `${index * 300}ms`,
-              animationDelay: `${index * 100}ms`,
-            }"
-          >
-            {{ tile.letter }}
-          </div>
+          {{ tile.letter }}
         </div>
       </div>
     </div>
-    <Keyboard
-      class="keyboard"
-      @key="onKey"
-      :letter-states="letterStates"
-      :language="currentLanguage"
-    />
   </div>
+  <Keyboard
+    @key="onKey"
+    :letter-states="letterStates"
+    :language="currentLanguage"
+  />
 </template>
 
 <style scoped>
-.keyboard {
-  bottom: 0;
-  width: 100%;
-  position: absolute;
-}
-.gameWrapper {
-  position: relative;
-  height: 100vh;
-}
 #board {
   display: grid;
   grid-template-rows: repeat(6, 1fr);

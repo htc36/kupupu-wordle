@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import Grid from '../components/cards/Grid.vue';
+import CardGrid from '../components/cards/CardGrid.vue';
 </script>
 <template>
-  <Grid></Grid>
+  <!-- THIS SHOULD BE HOME COMPONENT  -->
+  <CardGrid />
 </template>
