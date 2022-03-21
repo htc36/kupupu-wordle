@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import router from './router';
 import App from './App.vue';
+import { createPinia } from 'pinia';
 import './globalStyles.css';
 
 // resize for scaling the board size
@@ -13,4 +14,4 @@ import './globalStyles.css';
 //   document.body.style.setProperty('--vh', window.innerHeight + 'px')
 // }
 
-createApp(App).use(router).mount('#app');
+createApp(App).use(router).use(createPinia()).mount('#app');

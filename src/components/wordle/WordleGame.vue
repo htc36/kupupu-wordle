@@ -8,14 +8,18 @@ import {
   setGameState,
   setGameSettings,
 } from '../../helpers/localStorage';
-import Modal from './Modal.vue';
+import Modal from '../layout/Modal.vue';
 import WordDefinition from './WordDefinition.vue';
 import { defaultGameSettings } from '../../helpers/localStorage';
 import Keyboard from './Keyboard.vue';
 import { LetterState, Board, GameState } from '../../types';
 import getSuggestion from '../../helpers/suggestion';
-import { ref, onMounted } from 'vue';
-import Navbar from '../layout/Navbar.vue';
+import { onMounted } from 'vue';
+import { ModalNames } from '../../types';
+import { useModalStore } from '../../stores/modal';
+
+const modal = useModalStore();
+
 // Get word of the day
 const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
@@ -31,9 +35,6 @@ let currentRowIndex = $ref(gameState.currentRowIndex);
 const currentRow = $computed(() => board[currentRowIndex]);
 
 defineEmits(['setStats']);
-
-const wordDefinitionModal = ref<InstanceType<typeof Modal> | null>(null);
-// const navbar = ref<InstanceType<typeof Navbar> | null>(null);
 let message = $ref('');
 let grid = $ref('');
 let shakeRowIndex = $ref(-1);
@@ -181,7 +182,7 @@ function completeRow() {
         1000
       );
       success = true;
-      wordDefinitionModal.value?.open();
+      modal.toggleModal(ModalNames.wordDefinitionModal);
     }, 1600);
   } else if (currentRowIndex < board.length - 1) {
     // go the next row
@@ -191,7 +192,7 @@ function completeRow() {
     }, 1600);
   } else {
     setStats(stats, currentRowIndex);
-    wordDefinitionModal.value?.open();
+    modal.toggleModal(ModalNames.wordDefinitionModal);
     gameState.isGameFinished = true;
     // game over :(
     setTimeout(() => {
@@ -244,13 +245,13 @@ function genResultGrid() {
       <pre v-if="grid">{{ grid }}</pre>
     </div>
   </Transition>
-  <Modal ref="wordDefinitionModal">
+  <Modal :modal-name="ModalNames.wordDefinitionModal">
     <WordDefinition
       :word="gameState.solution"
       @hasSelectedNext="
         () => {
-          wordDefinitionModal?.close();
-          Navbar?.wordDefHasSelectedNext();
+          modal.toggleModal(ModalNames.wordDefinitionModal);
+          modal.toggleModal(ModalNames.statsModal);
         }
       "
     />

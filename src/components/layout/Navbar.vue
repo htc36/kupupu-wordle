@@ -1,42 +1,24 @@
 <script setup lang="ts">
-import Modal from '../wordle/Modal.vue';
+import Modal from './Modal.vue';
 import GameSettings from '../wordle/GameSettings.vue';
 import Statistics from '../wordle/GameStatistics.vue';
 import { AllGameStats } from '../../types';
 import { ref } from 'vue';
-
+import { ModalNames } from '../../types';
+import { useModalStore } from '../../stores/modal';
 defineProps<{
   stats: AllGameStats;
 }>();
-
-const statsModal = ref<InstanceType<typeof Modal> | null>(null);
-const settingsModal = ref<InstanceType<typeof Modal> | null>(null);
+const modal = useModalStore();
 const isMenuActive = ref(false);
-function wordDefHasSelectedNext() {
-  // wordDefinitionModal.value?.close();
-  statsModal.value?.open();
-}
-function toggleStats(shouldOpen: boolean) {
-  shouldOpen ? statsModal.value?.open() : statsModal.value?.close();
-}
-
-// function toggleWordDefModal(shouldOpen: boolean) {
-//   shouldOpen
-//     ? wordDefinitionModal.value?.open()
-//     : wordDefinitionModal.value?.close();
-// }
-defineExpose({
-  toggleStats,
-  wordDefHasSelectedNext,
-});
 </script>
 <template>
   <header class="header">
-    <Modal ref="settingsModal">
+    <Modal :modal-name="ModalNames.settingsModal">
       <GameSettings />
     </Modal>
 
-    <Modal ref="statsModal">
+    <Modal :modal-name="ModalNames.statsModal">
       <Statistics :stats="stats" />
     </Modal>
     <nav id="nav">
@@ -77,7 +59,10 @@ defineExpose({
     </nav>
     <router-link class="nav-title" to="/">kupupu</router-link>
     <div class="nav-links-group">
-      <button class="hamburger-nav-icon" @click="() => toggleStats(true)">
+      <button
+        class="hamburger-nav-icon"
+        @click="modal.toggleModal(ModalNames.statsModal)"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="24"
@@ -96,7 +81,7 @@ defineExpose({
           height="24"
           viewBox="0 0 24 24"
           width="24"
-          @click="() => settingsModal?.open()"
+          @click="modal.toggleModal(ModalNames.settingsModal)"
         >
           <path
             fill="var(--black)"
@@ -108,8 +93,6 @@ defineExpose({
   </header>
 </template>
 <style scoped>
-#nav {
-}
 .header {
   display: flex;
   justify-content: space-between;
