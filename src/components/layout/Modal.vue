@@ -1,33 +1,25 @@
+import { ref } from 'vue';
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useModalStore } from '../../stores/modal';
+import { ModalNames } from '../../types';
 const props = defineProps<{
-  height?: string;
-  width?: string;
-  boxShadow?: string;
+  modalName: ModalNames;
 }>();
-const styleObject = ref({
-  width: props.width,
-  height: props.height,
-  boxShadow: props.boxShadow,
-});
-
-const isContentShown = ref(false);
-const open = () => (isContentShown.value = true);
-const close = () => (isContentShown.value = false);
-
-defineExpose({
-  open,
-  close,
-});
+const modal = useModalStore();
 </script>
 
 <template>
-  <div v-if="isContentShown" class="content">
-    <div class="help-modal-content" :style="styleObject">
+  <div
+    v-if="modal.getCurrentModalState(props.modalName)"
+    @click="modal.toggleModal(props.modalName)"
+    class="content"
+  >
+    <div class="help-modal-content" @click.prevent.stop>
       <svg
         class="close-btn"
         xmlns="http://www.w3.org/2000/svg"
-        @click="close()"
+        @click="modal.toggleModal(props.modalName)"
         height="24"
         viewBox="0 0 24 24"
         width="24"
@@ -44,29 +36,34 @@ defineExpose({
 
 <style scoped>
 .content {
-  position: absolute;
+  position: fixed;
+  background-color: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
+  bottom: 50%;
+  left: 50%;
+  transform: translate(-50%, 50%);
   z-index: 2;
 }
 
 .help-modal-content {
-  width: 90%;
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  max-height: 500px;
   box-shadow: 0 4px 23px 0 rgb(0 0 0 / 20%);
   position: relative;
   display: flex;
-  align-items: flex-start;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
   padding: 24px;
   background: white;
   border-radius: 8px;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #d2d2d280 #fff0;
 }
 .close-btn {
   z-index: 5;

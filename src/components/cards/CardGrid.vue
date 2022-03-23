@@ -97,5 +97,6 @@ function cardOpened(index: number) {
   flex-wrap: wrap;
   justify-content: space-evenly;
   height: 82%; /* This height also needs to be calculated */
+  width: 100%;
 }
 </style>

@@ -18,8 +18,8 @@ function openLesson() {
       v-show="gameSettings.shouldShowImage"
       :src="`/assets/${wordAssets.image}`"
     />
-    <figure v-show="gameSettings.shouldPlaySound">
-      <audio controls :src="`/assets/${wordAssets.sound}`">
+    <figure class="audio-figure" v-show="gameSettings.shouldPlaySound">
+      <audio class="audio" controls :src="`/assets/${wordAssets.sound}`">
         Your browser does not support the
         <code>audio</code> element.
       </audio>
@@ -41,6 +41,13 @@ function openLesson() {
   padding: 16px 0;
   width: 100%;
   height: 100%;
+}
+.audio {
+  width: 300px;
+  height: 54px;
+}
+.audio-figure {
+  margin: 10px 0;
 }
 #statistics {
   color: var(--color-tone-1);

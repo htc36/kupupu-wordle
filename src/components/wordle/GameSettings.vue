@@ -122,6 +122,7 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 .setting {
   display: flex;

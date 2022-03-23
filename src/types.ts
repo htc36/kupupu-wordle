@@ -4,6 +4,13 @@ export const enum LetterState {
   PRESENT = 'present',
   ABSENT = 'absent',
 }
+
+export const enum ModalNames {
+  settingsModal = 'settingsModal',
+  statsModal = 'statsModal',
+  wordDefinitionModal = 'wordDefinitionModal',
+}
+
 export interface CardObj {
   sound?: string;
   image?: string;
