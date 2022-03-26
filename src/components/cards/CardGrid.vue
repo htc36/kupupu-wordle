@@ -50,8 +50,13 @@ function cardOpened(index: number) {
     if (firstSelected.answer === answer) {
       matchedPairs.value++;
       if (firstSelected.index !== undefined) {
-        cardsRef.value[firstSelected.index].lockCard();
+        const firstIndex = firstSelected.index;
+        cardsRef.value[firstIndex].lockCard();
         cardsRef.value[index].lockCard();
+        setTimeout(() => {
+          cardsRef.value[index].shakeCards();
+          cardsRef.value[firstIndex].shakeCards();
+        }, 500);
       }
       if (matchedPairs.value === allCards.value.length / 2) {
         if (clockRef.value) {

@@ -10,6 +10,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(['cardOpened']);
 const isActive = ref(false);
+const isShake = ref(false);
 const isLocked = ref(false);
 
 function close() {
@@ -27,14 +28,25 @@ function lockCard() {
   isLocked.value = true;
 }
 
+function shakeCards() {
+  isShake.value = true;
+  setTimeout(() => {
+    isShake.value = false;
+  }, 1500);
+}
+
 defineExpose({
   isActive,
   close,
   lockCard,
+  shakeCards,
 });
 </script>
 <template>
-  <div :class="[{ active: isActive }, 'flip-card']" @click="clickCard">
+  <div
+    :class="[{ active: isActive, shake: isShake }, 'flip-card']"
+    @click="clickCard"
+  >
     <div class="flip-card-inner">
       <div class="flip-card-front">
         <img src="/assets/card3.png" alt="Card front" class="card-img" />
@@ -107,5 +119,33 @@ defineExpose({
   width: auto;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
   border-radius: 5%;
+}
+
+.shake {
+  animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes shake {
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
 }
 </style>
