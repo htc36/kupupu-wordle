@@ -16,7 +16,7 @@ const toggleSwitch = (settingName: keyof GameSettings) => {
 </script>
 <template>
   <div class="sections">
-    <h1>Settings</h1>
+    <h1 class="modalTitle">Settings</h1>
     <section>
       <div class="setting">
         <div class="text">
