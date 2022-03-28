@@ -1,6 +1,4 @@
-import { ref } from 'vue';
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useModalStore } from '../../stores/modal';
 import { ModalNames } from '../../types';
 const props = defineProps<{

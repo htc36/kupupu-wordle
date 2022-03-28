@@ -1,8 +1,19 @@
 <script setup lang="ts">
 import { AllGameStats, Guesses } from '../../types';
+import { useMessageStore } from '../../stores/message';
 defineProps<{
   stats: AllGameStats;
 }>();
+const messageStore = useMessageStore();
+function onShare() {
+  const resultGrid = messageStore.genResultGrid();
+  if (resultGrid != '') {
+    navigator.clipboard.writeText(resultGrid);
+    messageStore.showMessage('Copied To Clipboard!', resultGrid);
+  } else {
+    messageStore.showMessage('Nothing To Share!');
+  }
+}
 </script>
 
 <template>
@@ -69,7 +80,7 @@ defineProps<{
         </div>
       </div>
       <div class="share">
-        <button id="share-button">Share</button>
+        <button id="share-button" @click="onShare()">Share</button>
       </div>
     </div>
   </div>
