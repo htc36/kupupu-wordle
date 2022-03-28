@@ -8,7 +8,7 @@ defineProps<{
 <template>
   <div class="container">
     <!-- <h1>{{ JSON.stringify(stats) }}</h1> -->
-    <h1>Statistics</h1>
+    <h1 class="modalTitle">Statistics</h1>
     <div id="statistics">
       <div class="statistic-container">
         <div class="statistic">{{ stats.gamesPlayed }}</div>
@@ -57,7 +57,7 @@ defineProps<{
     </div>
     <div class="footer">
       <div class="countdown">
-        <h1>Next WORDLE</h1>
+        <h1 style="text-align: center">Next Wordle</h1>
         <div id="timer">
           <div class="statistic-container">
             <div class="statistic timer">
@@ -208,7 +208,7 @@ export default {
 }
 .num-guesses {
   font-size: 14px;
-  line-height: 20px;
+  line-height: 17px;
   font-weight: bold;
   color: var(--tile-text-color);
 }
