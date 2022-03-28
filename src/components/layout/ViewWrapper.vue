@@ -17,6 +17,7 @@ const { messageToDisplay, formattedText } = storeToRefs(game);
           display: flex;
           justify-content: center;
         "
+        v-if="formattedText"
       >
         {{ formattedText }}
       </div>

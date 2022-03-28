@@ -5,6 +5,8 @@ import { shuffleArray } from '../../helpers/randomiseArray';
 import { cards } from '../../helpers/assetMapping';
 import { ref } from 'vue';
 import { CardObj } from '../../types';
+import { useMessageStore } from '../../stores/message';
+const messageStore = useMessageStore();
 
 //Generating and shuffling cards from the cards array
 function createPlayingCards() {
@@ -55,8 +57,10 @@ function cardOpened(index: number) {
       }
       if (matchedPairs.value === allCards.value.length / 2) {
         if (clockRef.value) {
-          alert(
-            `won then game, you finish it in ${clockRef.value.minutes} minutes and ${clockRef.value.seconds} seconds`
+          messageStore.showMessage(
+            'Completed Game!',
+            `Time ${clockRef.value.minutes}:${clockRef.value.seconds}`,
+            5000
           );
           clockRef.value.stopClock();
         }
