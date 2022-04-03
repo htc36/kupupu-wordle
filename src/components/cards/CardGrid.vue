@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Card from './Card.vue';
+import Modal from '../layout/Modal.vue';
 import { shuffleArray } from '../../helpers/randomiseArray';
 import { cards } from '../../helpers/assetMapping';
 import { ref } from 'vue';
@@ -8,7 +9,6 @@ import { useClockStore } from '../../stores/clock';
 import { useCardGameStore } from '../../stores/cardGame';
 import { useModalStore } from '../../stores/modal';
 import { storeToRefs } from 'pinia';
-import Modal from '../layout/Modal.vue';
 import { ModalNames } from '../../types';
 
 //Adding and destructuring store to refs to get reactivity without getters
@@ -45,8 +45,8 @@ type cardsRefType = typeof cardsRef;
 const allCards = ref<CardObj[]>(playingCards);
 const matchedPairs = ref<number>(0);
 let selectedCards: CardObj[] = [];
-let secondsFinished = ref(90);
-let minutesFinished = ref(90);
+let secondsFinished = ref(0);
+let minutesFinished = ref(0);
 function cardOpened(index: number) {
   if (!isCardGameStarted.value) {
     startCardGame();
