@@ -8,7 +8,10 @@ const messageStore = useMessageStore();
 function onShare() {
   const resultGrid = messageStore.genResultGrid();
   if (resultGrid != '') {
-    navigator.clipboard.writeText(resultGrid);
+    const messageToCopy = `#kupupu ${new Date().toLocaleDateString(
+      'en-NZ'
+    )}\n\n${resultGrid}`;
+    navigator.clipboard.writeText(messageToCopy);
     messageStore.showMessage('Copied To Clipboard!', resultGrid);
   } else {
     messageStore.showMessage('Nothing To Share!');
