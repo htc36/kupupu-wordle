@@ -18,7 +18,6 @@ function onShare() {
 
 <template>
   <div class="container">
-    <!-- <h1>{{ JSON.stringify(stats) }}</h1> -->
     <h1>Statistics</h1>
     <div id="statistics">
       <div class="statistic-container">

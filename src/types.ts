@@ -9,6 +9,7 @@ export const enum ModalNames {
   settingsModal = 'settingsModal',
   statsModal = 'statsModal',
   wordDefinitionModal = 'wordDefinitionModal',
+  cardGameFinishedModal = 'cardGameFinishedModal',
 }
 
 export interface CardObj {

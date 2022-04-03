@@ -6,6 +6,8 @@ import { AllGameStats } from '../../types';
 import { ref } from 'vue';
 import { ModalNames } from '../../types';
 import { useModalStore } from '../../stores/modal';
+import { useCardGameStore } from '../../stores/cardGame';
+const { stopCardGame } = useCardGameStore();
 defineProps<{
   stats: AllGameStats;
 }>();
@@ -14,7 +16,7 @@ const isMenuActive = ref(false);
 </script>
 <template>
   <header class="header">
-    <Modal :modal-name="ModalNames.settingsModal">
+    <Modal :modal-name="ModalNames.cardGameFinishedModal">
       <GameSettings />
     </Modal>
 
@@ -43,7 +45,12 @@ const isMenuActive = ref(false);
       <Transition name="slide-bottom">
         <div v-if="isMenuActive" class="nav-menu-pages">
           <router-link
-            @click="() => (isMenuActive = !isMenuActive)"
+            @click="
+              () => {
+                isMenuActive = !isMenuActive;
+                stopCardGame();
+              }
+            "
             class="nav-link"
             to="/wordle"
             >Wordle</router-link
