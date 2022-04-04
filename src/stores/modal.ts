@@ -1,11 +1,14 @@
 import { defineStore } from 'pinia';
 import { ModalNames } from '../types';
+import { useCardGameStore } from './cardGame';
+
 export const useModalStore = defineStore('modal', {
   state: () => {
     return {
       isSettingsModalShown: false,
       isStatsModalShown: false,
       isWordDefinitionModalShown: false,
+      isCardGameFinishedModal: false,
     };
   },
   actions: {
@@ -20,6 +23,15 @@ export const useModalStore = defineStore('modal', {
         case ModalNames.wordDefinitionModal:
           this.isWordDefinitionModalShown = !this.isWordDefinitionModalShown;
           break;
+        case ModalNames.cardGameFinishedModal:
+          if (this.isCardGameFinishedModal) {
+            const { reRenderCardGameComponent } = useCardGameStore();
+            reRenderCardGameComponent();
+            this.isCardGameFinishedModal = false;
+          } else {
+            this.isCardGameFinishedModal = true;
+          }
+          break;
       }
     },
     getCurrentModalState(modalName: ModalNames) {
@@ -30,6 +42,8 @@ export const useModalStore = defineStore('modal', {
           return this.isStatsModalShown;
         case ModalNames.wordDefinitionModal:
           return this.isWordDefinitionModalShown;
+        case ModalNames.cardGameFinishedModal:
+          return this.isCardGameFinishedModal;
       }
     },
   },

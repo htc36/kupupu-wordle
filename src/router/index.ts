@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/HomeScreen.vue';
 import WordleScreen from '../views/WordleScreen.vue';
-import CardGame from '../views/CardGame.vue';
+import CardScreen from '../views/CardScreen.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/wordle', name: 'WordleScreen', component: WordleScreen },
-  { path: '/cards', name: 'CardGame', component: CardGame },
+  { path: '/cards', name: 'CardScreen', component: CardScreen },
 ];
 
 const router = createRouter({

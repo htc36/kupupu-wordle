@@ -6,6 +6,8 @@ import { AllGameStats } from '../../types';
 import { ref } from 'vue';
 import { ModalNames } from '../../types';
 import { useModalStore } from '../../stores/modal';
+import { useCardGameStore } from '../../stores/cardGame';
+const { stopCardGame } = useCardGameStore();
 defineProps<{
   stats: AllGameStats;
 }>();
@@ -43,7 +45,12 @@ const isMenuActive = ref(false);
       <Transition name="slide-bottom">
         <div v-if="isMenuActive" class="nav-menu-pages">
           <router-link
-            @click="() => (isMenuActive = !isMenuActive)"
+            @click="
+              () => {
+                isMenuActive = !isMenuActive;
+                stopCardGame();
+              }
+            "
             class="nav-link"
             to="/wordle"
           >
@@ -70,6 +77,7 @@ const isMenuActive = ref(false);
       <button
         class="hamburger-nav-icon"
         @click="modal.toggleModal(ModalNames.statsModal)"
+        type="button"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -83,13 +91,17 @@ const isMenuActive = ref(false);
           />
         </svg>
       </button>
-      <button class="hamburger-nav-icon" style="margin-left: 2px">
+      <button
+        class="hamburger-nav-icon"
+        type="button"
+        style="margin-left: 2px"
+        @click="modal.toggleModal(ModalNames.settingsModal)"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="24"
           viewBox="0 0 24 24"
           width="24"
-          @click="modal.toggleModal(ModalNames.settingsModal)"
         >
           <path
             fill="var(--black)"

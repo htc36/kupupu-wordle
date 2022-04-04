@@ -1,37 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { useClockStore } from '../stores/clock';
+import { storeToRefs } from 'pinia';
 
-const seconds = ref(0);
-const minutes = ref(0);
-let clockIntervalId: number | null = null;
-let localSeconds = 0;
-function startInterval() {
-  seconds.value = ++localSeconds % 60;
-  minutes.value = Math.floor(localSeconds / 60);
-}
-function startClock() {
-  // Have a look at that:
-  // If we want to start clock immediately we need to uncomment startInterval()
-  // Otherwise we need to wait for the first tick
-
-  // startInterval();
-  clockIntervalId = setInterval(startInterval, 1000);
-}
-function stopClock() {
-  if (clockIntervalId) {
-    seconds.value = 0;
-    minutes.value = 0;
-    clearInterval(clockIntervalId);
-  }
-  // release our clockIntervalId from the variable
-  clockIntervalId = null;
-}
-defineExpose({
-  startClock,
-  stopClock,
-  seconds,
-  minutes,
-});
+const clockStore = useClockStore();
+const { clockSeconds, clockMinutes } = storeToRefs(clockStore);
 </script>
 <template>
   <div class="clock-container">
@@ -39,11 +11,11 @@ defineExpose({
       <div class="clock-title">Current time:</div>
       <div class="clock-digits">
         <div class="clock-text">
-          {{ minutes < 10 ? `0${minutes}` : minutes }}
+          {{ clockMinutes < 10 ? `0${clockMinutes}` : clockMinutes }}
         </div>
         <div class="clock-text">:</div>
         <div class="clock-text">
-          {{ seconds < 10 ? `0${seconds}` : seconds }}
+          {{ clockSeconds < 10 ? `0${clockSeconds}` : clockSeconds }}
         </div>
       </div>
     </div>
