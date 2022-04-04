@@ -47,8 +47,7 @@ onMounted(() => {
   if (!existingSettings) setGameSettings(defaultGameSettings);
 });
 // Handle keyboard input.
-let allowInput = true;
-
+let allowInput = !gameState.isGameFinished;
 const onKeyup = (e: KeyboardEvent) => onKey(e.key);
 
 window.addEventListener('keyup', onKeyup);

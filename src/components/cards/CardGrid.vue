@@ -19,6 +19,7 @@ const cardGameStore = useCardGameStore();
 const { startCardGame, stopCardGame } = cardGameStore;
 const { isCardGameStarted } = storeToRefs(cardGameStore);
 
+
 //Generating and shuffling cards from the cards array
 function createPlayingCards() {
   const playingCards: CardObj[] = [];
@@ -58,8 +59,13 @@ function cardOpened(index: number) {
     if (firstSelected.answer === answer) {
       matchedPairs.value++;
       if (firstSelected.index !== undefined) {
-        cardsRef.value[firstSelected.index].lockCard();
+        const firstIndex = firstSelected.index;
+        cardsRef.value[firstIndex].lockCard();
         cardsRef.value[index].lockCard();
+        setTimeout(() => {
+          cardsRef.value[index].shakeCards();
+          cardsRef.value[firstIndex].shakeCards();
+        }, 500);
       }
       if (matchedPairs.value === allCards.value.length / 2) {
         secondsFinished.value = clockSeconds.value;

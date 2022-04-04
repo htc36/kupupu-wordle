@@ -51,6 +51,13 @@ body {
   background-color: #c9b458 !important;
 }
 
+.modalTitle {
+  text-transform: uppercase;
+  font-weight: bold;
+  padding-bottom: 10px;
+  text-align: center;
+}
+
 .absent {
   background-color: #787c7e !important;
 }

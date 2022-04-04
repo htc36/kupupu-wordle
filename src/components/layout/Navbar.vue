@@ -53,14 +53,22 @@ const isMenuActive = ref(false);
             "
             class="nav-link"
             to="/wordle"
-            >Wordle</router-link
           >
+            <img
+              src="/assets/wordleIcon.svg"
+              alt="Card front"
+              class="gameIcon"
+            />
+            Wordle
+          </router-link>
           <router-link
             @click="() => (isMenuActive = !isMenuActive)"
             class="nav-link"
             to="/cards"
-            >Cards</router-link
           >
+            <img src="/assets/cardsIcon.svg" alt="CardsIcon" class="gameIcon" />
+            Cards
+          </router-link>
         </div>
       </Transition>
     </nav>
@@ -120,6 +128,10 @@ const isMenuActive = ref(false);
     width: 100%;
   }
 }
+.gameIcon {
+  width: 25px;
+  margin-right: 10px;
+}
 
 /*NAVIGATION*/
 .nav-title,
@@ -134,7 +146,16 @@ const isMenuActive = ref(false);
 }
 .nav-link {
   font-size: 20px;
+  font-weight: 400;
   margin: 5px 0;
+  align-items: center;
+  display: flex;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+.nav-link:last-child {
+  border: 0;
+  padding-bottom: 0px;
 }
 .nav-link:hover {
   color: var(--darkendYellow);
@@ -167,7 +188,7 @@ const isMenuActive = ref(false);
   flex-direction: column;
   top: 50px;
   background: white;
-  padding: 20px 30px;
+  padding: 10px 20px;
   z-index: 2;
   border-radius: 5%;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
