@@ -59,7 +59,14 @@ export function getGameState(solution: string) {
     letterState: {},
     currentRowIndex: 0,
   };
+  setGameState(gameState);
   return gameState;
+}
+export function getBoard() {
+  const existingGameState: GameState = JSON.parse(
+    window.localStorage.getItem('gameState') as string
+  );
+  return existingGameState.board;
 }
 
 export function setGameSettings(gameSettingsObj: GameSettings) {
