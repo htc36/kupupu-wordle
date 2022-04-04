@@ -16,7 +16,7 @@ const isMenuActive = ref(false);
 </script>
 <template>
   <header class="header">
-    <Modal :modal-name="ModalNames.cardGameFinishedModal">
+    <Modal :modal-name="ModalNames.settingsModal">
       <GameSettings />
     </Modal>
 
@@ -69,6 +69,7 @@ const isMenuActive = ref(false);
       <button
         class="hamburger-nav-icon"
         @click="modal.toggleModal(ModalNames.statsModal)"
+        type="button"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -82,13 +83,17 @@ const isMenuActive = ref(false);
           />
         </svg>
       </button>
-      <button class="hamburger-nav-icon" style="margin-left: 2px">
+      <button
+        class="hamburger-nav-icon"
+        type="button"
+        style="margin-left: 2px"
+        @click="modal.toggleModal(ModalNames.settingsModal)"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="24"
           viewBox="0 0 24 24"
           width="24"
-          @click="modal.toggleModal(ModalNames.settingsModal)"
         >
           <path
             fill="var(--black)"

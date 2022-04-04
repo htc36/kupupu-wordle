@@ -86,11 +86,8 @@ function cardOpened(index: number) {
   <div class="gridWrapper">
     <Modal :modal-name="ModalNames.cardGameFinishedModal">
       <div class="modal-finished-wrapper">
-        <h3 class="modal-title">
-          Game Completed in {{ minutesFinished }}:{{ secondsFinished }}
-        </h3>
+        <h3 class="modal-title">Game Completed</h3>
         <ul class="words-list">
-          <h4 class="words-title">Listen words of the game</h4>
           <li v-for="card in cards" :key="card.answer">
             <div class="words-list-item">
               <p class="word-item">{{ card.answer }}</p>
@@ -103,6 +100,11 @@ function cardOpened(index: number) {
             </div>
           </li>
         </ul>
+        <h3 class="words-time">
+          Time
+          {{ minutesFinished < 10 ? `0${minutesFinished}` : minutesFinished }} :
+          {{ secondsFinished < 10 ? `0${secondsFinished}` : secondsFinished }}
+        </h3>
       </div>
     </Modal>
     <Card
@@ -134,11 +136,8 @@ function cardOpened(index: number) {
 }
 .modal-title {
   font-size: 1.7rem;
-  font-weight: 500;
+  font-weight: bold;
   text-align: center;
-  color: var(--red);
-  text-shadow: -1px -1px 1px rgba(255, 255, 255, 0.1),
-    1px 1px 1px rgba(0, 0, 0, 0.5);
 }
 .words-list-item,
 .words-list {
@@ -156,9 +155,8 @@ function cardOpened(index: number) {
 .word-item {
   text-transform: uppercase;
   color: var(--red);
-  font-weight: 600;
-  text-shadow: brown;
-  font-size: 1.6rem;
+  font-weight: bold;
+  font-size: 1.8rem;
 }
 .audio {
   width: 100%;
@@ -168,10 +166,10 @@ function cardOpened(index: number) {
   margin: 10px 0;
   width: 70%;
 }
-.words-title {
+.words-time {
   text-align: center;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.6rem;
+  font-weight: 500;
 }
 @media (max-width: 450px) {
   audio::-webkit-media-controls-current-time-display,
