@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Switch from '../../utils/Switch.vue';
+import Switch from '../utils/Switch.vue';
 import { ref } from 'vue';
 import { GameSettings } from '../../types';
 import { setGameSettings, getGameSettings } from '../../helpers/localStorage';

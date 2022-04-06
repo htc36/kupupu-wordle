@@ -6,6 +6,7 @@ export const enum LetterState {
 }
 
 export const enum ModalNames {
+  donationModal = 'donationModal',
   settingsModal = 'settingsModal',
   statsModal = 'statsModal',
   wordDefinitionModal = 'wordDefinitionModal',

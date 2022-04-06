@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useClockStore } from '../stores/clock';
+import { useClockStore } from '../../stores/clock';
 import { storeToRefs } from 'pinia';
 
 const clockStore = useClockStore();
