@@ -19,7 +19,6 @@ const cardGameStore = useCardGameStore();
 const { startCardGame, stopCardGame } = cardGameStore;
 const { isCardGameStarted } = storeToRefs(cardGameStore);
 
-
 //Generating and shuffling cards from the cards array
 function createPlayingCards() {
   const playingCards: CardObj[] = [];
@@ -130,7 +129,7 @@ function cardOpened(index: number) {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-evenly;
-  height: 82%; /* This height also needs to be calculated */
+  height: 95%; /* This height also needs to be calculated */
   width: 100%;
 }
 .modal-finished-wrapper {

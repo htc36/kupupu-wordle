@@ -9,11 +9,14 @@ export const useModalStore = defineStore('modal', {
       isStatsModalShown: false,
       isWordDefinitionModalShown: false,
       isCardGameFinishedModal: false,
+      isDonationModalShown: false,
     };
   },
   actions: {
     toggleModal(modalName: ModalNames) {
       switch (modalName) {
+        case ModalNames.donationModal:
+          this.isDonationModalShown = !this.isDonationModalShown;
         case ModalNames.settingsModal:
           this.isSettingsModalShown = !this.isSettingsModalShown;
           break;
@@ -36,6 +39,8 @@ export const useModalStore = defineStore('modal', {
     },
     getCurrentModalState(modalName: ModalNames) {
       switch (modalName) {
+        case ModalNames.donationModal:
+          return this.isDonationModalShown;
         case ModalNames.settingsModal:
           return this.isSettingsModalShown;
         case ModalNames.statsModal:

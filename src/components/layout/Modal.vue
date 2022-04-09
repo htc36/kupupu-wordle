@@ -13,7 +13,7 @@ const modal = useModalStore();
     @click="modal.toggleModal(props.modalName)"
     class="content"
   >
-    <div class="help-modal-content" @click.prevent.stop>
+    <div :class="['help-modal-content', props.modalName]" @click.prevent.stop>
       <svg
         class="close-btn"
         xmlns="http://www.w3.org/2000/svg"
@@ -62,6 +62,10 @@ const modal = useModalStore();
   background: white;
   border-radius: 8px;
   overflow-y: auto;
+}
+.help-modal-content.donationModal {
+  background: #636363;
+  max-height: 700px;
 }
 .close-btn {
   z-index: 5;

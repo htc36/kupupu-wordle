@@ -2,15 +2,17 @@
 import ViewWrapper from './components/layout/ViewWrapper.vue';
 import Navbar from './components/layout/Navbar.vue';
 import { getStats } from './helpers/localStorage';
+import Footer from './components/layout/Footer.vue';
 const stats = getStats();
 </script>
 
 <template>
   <ViewWrapper>
-    <Navbar :stats="stats"></Navbar>
+    <Navbar :stats="stats" />
     <div class="game-wrapper">
       <router-view />
     </div>
+    <Footer />
   </ViewWrapper>
 </template>
 <style>
