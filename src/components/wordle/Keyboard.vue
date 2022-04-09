@@ -31,6 +31,7 @@ function getKeyboard(language: string) {
       <button
         v-for="key in row"
         :key="key"
+        type="button"
         :class="[key.length > 1 && 'big', letterStates[key]]"
         @click="$emit('key', key)"
       >
@@ -55,8 +56,6 @@ function getKeyboard(language: string) {
 
 <style scoped>
 #keyboard {
-  margin-left: auto;
-  margin-right: auto;
   user-select: none;
   bottom: 0;
   width: 100%;

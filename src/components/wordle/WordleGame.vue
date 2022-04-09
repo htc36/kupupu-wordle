@@ -296,6 +296,7 @@ function shake() {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
 }
 .loading {
   height: 100%;
