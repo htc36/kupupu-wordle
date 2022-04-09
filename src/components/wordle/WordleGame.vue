@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { onUnmounted } from 'vue';
-import { getWordOfTheDay, getAllWords } from '../../words';
+import { onBeforeMount, onUnmounted } from 'vue';
+import {
+  getWordOfTheDay,
+  getAllWords,
+  getWordOfTheDayFromAPI,
+} from '../../words';
 import {
   getStats,
   setStats,
   getGameState,
   setGameState,
   setGameSettings,
+  getDefaultGameState,
 } from '../../helpers/localStorage';
 import Modal from '../layout/Modal.vue';
 import WordDefinition from './WordDefinition.vue';
@@ -18,22 +23,46 @@ import { onMounted } from 'vue';
 import { ModalNames } from '../../types';
 import { useModalStore } from '../../stores/modal';
 import { useMessageStore } from '../../stores/message';
+import { ref } from 'vue';
+
+let answer = ref<string>('');
+let gameState: GameState = getDefaultGameState();
+let board = ref<Board[][]>([]);
+let letterStates = ref<Record<string, LetterState>>({});
+let currentRowIndex = ref<number>(0);
+let allowInput: boolean;
+
+function handleGameState() {
+  const savedGameState = getGameState(answer.value);
+  if (savedGameState) {
+    console.log('im here');
+    gameState = savedGameState;
+  } else {
+    gameState.solution = answer.value;
+    setGameState(gameState);
+  }
+}
+onBeforeMount(async () => {
+  answer.value = await getWordOfTheDayFromAPI();
+  console.log(answer.value);
+
+  handleGameState();
+
+  board.value = gameState.board;
+  letterStates.value = gameState.letterState;
+  currentRowIndex.value = gameState.currentRowIndex;
+  allowInput = !gameState.isGameFinished;
+});
 
 const modal = useModalStore();
 
 // Get word of the day
 const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
-const answer = getWordOfTheDay(currentLanguage);
 const stats = getStats();
 
 // Board state. Each tile is represented as { letter, state }
-const gameState: GameState = $ref(getGameState(answer));
-const board: Board[][] = $ref(gameState.board);
-const letterStates: Record<string, LetterState> = $ref(gameState.letterState);
-// Current active row.
-let currentRowIndex = $ref(gameState.currentRowIndex);
-const currentRow = $computed(() => board[currentRowIndex]);
+const currentRow = $computed(() => board.value[currentRowIndex.value]);
 
 defineEmits(['setStats']);
 let grid = $ref('');
@@ -47,7 +76,6 @@ onMounted(() => {
   if (!existingSettings) setGameSettings(defaultGameSettings);
 });
 // Handle keyboard input.
-let allowInput = !gameState.isGameFinished;
 const onKeyup = (e: KeyboardEvent) => onKey(e.key);
 
 window.addEventListener('keyup', onKeyup);
@@ -103,7 +131,7 @@ function markCorrectRows(
   index: number
 ) {
   if (answerLetters[index] === tile.letter) {
-    tile.state = letterStates[tile.letter] = LetterState.CORRECT;
+    tile.state = letterStates.value[tile.letter] = LetterState.CORRECT;
     answerLetters[index] = null;
   }
 }
@@ -111,16 +139,16 @@ function markPresentRows(tile: Board, answerLetters: (string | null)[]) {
   if (!tile.state && answerLetters.includes(tile.letter)) {
     tile.state = LetterState.PRESENT;
     answerLetters[answerLetters.indexOf(tile.letter)] = null;
-    if (!letterStates[tile.letter]) {
-      letterStates[tile.letter] = LetterState.PRESENT;
+    if (!letterStates.value[tile.letter]) {
+      letterStates.value[tile.letter] = LetterState.PRESENT;
     }
   }
 }
 function markAbsentRows(tile: Board) {
   if (!tile.state) {
     tile.state = LetterState.ABSENT;
-    if (!letterStates[tile.letter]) {
-      letterStates[tile.letter] = LetterState.ABSENT;
+    if (!letterStates.value[tile.letter]) {
+      letterStates.value[tile.letter] = LetterState.ABSENT;
     }
   }
 }
@@ -131,15 +159,15 @@ function markAbsentRows(tile: Board) {
  */
 function isValidWord() {
   const guess = currentRow.map((tile) => tile.letter).join('');
-  if (!allWords.includes(guess) && guess !== answer) {
+  if (!allWords.includes(guess) && guess !== answer.value) {
     shake();
-    let guesses = board.map((item) => {
+    let guesses = board.value.map((item) => {
       return item.map((letterObj) => letterObj.letter).join('');
     });
     const suggestion = getSuggestion(
-      answer,
+      answer.value,
       guesses,
-      currentRowIndex,
+      currentRowIndex.value,
       allWords
     );
     messageStore.showMessage(`Not in word list try ${suggestion}`, '', 2000);
@@ -157,7 +185,7 @@ function completeRow() {
   }
   if (!isValidWord()) return;
 
-  let answerLetters: (string | null)[] = answer.split('');
+  let answerLetters: (string | null)[] = answer.value.split('');
 
   // Mark correct/present/absent letters
   currentRow.forEach((tile, i) => {
@@ -169,43 +197,43 @@ function completeRow() {
   allowInput = false;
   console.log(answer);
   if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
-    setStats(stats, currentRowIndex);
+    setStats(stats, currentRowIndex.value);
     gameState.isGameFinished = true;
     // yay!
     setTimeout(() => {
       grid = messageStore.genResultGrid();
       messageStore.showMessage(
         ['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][
-          currentRowIndex
+          currentRowIndex.value
         ],
         grid
       );
       success = true;
       modal.toggleModal(ModalNames.wordDefinitionModal);
     }, 1600);
-  } else if (currentRowIndex < board.length - 1) {
+  } else if (currentRowIndex.value < board.value.length - 1) {
     // go the next row
-    currentRowIndex++;
+    currentRowIndex.value++;
     setTimeout(() => {
       allowInput = true;
     }, 1600);
   } else {
-    setStats(stats, currentRowIndex);
+    setStats(stats, currentRowIndex.value);
     modal.toggleModal(ModalNames.wordDefinitionModal);
     gameState.isGameFinished = true;
     // game over :(
     setTimeout(() => {
-      messageStore.showMessage(answer.toUpperCase(), '', 2000);
+      messageStore.showMessage(answer.value.toUpperCase(), '', 2000);
     }, 1600);
   }
-  gameState.board = board;
-  gameState.currentRowIndex = currentRowIndex;
-  gameState.letterState = letterStates;
+  gameState.board = board.value;
+  gameState.currentRowIndex = currentRowIndex.value;
+  gameState.letterState = letterStates.value;
   setGameState(gameState);
 }
 
 function shake() {
-  shakeRowIndex = currentRowIndex;
+  shakeRowIndex = currentRowIndex.value;
   setTimeout(() => {
     shakeRowIndex = -1;
   }, 1000);
@@ -213,52 +241,65 @@ function shake() {
 </script>
 
 <template>
-  <Modal :modal-name="ModalNames.wordDefinitionModal">
-    <WordDefinition
-      :word="gameState.solution"
-      @hasSelectedNext="
-        () => {
-          modal.toggleModal(ModalNames.wordDefinitionModal);
-          modal.toggleModal(ModalNames.statsModal);
-        }
-      "
-    />
-  </Modal>
-  <div id="board">
-    <div
-      v-for="(row, index) in board"
-      :class="[
-        'row',
-        shakeRowIndex === index && 'shake',
-        success && currentRowIndex === index && 'jump',
-      ]"
-      v-bind:key="row[0].letter + row[1].letter"
-    >
+  <div
+    style="
+      width: 100%;
+      height: 100%;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    "
+    v-if="answer != ''"
+  >
+    <Modal :modal-name="ModalNames.wordDefinitionModal">
+      <WordDefinition
+        :word="answer"
+        @hasSelectedNext="
+          () => {
+            modal.toggleModal(ModalNames.wordDefinitionModal);
+            modal.toggleModal(ModalNames.statsModal);
+          }
+        "
+      />
+    </Modal>
+    <div id="board">
       <div
-        v-for="(tile, index) in row"
-        :class="['tile', tile.letter && 'filled', tile.state && 'revealed']"
-        v-bind:key="tile.letter"
+        v-for="(row, index) in board"
+        :class="[
+          'row',
+          shakeRowIndex === index && 'shake',
+          success && currentRowIndex === index && 'jump',
+        ]"
+        v-bind:key="row[0].letter + row[1].letter"
       >
-        <div class="front" :style="{ transitionDelay: `${index * 300}ms` }">
-          {{ tile.letter }}
-        </div>
         <div
-          :class="['back', tile.state]"
-          :style="{
-            transitionDelay: `${index * 300}ms`,
-            animationDelay: `${index * 100}ms`,
-          }"
+          v-for="(tile, index) in row"
+          :class="['tile', tile.letter && 'filled', tile.state && 'revealed']"
+          v-bind:key="tile.letter"
         >
-          {{ tile.letter }}
+          <div class="front" :style="{ transitionDelay: `${index * 300}ms` }">
+            {{ tile.letter }}
+          </div>
+          <div
+            :class="['back', tile.state]"
+            :style="{
+              transitionDelay: `${index * 300}ms`,
+              animationDelay: `${index * 100}ms`,
+            }"
+          >
+            {{ tile.letter }}
+          </div>
         </div>
       </div>
     </div>
+    <Keyboard
+      @key="onKey"
+      :letter-states="letterStates"
+      :language="currentLanguage"
+    />
   </div>
-  <Keyboard
-    @key="onKey"
-    :letter-states="letterStates"
-    :language="currentLanguage"
-  />
 </template>
 
 <style scoped>

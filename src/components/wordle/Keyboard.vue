@@ -55,6 +55,8 @@ function getKeyboard(language: string) {
 
 <style scoped>
 #keyboard {
+  margin-left: auto;
+  margin-right: auto;
   user-select: none;
   bottom: 0;
   width: 100%;

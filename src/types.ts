@@ -12,6 +12,16 @@ export const enum ModalNames {
   cardGameFinishedModal = 'cardGameFinishedModal',
 }
 
+export interface WordResponse {
+  date?: string;
+  id: number;
+  name_eng: string;
+  name_tereo: string;
+  image: string;
+  audio: string;
+  description: string;
+}
+
 export interface CardObj {
   sound?: string;
   image?: string;
