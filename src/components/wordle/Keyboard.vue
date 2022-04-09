@@ -31,6 +31,7 @@ function getKeyboard(language: string) {
       <button
         v-for="key in row"
         :key="key"
+        type="button"
         :class="[key.length > 1 && 'big', letterStates[key]]"
         @click="$emit('key', key)"
       >
