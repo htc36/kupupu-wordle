@@ -8,11 +8,11 @@ const stats = getStats();
 
 <template>
   <ViewWrapper>
-    <Navbar :stats="stats"></Navbar>
+    <Navbar :stats="stats" />
     <div class="game-wrapper">
       <router-view />
     </div>
-    <Footer></Footer>
+    <Footer />
   </ViewWrapper>
 </template>
 <style>

@@ -43,20 +43,26 @@ defineExpose({
 });
 </script>
 <template>
-  <div
-    :class="[{ active: isActive, shake: isShake }, 'flip-card']"
-    @click="clickCard"
-  >
+  <div :class="[{ active: isActive, shake: isShake }, 'flip-card']">
     <div class="flip-card-inner">
       <div class="flip-card-front">
-        <img src="/assets/card3.png" alt="Card front" class="card-img" />
+        <img
+          @click="clickCard"
+          src="/assets/card3.png"
+          alt="Card front"
+          class="card-img"
+        />
       </div>
       <div v-if="isTextCard" class="flip-card-back">
         <p class="card-text">{{ answer }}</p>
-        <img src="/assets/card_text_background.png" class="card-img" />
+        <img
+          @click="clickCard"
+          src="/assets/card_text_background.png"
+          class="card-img"
+        />
       </div>
       <div v-else class="flip-card-back">
-        <img :src="`/assets/${image}`" class="card-img" />
+        <img @click="clickCard" :src="`/assets/${image}`" class="card-img" />
       </div>
     </div>
   </div>
@@ -64,7 +70,6 @@ defineExpose({
 <style scoped>
 .flip-card {
   transition: 0.5s;
-  cursor: pointer;
   background-color: transparent;
   perspective: 1000px;
   max-height: v-bind(maxCardHeight);
@@ -116,6 +121,7 @@ defineExpose({
 
 .card-img {
   height: 100%;
+  cursor: pointer;
   width: auto;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
   border-radius: 5%;

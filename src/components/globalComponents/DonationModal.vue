@@ -7,6 +7,7 @@ import { ModalNames } from '../../types';
     <Modal :modal-name="ModalNames.donationModal">
       <div class="iframeContainer">
         <iframe
+          title="Buy me a coffee modal"
           src="https://www.buymeacoffee.com/widget/page/papatuanuku?description=Support%20me%20on%20Buy%20me%20a%20coffee!&amp;color=%23FF813F"
         ></iframe>
       </div>
