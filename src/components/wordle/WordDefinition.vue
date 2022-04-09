@@ -7,7 +7,6 @@ defineProps<{
 }>();
 const gameSettings = ref(getGameSettings());
 const solutionObject = ref<WordResponse>(getSolutionObject());
-console.log(solutionObject.value);
 function openLesson() {
   window.open('https://whanau.tv/', '_blank');
 }

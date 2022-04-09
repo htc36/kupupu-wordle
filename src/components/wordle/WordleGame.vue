@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { onBeforeMount, onUnmounted } from 'vue';
-import {
-  getWordOfTheDay,
-  getAllWords,
-  getWordOfTheDayFromAPI,
-} from '../../words';
+import { getAllWords, getWordOfTheDayFromAPI } from '../../words';
 import {
   getStats,
   setStats,
@@ -35,7 +31,6 @@ let allowInput: boolean;
 function handleGameState() {
   const savedGameState = getGameState(answer.value);
   if (savedGameState) {
-    console.log('im here');
     gameState = savedGameState;
   } else {
     gameState.solution = answer.value;
@@ -241,18 +236,7 @@ function shake() {
 </script>
 
 <template>
-  <div
-    style="
-      width: 100%;
-      height: 100%;
-      margin-top: 20px;
-      margin-bottom: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    "
-    v-if="answer != ''"
-  >
+  <div class="gameContainer" v-if="answer != ''">
     <Modal :modal-name="ModalNames.wordDefinitionModal">
       <WordDefinition
         :word="answer"
@@ -300,9 +284,24 @@ function shake() {
       :language="currentLanguage"
     />
   </div>
+  <div v-else class="loading"></div>
 </template>
 
 <style scoped>
+.gameContainer {
+  width: 100%;
+  height: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.loading {
+  height: 100%;
+  width: 100%;
+  background: url('/assets/loader.svg') no-repeat center;
+}
 #board {
   display: grid;
   grid-template-rows: repeat(6, 1fr);

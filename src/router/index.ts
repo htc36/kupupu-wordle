@@ -4,8 +4,8 @@ import WordleScreen from '../views/WordleScreen.vue';
 import CardScreen from '../views/CardScreen.vue';
 
 const routes = [
-  // { path: '/', name: 'Home', component: Home },
-  { path: '/', name: 'WordleScreen', component: WordleScreen },
+  { path: '/', name: 'Home', component: Home },
+  { path: '/wordle', name: 'WordleScreen', component: WordleScreen },
   { path: '/cards', name: 'CardScreen', component: CardScreen },
 ];
 

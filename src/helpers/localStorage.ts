@@ -72,7 +72,6 @@ export function getGameState(solution: string) {
   const existingGameState: GameState = JSON.parse(
     window.localStorage.getItem('gameState') as string
   );
-  console.log(existingGameState);
   if (existingGameState && existingGameState.solution === solution) {
     return JSON.parse(
       window.localStorage.getItem('gameState') as string
