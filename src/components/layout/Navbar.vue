@@ -2,6 +2,8 @@
 import Modal from './Modal.vue';
 import GameSettings from '../wordle/GameSettings.vue';
 import Statistics from '../wordle/GameStatistics.vue';
+import Tabs from '../utils/Tabs.vue';
+import Tab from '../utils/Tab.vue';
 import { AllGameStats } from '../../types';
 import { ref } from 'vue';
 import { ModalNames } from '../../types';
@@ -17,7 +19,10 @@ const isMenuActive = ref(false);
 <template>
   <header class="header">
     <Modal :modal-name="ModalNames.settingsModal">
-      <GameSettings />
+      <Tabs>
+        <Tab title="Settings"><GameSettings /></Tab>
+        <Tab title="Statistics"><Statistics :stats="stats" /></Tab>
+      </Tabs>
     </Modal>
 
     <Modal :modal-name="ModalNames.statsModal">

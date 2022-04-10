@@ -44,6 +44,7 @@ const modal = useModalStore();
   bottom: 50%;
   left: 50%;
   transform: translate(-50%, 50%);
+  transition: 0.4s all ease-out;
   z-index: 2;
 }
 
@@ -58,7 +59,7 @@ const modal = useModalStore();
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  padding: 24px;
+  padding: 4%;
   background: white;
   border-radius: 8px;
   overflow-y: auto;
@@ -70,8 +71,8 @@ const modal = useModalStore();
 .close-btn {
   z-index: 5;
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 10px;
+  right: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
