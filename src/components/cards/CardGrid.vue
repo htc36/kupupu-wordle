@@ -138,6 +138,8 @@ function cardOpened(index: number) {
   width: 100%;
   height: 100%;
   justify-content: space-between;
+  background-color: white;
+  border-radius: 10px;
 }
 .modal-title {
   font-size: 1.7rem;

@@ -15,10 +15,9 @@ const selectedTitle = inject('selectedTitle');
 <style scoped>
 .tab-content {
   width: 100%;
-  height: 94%;
-  background-color: #e5ebff;
+  height: 100%;
+  background-color: white;
   border-radius: 0 0 10px 10px;
-  padding: 15px 10px;
   transition: 0.4s display ease-out;
 }
 </style>

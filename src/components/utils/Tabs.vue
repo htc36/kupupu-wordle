@@ -49,11 +49,11 @@ provide('selectedTitle', selectedTitle);
   text-align: center;
   cursor: pointer;
   transition: 0.4s all ease-out;
-  background-color: #fff;
+  background-color: #e5ebff;
   border-radius: 10px 10px 0 0;
 }
 
 .activeTab {
-  background-color: #e5ebff;
+  background-color: white;
 }
 </style>

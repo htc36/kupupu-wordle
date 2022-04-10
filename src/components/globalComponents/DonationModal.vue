@@ -20,6 +20,7 @@ import { ModalNames } from '../../types';
   width: 100%;
   display: flex;
   align-items: flex-end;
+  background-color: white;
 }
 iframe {
   margin: 0px;
