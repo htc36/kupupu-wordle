@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GameSettings } from '../types';
+import { GameSettings } from '../../types';
 const props = defineProps<{
   settingName: keyof GameSettings;
   toggleSwitch: (whichSwitch: keyof GameSettings) => void;

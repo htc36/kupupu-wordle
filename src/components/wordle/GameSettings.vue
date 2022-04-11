@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import Switch from '../utils/Switch.vue';
 import { ref } from 'vue';
-import { GameSettings } from '../types';
-import { setGameSettings, getGameSettings } from '../helpers/localStorage';
+import { GameSettings } from '../../types';
+import { setGameSettings, getGameSettings } from '../../helpers/localStorage';
 const settings = ref<GameSettings>(getGameSettings());
 const toggleSwitch = (settingName: keyof GameSettings) => {
   settings.value[settingName] = !settings.value[settingName];
@@ -16,7 +16,7 @@ const toggleSwitch = (settingName: keyof GameSettings) => {
 </script>
 <template>
   <div class="sections">
-    <h1>Settings</h1>
+    <h1 class="modalTitle">Settings</h1>
     <section>
       <div class="setting">
         <div class="text">
@@ -122,6 +122,7 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 .setting {
   display: flex;

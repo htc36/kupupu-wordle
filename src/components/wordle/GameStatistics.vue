@@ -1,14 +1,27 @@
 <script setup lang="ts">
-import { AllGameStats, Guesses } from '../types';
+import { AllGameStats, Guesses } from '../../types';
+import { useMessageStore } from '../../stores/message';
 defineProps<{
   stats: AllGameStats;
 }>();
+const messageStore = useMessageStore();
+function onShare() {
+  const resultGrid = messageStore.genResultGrid();
+  if (resultGrid != '') {
+    const messageToCopy = `#kupupu ${new Date().toLocaleDateString(
+      'en-NZ'
+    )}\n\n${resultGrid}`;
+    navigator.clipboard.writeText(messageToCopy);
+    messageStore.showMessage('Copied To Clipboard!', resultGrid);
+  } else {
+    messageStore.showMessage('Nothing To Share!');
+  }
+}
 </script>
 
 <template>
   <div class="container">
-    <!-- <h1>{{ JSON.stringify(stats) }}</h1> -->
-    <h1>Statistics</h1>
+    <h1 class="modalTitle">Statistics</h1>
     <div id="statistics">
       <div class="statistic-container">
         <div class="statistic">{{ stats.gamesPlayed }}</div>
@@ -57,7 +70,7 @@ defineProps<{
     </div>
     <div class="footer">
       <div class="countdown">
-        <h1>Next WORDLE</h1>
+        <h1 style="text-align: center">Next Wordle</h1>
         <div id="timer">
           <div class="statistic-container">
             <div class="statistic timer">
@@ -69,7 +82,7 @@ defineProps<{
         </div>
       </div>
       <div class="share">
-        <button id="share-button">Share</button>
+        <button id="share-button" @click="onShare()">Share</button>
       </div>
     </div>
   </div>
@@ -141,6 +154,8 @@ export default {
   padding: 16px 0;
   width: 100%;
   height: 100%;
+  background-color: white;
+  border-radius: 10px;
 }
 #statistics {
   color: var(--color-tone-1);
@@ -208,7 +223,7 @@ export default {
 }
 .num-guesses {
   font-size: 14px;
-  line-height: 20px;
+  line-height: 17px;
   font-weight: bold;
   color: var(--tile-text-color);
 }

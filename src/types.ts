@@ -4,6 +4,34 @@ export const enum LetterState {
   PRESENT = 'present',
   ABSENT = 'absent',
 }
+
+export const enum ModalNames {
+  donationModal = 'donationModal',
+  settingsModal = 'settingsModal',
+  statsModal = 'statsModal',
+  wordDefinitionModal = 'wordDefinitionModal',
+  cardGameFinishedModal = 'cardGameFinishedModal',
+}
+
+export interface WordResponse {
+  date?: string;
+  id: number;
+  name_eng: string;
+  name_tereo: string;
+  image: string;
+  audio: string;
+  description: string;
+}
+
+export interface CardObj {
+  sound?: string;
+  image?: string;
+  answer: string;
+  index?: number;
+  id?: number;
+  isTextCard?: boolean;
+  cardLocked?: boolean;
+}
 export interface Board {
   letter: string;
   state: LetterState;

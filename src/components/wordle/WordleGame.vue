@@ -1,38 +1,69 @@
 <script setup lang="ts">
-import { onUnmounted } from 'vue';
-import { getWordOfTheDay, getAllWords } from './words';
+import { onBeforeMount, onUnmounted } from 'vue';
+import { getAllWords, getWordOfTheDayFromAPI } from '../../words';
 import {
   getStats,
   setStats,
   getGameState,
   setGameState,
   setGameSettings,
-} from './helpers/localStorage';
-import { defaultGameSettings } from './helpers/localStorage';
-import Keyboard from './components/Keyboard.vue';
-import { LetterState, Board, GameState } from './types';
-import getSuggestion from './helpers/suggestion';
-import { ref, onMounted } from 'vue';
-import Navbar from './components/Navbar.vue';
+  getDefaultGameState,
+} from '../../helpers/localStorage';
+import Modal from '../layout/Modal.vue';
+import WordDefinition from './WordDefinition.vue';
+import { defaultGameSettings } from '../../helpers/localStorage';
+import Keyboard from './Keyboard.vue';
+import { LetterState, Board, GameState } from '../../types';
+import getSuggestion from '../../helpers/suggestion';
+import { onMounted } from 'vue';
+import { ModalNames } from '../../types';
+import { useModalStore } from '../../stores/modal';
+import { useMessageStore } from '../../stores/message';
+import { ref } from 'vue';
+
+let answer = ref<string>('');
+let gameState: GameState = getDefaultGameState();
+let board = ref<Board[][]>([]);
+let letterStates = ref<Record<string, LetterState>>({});
+let currentRowIndex = ref<number>(0);
+let allowInput: boolean;
+
+function handleGameState() {
+  const savedGameState = getGameState(answer.value);
+  if (savedGameState) {
+    gameState = savedGameState;
+  } else {
+    gameState.solution = answer.value;
+    setGameState(gameState);
+  }
+}
+onBeforeMount(async () => {
+  answer.value = await getWordOfTheDayFromAPI();
+  console.log(answer.value);
+
+  handleGameState();
+
+  board.value = gameState.board;
+  letterStates.value = gameState.letterState;
+  currentRowIndex.value = gameState.currentRowIndex;
+  allowInput = !gameState.isGameFinished;
+});
+
+const modal = useModalStore();
+
 // Get word of the day
 const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
-const answer = getWordOfTheDay(currentLanguage);
 const stats = getStats();
 
 // Board state. Each tile is represented as { letter, state }
-const gameState: GameState = $ref(getGameState(answer));
-const board: Board[][] = $ref(gameState.board);
-const letterStates: Record<string, LetterState> = $ref(gameState.letterState);
-// Current active row.
-let currentRowIndex = $ref(gameState.currentRowIndex);
-const currentRow = $computed(() => board[currentRowIndex]);
+const currentRow = $computed(() => board.value[currentRowIndex.value]);
 
-const navbar = ref<InstanceType<typeof Navbar> | null>(null);
-let message = $ref('');
+defineEmits(['setStats']);
 let grid = $ref('');
 let shakeRowIndex = $ref(-1);
 let success = $ref(false);
+const messageStore = useMessageStore();
 onMounted(() => {
   const existingSettings = JSON.parse(
     window.localStorage.getItem('gameSettings') as string
@@ -40,8 +71,6 @@ onMounted(() => {
   if (!existingSettings) setGameSettings(defaultGameSettings);
 });
 // Handle keyboard input.
-let allowInput = true;
-
 const onKeyup = (e: KeyboardEvent) => onKey(e.key);
 
 window.addEventListener('keyup', onKeyup);
@@ -97,7 +126,7 @@ function markCorrectRows(
   index: number
 ) {
   if (answerLetters[index] === tile.letter) {
-    tile.state = letterStates[tile.letter] = LetterState.CORRECT;
+    tile.state = letterStates.value[tile.letter] = LetterState.CORRECT;
     answerLetters[index] = null;
   }
 }
@@ -105,16 +134,16 @@ function markPresentRows(tile: Board, answerLetters: (string | null)[]) {
   if (!tile.state && answerLetters.includes(tile.letter)) {
     tile.state = LetterState.PRESENT;
     answerLetters[answerLetters.indexOf(tile.letter)] = null;
-    if (!letterStates[tile.letter]) {
-      letterStates[tile.letter] = LetterState.PRESENT;
+    if (!letterStates.value[tile.letter]) {
+      letterStates.value[tile.letter] = LetterState.PRESENT;
     }
   }
 }
 function markAbsentRows(tile: Board) {
   if (!tile.state) {
     tile.state = LetterState.ABSENT;
-    if (!letterStates[tile.letter]) {
-      letterStates[tile.letter] = LetterState.ABSENT;
+    if (!letterStates.value[tile.letter]) {
+      letterStates.value[tile.letter] = LetterState.ABSENT;
     }
   }
 }
@@ -125,18 +154,18 @@ function markAbsentRows(tile: Board) {
  */
 function isValidWord() {
   const guess = currentRow.map((tile) => tile.letter).join('');
-  if (!allWords.includes(guess) && guess !== answer) {
+  if (!allWords.includes(guess) && guess !== answer.value) {
     shake();
-    let guesses = board.map((item) => {
+    let guesses = board.value.map((item) => {
       return item.map((letterObj) => letterObj.letter).join('');
     });
     const suggestion = getSuggestion(
-      answer,
+      answer.value,
       guesses,
-      currentRowIndex,
+      currentRowIndex.value,
       allWords
     );
-    showMessage(`Not in word list try ${suggestion}`, 2000);
+    messageStore.showMessage(`Not in word list try ${suggestion}`, '', 2000);
     return false;
   }
   return true;
@@ -146,12 +175,12 @@ function completeRow() {
   if (!currentRow.every((tile) => tile.letter)) {
     // The row is not filled out
     shake();
-    showMessage('Not enough letters');
+    messageStore.showMessage('Not enough letters');
     return;
   }
   if (!isValidWord()) return;
 
-  let answerLetters: (string | null)[] = answer.split('');
+  let answerLetters: (string | null)[] = answer.value.split('');
 
   // Mark correct/present/absent letters
   currentRow.forEach((tile, i) => {
@@ -161,86 +190,64 @@ function completeRow() {
   });
 
   allowInput = false;
+  console.log(answer);
   if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
-    setStats(stats, currentRowIndex);
+    setStats(stats, currentRowIndex.value);
     gameState.isGameFinished = true;
     // yay!
     setTimeout(() => {
-      grid = genResultGrid();
-      showMessage(
+      grid = messageStore.genResultGrid();
+      messageStore.showMessage(
         ['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][
-          currentRowIndex
+          currentRowIndex.value
         ],
-        1000
+        grid
       );
       success = true;
-      navbar.value?.toggleWordDefModal(true);
-      // wordDefinitionModal.value?.open();
+      modal.toggleModal(ModalNames.wordDefinitionModal);
     }, 1600);
-  } else if (currentRowIndex < board.length - 1) {
+  } else if (currentRowIndex.value < board.value.length - 1) {
     // go the next row
-    currentRowIndex++;
+    currentRowIndex.value++;
     setTimeout(() => {
       allowInput = true;
     }, 1600);
   } else {
-    setStats(stats, currentRowIndex);
-    navbar.value?.toggleWordDefModal(true);
+    setStats(stats, currentRowIndex.value);
+    modal.toggleModal(ModalNames.wordDefinitionModal);
     gameState.isGameFinished = true;
     // game over :(
     setTimeout(() => {
-      showMessage(answer.toUpperCase(), 2000);
+      messageStore.showMessage(answer.value.toUpperCase(), '', 2000);
     }, 1600);
   }
-  gameState.board = board;
-  gameState.currentRowIndex = currentRowIndex;
-  gameState.letterState = letterStates;
+  gameState.board = board.value;
+  gameState.currentRowIndex = currentRowIndex.value;
+  gameState.letterState = letterStates.value;
   setGameState(gameState);
 }
 
-function showMessage(msg: string, time = 1000) {
-  message = msg;
-  if (time > 0) {
-    setTimeout(() => {
-      message = '';
-    }, time);
-  }
-}
-
 function shake() {
-  shakeRowIndex = currentRowIndex;
+  shakeRowIndex = currentRowIndex.value;
   setTimeout(() => {
     shakeRowIndex = -1;
   }, 1000);
 }
-
-const icons = {
-  [LetterState.CORRECT]: '🟩',
-  [LetterState.PRESENT]: '🟨',
-  [LetterState.ABSENT]: '⬜',
-  [LetterState.INITIAL]: null,
-};
-
-function genResultGrid() {
-  return board
-    .slice(0, currentRowIndex + 1)
-    .map((row) => {
-      return row.map((tile) => icons[tile.state]).join('');
-    })
-    .join('\n');
-}
 </script>
 
 <template>
-  <Transition>
-    <div class="message" v-if="message">
-      {{ message }}
-      <pre v-if="grid">{{ grid }}</pre>
-    </div>
-  </Transition>
-
-  <div class="gameWrapper">
-    <Navbar ref="navbar" :gameState="gameState" :stats="stats" />
+  <div class="gameContainer" v-if="answer != ''">
+    <Modal :modal-name="ModalNames.wordDefinitionModal">
+      <WordDefinition
+        :word="answer"
+        @hasSelectedNext="
+          () => {
+            modal.toggleModal(ModalNames.wordDefinitionModal);
+            modal.toggleModal(ModalNames.statsModal);
+          }
+        "
+      />
+    </Modal>
     <div id="board">
       <div
         v-for="(row, index) in board"
@@ -272,23 +279,27 @@ function genResultGrid() {
       </div>
     </div>
     <Keyboard
-      class="keyboard"
       @key="onKey"
       :letter-states="letterStates"
       :language="currentLanguage"
     />
   </div>
+  <div v-else class="loading"></div>
 </template>
 
 <style scoped>
-.keyboard {
-  bottom: 0;
+.gameContainer {
   width: 100%;
-  position: absolute;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
 }
-.gameWrapper {
-  position: relative;
-  height: 100vh;
+.loading {
+  height: 100%;
+  width: 100%;
+  background: url('/assets/loader.svg') no-repeat center;
 }
 #board {
   display: grid;
@@ -300,22 +311,6 @@ function genResultGrid() {
   height: var(--height);
   width: min(350px, calc(var(--height) / 6 * 5));
   margin: 0px auto;
-}
-.message {
-  position: absolute;
-  left: 50%;
-  top: 80px;
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.85);
-  padding: 16px 20px;
-  z-index: 4;
-  border-radius: 4px;
-  transform: translateX(-50%);
-  transition: opacity 0.3s ease-out;
-  font-weight: 600;
-}
-.message.v-leave-to {
-  opacity: 0;
 }
 .easeModal {
   z-index: 9;

@@ -1,6 +1,35 @@
+import { CardObj } from '../types';
+
 interface AssetMapping {
   [key: string]: any;
 }
+export const cards: CardObj[] = [
+  {
+    sound: '00044 whare - house 01.mp3',
+    image: '00044 whare - house 01.png',
+    answer: 'whare',
+  },
+  {
+    sound: '00080 rakau - tree 01.mp3',
+    image: '00080 rakau - tree 01.png',
+    answer: 'rākau',
+  },
+  {
+    sound: '00102 matua - father 01.mp3',
+    image: '00102 matua - father 01.png',
+    answer: 'matua',
+  },
+  {
+    sound: '00113 moana - ocean 02.mp3',
+    image: '00113 moana - ocean 02.png',
+    answer: 'moana',
+  },
+  {
+    sound: '00133 hoiho - horse 01.mp3',
+    image: '00133 hoiho - horse 01.png',
+    answer: 'hōiho',
+  },
+];
 export const assetMapping: AssetMapping = {
   whare: {
     sound: '00044 whare - house 01.mp3',

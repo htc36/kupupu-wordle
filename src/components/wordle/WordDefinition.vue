@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { assetMapping } from '../helpers/assetMapping';
-import { getGameSettings } from '../helpers/localStorage';
-const props = defineProps<{
+import { getGameSettings, getSolutionObject } from '../../helpers/localStorage';
+import { WordResponse } from '../../types';
+defineProps<{
   word: string;
 }>();
 const gameSettings = ref(getGameSettings());
-const wordAssets = ref(assetMapping[props.word]);
+const solutionObject = ref<WordResponse>(getSolutionObject());
 function openLesson() {
   window.open('https://whanau.tv/', '_blank');
 }
@@ -16,10 +16,14 @@ function openLesson() {
   <div class="container">
     <img
       v-show="gameSettings.shouldShowImage"
-      :src="`/assets/${wordAssets.image}`"
+      :src="`https://whanau.tv/eventMedia/${solutionObject.image}`"
     />
-    <figure v-show="gameSettings.shouldPlaySound">
-      <audio controls :src="`/assets/${wordAssets.sound}`">
+    <figure class="audio-figure" v-show="gameSettings.shouldPlaySound">
+      <audio
+        class="audio"
+        controls
+        :src="`https://whanau.tv/eventMedia/${solutionObject.audio}`"
+      >
         Your browser does not support the
         <code>audio</code> element.
       </audio>
@@ -41,6 +45,15 @@ function openLesson() {
   padding: 16px 0;
   width: 100%;
   height: 100%;
+  background-color: white;
+  border-radius: 10px;
+}
+.audio {
+  width: 300px;
+  height: 54px;
+}
+.audio-figure {
+  margin: 10px 0;
 }
 #statistics {
   color: var(--color-tone-1);

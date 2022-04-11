@@ -1,5 +1,5 @@
 import { LetterState } from '../types';
-import { AllGameStats, GameState, GameSettings } from '../types';
+import { AllGameStats, GameState, GameSettings, WordResponse } from '../types';
 const defaultStats: AllGameStats = {
   currentStreak: 0,
   maxStreak: 0,
@@ -34,6 +34,39 @@ export function setStats(statsObj: AllGameStats, guessLine: number) {
   console.log('Setting new stats', statsObj);
   window.localStorage.setItem('wordleStats', JSON.stringify(statsObj));
 }
+export function getSolutionObject() {
+  const solutionObjectString = window.localStorage.getItem('solutionObject');
+  if (solutionObjectString) {
+    return JSON.parse(solutionObjectString);
+  }
+  return;
+}
+export function setSolutionObject(solutionObj: WordResponse, date: string) {
+  const solutionObjToSave = { ...solutionObj, ...{ date } };
+  window.localStorage.setItem(
+    'solutionObject',
+    JSON.stringify(solutionObjToSave)
+  );
+  return;
+}
+
+export function getDefaultGameState() {
+  const defaultBoard = Array.from({ length: 6 }, () =>
+    Array.from({ length: 5 }, () => ({
+      letter: '',
+      state: LetterState.INITIAL,
+    }))
+  );
+  const gameState: GameState = {
+    solution: '',
+    lastCompleted: null,
+    isGameFinished: false,
+    board: defaultBoard,
+    letterState: {},
+    currentRowIndex: 0,
+  };
+  return gameState;
+}
 
 export function getGameState(solution: string) {
   const existingGameState: GameState = JSON.parse(
@@ -44,21 +77,13 @@ export function getGameState(solution: string) {
       window.localStorage.getItem('gameState') as string
     ) as GameState;
   }
-  const defaultBoard = Array.from({ length: 6 }, () =>
-    Array.from({ length: 5 }, () => ({
-      letter: '',
-      state: LetterState.INITIAL,
-    }))
+  return false;
+}
+export function getBoard() {
+  const existingGameState: GameState = JSON.parse(
+    window.localStorage.getItem('gameState') as string
   );
-  const gameState: GameState = {
-    solution: solution,
-    lastCompleted: null,
-    isGameFinished: false,
-    board: defaultBoard,
-    letterState: {},
-    currentRowIndex: 0,
-  };
-  return gameState;
+  return existingGameState.board;
 }
 
 export function setGameSettings(gameSettingsObj: GameSettings) {
