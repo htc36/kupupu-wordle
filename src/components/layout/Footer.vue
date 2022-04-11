@@ -26,9 +26,7 @@ import BuyCoffeeButton from '../utils/BuyCoffeeButton.vue';
   justify-content: space-between;
   border-top: 1px solid #e5e5e5;
   padding: 0.5rem 1rem;
-  height: 3.4rem;
   width: 80%;
-  position: relative;
   max-width: 600px;
 }
 </style>

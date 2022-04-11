@@ -41,6 +41,12 @@ textarea {
 
 body {
   font-family: 'Calibri', sans-serif;
+  height: 100vh;
+  max-height: 100vh;
+}
+#app {
+  height: 100vh;
+  max-height: 100vh;
 }
 /*COLOR PALETTE*/
 .correct {

@@ -291,11 +291,9 @@ function shake() {
 .gameContainer {
   width: 100%;
   height: 100%;
-  margin-top: 20px;
-  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
 }
 .loading {

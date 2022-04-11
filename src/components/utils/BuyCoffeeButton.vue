@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import DonationModal from '../globalComponents/DonationModal.vue';
-// import { useMessageStore } from '../stores/message';
 import { useModalStore } from '../../stores/modal';
 import { ModalNames } from '../../types';
 const modalStore = useModalStore();

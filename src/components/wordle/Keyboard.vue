@@ -60,7 +60,6 @@ function getKeyboard(language: string) {
   bottom: 0;
   width: 100%;
   max-width: 500px;
-  margin-top: 50px;
 }
 @media screen and (max-width: 500px) {
   #keyboard {

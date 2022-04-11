@@ -46,12 +46,11 @@ const { messageToDisplay, formattedText } = storeToRefs(game);
   opacity: 0;
 }
 .wrapper-container {
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100vw;
-  height: 100vh;
   overflow: hidden;
 }
 </style>

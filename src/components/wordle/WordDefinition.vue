@@ -45,6 +45,8 @@ function openLesson() {
   padding: 16px 0;
   width: 100%;
   height: 100%;
+  background-color: white;
+  border-radius: 10px;
 }
 .audio {
   width: 300px;
