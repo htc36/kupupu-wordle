@@ -140,6 +140,7 @@ function cardOpened(index: number) {
   justify-content: space-around;
   background-color: white;
   border-radius: 10px;
+  padding: 30px;
 }
 .modal-title {
   font-size: 1.7rem;

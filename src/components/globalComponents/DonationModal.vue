@@ -32,8 +32,7 @@ iframe {
   height: 100%;
   width: 100%;
   border-radius: 10px;
-  background: url('https://marketplace.kony.com/static/dist/images/loader.svg')
-    no-repeat center;
+  background: url('/assets/loader.svg') no-repeat center;
   transition: all 0.4s ease 0s;
 }
 </style>
