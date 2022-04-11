@@ -38,7 +38,7 @@ const modal = useModalStore();
 <style scoped>
 .content {
   position: fixed;
-  background-color: #000000b3;
+  background-color: #0000005e;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -56,9 +56,6 @@ const modal = useModalStore();
   max-width: 530px;
   height: 100%;
   max-height: 500px;
-  box-shadow: 0px 0px 12px 0px rgba(161, 161, 161, 0.75);
-  -webkit-box-shadow: 0px 0px 12px 0px rgba(161, 161, 161, 0.75);
-  -moz-box-shadow: 0px 0px 12px 0px rgba(161, 161, 161, 0.75);
   position: relative;
   display: flex;
   align-items: center;

@@ -137,7 +137,7 @@ function cardOpened(index: number) {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  justify-content: space-between;
+  justify-content: space-around;
   background-color: white;
   border-radius: 10px;
 }
