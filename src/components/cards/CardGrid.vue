@@ -172,6 +172,7 @@ function cardOpened(index: number) {
 .audio-figure {
   margin: 10px 0;
   width: 70%;
+  flex-shrink: 0;
 }
 .words-time {
   text-align: center;
@@ -184,6 +185,9 @@ function cardOpened(index: number) {
   audio::-webkit-media-controls-volume-control-container,
   audio::-webkit-media-controls-timeline {
     display: none;
+  }
+  audio::-webkit-media-controls-panel {
+    justify-content: space-between;
   }
   .audio {
     width: 100%;

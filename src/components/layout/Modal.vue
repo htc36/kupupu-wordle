@@ -38,7 +38,7 @@ const modal = useModalStore();
 <style scoped>
 .content {
   position: fixed;
-  background-color: transparent;
+  background-color: #000000b3;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -53,7 +53,7 @@ const modal = useModalStore();
 
 .help-modal-content {
   width: 100%;
-  max-width: 500px;
+  max-width: 530px;
   height: 100%;
   max-height: 500px;
   box-shadow: 0px 0px 12px 0px rgba(161, 161, 161, 0.75);
@@ -69,7 +69,7 @@ const modal = useModalStore();
 }
 .help-modal-content.donationModal {
   background: #636363;
-  max-height: 700px;
+  max-height: 740px;
 }
 .close-btn {
   z-index: 5;
@@ -78,12 +78,18 @@ const modal = useModalStore();
   align-items: center;
   justify-content: center;
   top: -32px;
-  right: -5px;
+  right: 0px;
   width: 30px;
   height: 30px;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s;
   background-color: #f4d5d5;
+}
+
+@media screen and (max-width: 400px) {
+  .help-modal-content.donationModal {
+    max-height: 540px;
+  }
 }
 </style>

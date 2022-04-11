@@ -30,9 +30,10 @@ provide('selectedTitle', selectedTitle);
 <style scoped>
 .tabs {
   width: 100%;
-  max-width: 500px;
   height: 100%;
   max-height: 500px;
+  display: flex;
+  flex-direction: column;
 }
 
 .tabs-header {
