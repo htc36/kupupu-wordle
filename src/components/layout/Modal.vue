@@ -66,7 +66,7 @@ const modal = useModalStore();
 }
 .help-modal-content.donationModal {
   background: #636363;
-  max-height: 740px;
+  max-height: 540px;
 }
 .close-btn {
   z-index: 5;
