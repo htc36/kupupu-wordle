@@ -3,7 +3,7 @@ import { onBeforeMount, onUnmounted } from 'vue';
 import { getAllWords, getWordOfTheDayFromAPI } from '../../words';
 import {
   getStats,
-  setStats,
+  setWordleStats,
   getGameState,
   setGameState,
   setGameSettings,
@@ -13,7 +13,13 @@ import Modal from '../layout/Modal.vue';
 import WordDefinition from './WordDefinition.vue';
 import { defaultGameSettings } from '../../helpers/localStorage';
 import Keyboard from './Keyboard.vue';
-import { LetterState, Board, GameState } from '../../types';
+import {
+  LetterState,
+  Board,
+  GameState,
+  WordleGameStats,
+  CardGameStats,
+} from '../../types';
 import getSuggestion from '../../helpers/suggestion';
 import { onMounted } from 'vue';
 import { ModalNames } from '../../types';
@@ -54,12 +60,13 @@ const modal = useModalStore();
 // Get word of the day
 const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
-const stats = getStats();
+const wordleStats: WordleGameStats | CardGameStats | object =
+  getStats('wordleStats');
 
 // Board state. Each tile is represented as { letter, state }
 const currentRow = $computed(() => board.value[currentRowIndex.value]);
 
-defineEmits(['setStats']);
+defineEmits(['setWordleStats']);
 let grid = $ref('');
 let shakeRowIndex = $ref(-1);
 let success = $ref(false);
@@ -192,7 +199,7 @@ function completeRow() {
   allowInput = false;
   console.log(answer);
   if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
-    setStats(stats, currentRowIndex.value);
+    setWordleStats(wordleStats as WordleGameStats, currentRowIndex.value);
     gameState.isGameFinished = true;
     // yay!
     setTimeout(() => {
@@ -213,7 +220,7 @@ function completeRow() {
       allowInput = true;
     }, 1600);
   } else {
-    setStats(stats, currentRowIndex.value);
+    setWordleStats(wordleStats as WordleGameStats, currentRowIndex.value);
     modal.toggleModal(ModalNames.wordDefinitionModal);
     gameState.isGameFinished = true;
     // game over :(

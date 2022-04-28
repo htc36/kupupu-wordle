@@ -1,32 +1,29 @@
 <script setup lang="ts">
 import Modal from './Modal.vue';
 import GameSettings from '../wordle/GameSettings.vue';
-import Statistics from '../wordle/GameStatistics.vue';
-import Tabs from '../utils/Tabs.vue';
-import Tab from '../utils/Tab.vue';
-import { AllGameStats } from '../../types';
+import WordleStatistics from '../wordle/GameStatistics.vue';
+import CardsStatistics from '../cards/GameStatistics.vue';
+import Tabs from '../ui/Tabs.vue';
+import Tab from '../ui/Tab.vue';
 import { ref } from 'vue';
 import { ModalNames } from '../../types';
 import { useModalStore } from '../../stores/modal';
 import { useCardGameStore } from '../../stores/cardGame';
 const { stopCardGame } = useCardGameStore();
-defineProps<{
-  stats: AllGameStats;
-}>();
 const modal = useModalStore();
 const isMenuActive = ref(false);
 </script>
 <template>
   <header class="header">
     <Modal :modal-name="ModalNames.settingsModal">
-      <Tabs>
-        <Tab title="Settings"><GameSettings /></Tab>
-        <Tab title="Statistics"><Statistics :stats="stats" /></Tab>
-      </Tabs>
+      <GameSettings />
     </Modal>
 
     <Modal :modal-name="ModalNames.statsModal">
-      <Statistics :stats="stats" />
+      <Tabs>
+        <Tab title="Kupu"><WordleStatistics /></Tab>
+        <Tab title="Rerenga"><CardsStatistics /></Tab>
+      </Tabs>
     </Modal>
     <nav id="nav">
       <button

@@ -52,7 +52,7 @@ const modal = useModalStore();
 }
 
 .help-modal-content {
-  width: 100%;
+  width: 96%;
   max-width: 530px;
   height: 100%;
   max-height: 500px;

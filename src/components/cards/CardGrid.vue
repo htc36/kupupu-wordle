@@ -10,6 +10,7 @@ import { useCardGameStore } from '../../stores/cardGame';
 import { useModalStore } from '../../stores/modal';
 import { storeToRefs } from 'pinia';
 import { ModalNames } from '../../types';
+import { setCardStats } from '../../helpers/localStorage';
 
 //Adding and destructuring store to refs to get reactivity without getters
 const modal = useModalStore();
@@ -69,7 +70,14 @@ function cardOpened(index: number) {
       if (matchedPairs.value === allCards.value.length / 2) {
         secondsFinished.value = clockSeconds.value;
         minutesFinished.value = clockMinutes.value;
+        const statObject = {
+          lastGameTime: {
+            secondsFinished: secondsFinished.value,
+            minutesFinished: minutesFinished.value,
+          },
+        };
         stopCardGame();
+        setCardStats(statObject);
         modal.toggleModal(ModalNames.cardGameFinishedModal);
       }
       return;

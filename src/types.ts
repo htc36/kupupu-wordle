@@ -12,6 +12,10 @@ export const enum ModalNames {
   wordDefinitionModal = 'wordDefinitionModal',
   cardGameFinishedModal = 'cardGameFinishedModal',
 }
+export const enum GameNames {
+  Kupu = 'Kupu',
+  Rerenga = 'Rerenga',
+}
 
 export interface WordResponse {
   date?: string;
@@ -48,13 +52,23 @@ export interface GameSettings {
   shouldPlaySound: boolean;
   shouldShowImage: boolean;
 }
-export interface AllGameStats {
+export interface WordleGameStats {
   currentStreak: number;
   maxStreak: number;
   guesses: Guesses;
   gamesPlayed: number;
   gamesWon: number;
   averageGuesses: number;
+}
+
+interface Clock {
+  secondsFinished: number;
+  minutesFinished: number;
+}
+
+export interface CardGameStats {
+  lastGameTime: Clock;
+  bestTime?: Clock;
 }
 export interface Guesses {
   [key: string]: number;

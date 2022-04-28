@@ -1,96 +1,77 @@
 <script setup lang="ts">
-import { AllGameStats, Guesses } from '../../types';
-import { useMessageStore } from '../../stores/message';
-defineProps<{
-  stats: AllGameStats;
-}>();
-const messageStore = useMessageStore();
-function onShare() {
-  const resultGrid = messageStore.genResultGrid();
-  if (resultGrid != '') {
-    const messageToCopy = `#kupupu ${new Date().toLocaleDateString(
-      'en-NZ'
-    )}\n\n${resultGrid}`;
-    navigator.clipboard.writeText(messageToCopy);
-    messageStore.showMessage('Copied To Clipboard!', resultGrid);
-  } else {
-    messageStore.showMessage('Nothing To Share!');
-  }
-}
+import { WordleGameStats, Guesses } from '../../types';
+import ModalFooter from '../ui/ModalFooter.vue';
+import { GameNames } from '../../types';
+import { getStats } from '../../helpers/localStorage';
+
+const wordleStats = getStats('wordleStats') as WordleGameStats;
 </script>
 
 <template>
   <div class="container">
     <h1 class="modalTitle">Statistics</h1>
-    <div id="statistics">
-      <div class="statistic-container">
-        <div class="statistic">{{ stats.gamesPlayed }}</div>
-        <div class="label">Played</div>
-      </div>
-
-      <div class="statistic-container">
-        <div class="statistic">
-          {{
-            stats.gamesPlayed === 0
-              ? 0
-              : ((stats.gamesWon / stats.gamesPlayed) * 100).toFixed(0)
-          }}
+    <div class="modal-middle">
+      <div class="statistics-container">
+        <div class="stat-group">
+          <div class="label">Played</div>
+          <div class="label number">{{ wordleStats.gamesPlayed }}</div>
         </div>
-        <div class="label">Win %</div>
-      </div>
-
-      <div class="statistic-container">
-        <div class="statistic">{{ stats.currentStreak }}</div>
-        <div class="label">Current Streak</div>
-      </div>
-
-      <div class="statistic-container">
-        <div class="statistic">{{ stats.maxStreak }}</div>
-        <div class="label">Max Streak</div>
-      </div>
-    </div>
-    <h1>Guess Distribution</h1>
-    <div id="guess-distribution">
-      <div
-        v-for="(amount, guessNum) in stats.guesses"
-        class="graph-container"
-        v-bind:key="guessNum"
-      >
-        <div class="guess">{{ guessNum }}</div>
-        <div class="graph">
-          <!-- <div class="graph-bar" :style="`width: ${getWidth(stats.guess, guessNum, amount)}%`"> -->
-          <div
-            class="graph-bar"
-            :style="`width: ${getWidth(stats.guesses, amount)}`"
-          >
-            <div class="num-guesses">{{ amount }}</div>
+        <div class="stat-group">
+          <div class="label">Win %</div>
+          <div class="label number">
+            {{
+              wordleStats.gamesPlayed === 0
+                ? 0
+                : (
+                    (wordleStats.gamesWon / wordleStats.gamesPlayed) *
+                    100
+                  ).toFixed(0)
+            }}
+          </div>
+        </div>
+        <div class="stat-group">
+          <div class="label">Current Streak</div>
+          <div class="label number">{{ wordleStats.currentStreak }}</div>
+        </div>
+        <div class="stat-group">
+          <div class="label">Max Streak</div>
+          <div class="label number">{{ wordleStats.maxStreak }}</div>
+        </div>
+        <div class="stat-group time-group">
+          <h1 class="label">Next Wordle</h1>
+          <div class="label number">
+            {{
+              `${timeToNextGame.hours}:${timeToNextGame.minutes}:${timeToNextGame.seconds}`
+            }}
           </div>
         </div>
       </div>
-    </div>
-    <div class="footer">
-      <div class="countdown">
-        <h1 style="text-align: center">Next Wordle</h1>
-        <div id="timer">
-          <div class="statistic-container">
-            <div class="statistic timer">
-              {{
-                `${timeToNextGame.hours}:${timeToNextGame.minutes}:${timeToNextGame.seconds}`
-              }}
+      <div class="guess-distribution">
+        <h1 class="guess-title">Guess Distribution</h1>
+        <div
+          v-for="(amount, guessNum) in wordleStats.guesses"
+          class="graph-container"
+          v-bind:key="guessNum"
+        >
+          <div class="guess">{{ guessNum }}</div>
+          <div class="graph">
+            <div
+              class="graph-bar"
+              :style="`width: ${getWidth(wordleStats.guesses, amount)}`"
+            >
+              <div class="num-guesses">{{ amount }}</div>
             </div>
           </div>
         </div>
       </div>
-      <div class="share">
-        <button id="share-button" @click="onShare()">Share</button>
-      </div>
+      <!-- <hr /> -->
     </div>
+    <ModalFooter :for-modal="GameNames.Kupu" />
   </div>
 </template>
 
 <script lang="ts">
 export default {
-  //   expose: ['isOpen', 'close', 'open'],
   data() {
     return {
       isOpen: true,
@@ -145,47 +126,76 @@ export default {
 };
 </script>
 <style scoped>
+/* hr {
+  border: none;
+  width: 100%;
+  background-color: var(--color-absent);
+  overflow: visible;
+  text-align: center;
+  height: 1px;
+} */
+
 .container {
   color: black;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 16px 0;
+  justify-content: space-between;
   width: 100%;
   height: 100%;
   background-color: white;
   border-radius: 10px;
+  padding: 15px 0;
 }
-#statistics {
-  color: var(--color-tone-1);
+.modal-middle {
+  height: 100%;
+  width: 100%;
   display: flex;
-  padding-bottom: 10px;
-}
-.statistic-container {
-  flex: 1;
-}
-.statistic {
-  color: var(--color-tone-1);
-  font-size: 36px;
-  font-weight: 400;
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  letter-spacing: 0.05em;
-  font-variant-numeric: proportional-nums;
+  justify-content: space-evenly;
+}
+.statistics-container {
+  display: flex;
+  align-items: flex-end;
+}
+.stat-group {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 55px;
+  height: 100%;
+  justify-content: space-between;
+}
+.stat-group:nth-child(4) {
+  padding-right: 10px;
+}
+@media (min-width: 600px) {
+  .stat-group {
+    flex-basis: 100px;
+  }
+  .statistics-container {
+    width: 80%;
+  }
+}
+.time-group {
+  justify-content: space-between;
+  border-left: 1px solid var(--color-absent);
+  padding: 0px 15px;
 }
 .label {
+  align-self: center;
+  justify-self: center;
   color: var(--color-tone-1);
   font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   text-align: center;
 }
-#guess-distribution {
-  padding-bottom: 10px;
+.number {
+  font-size: 36px;
+}
+.guess-title {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
 }
 .graph-container {
   color: var(--color-tone-1);
@@ -227,60 +237,8 @@ export default {
   font-weight: bold;
   color: var(--tile-text-color);
 }
-#timer {
-  color: var(--color-tone-1);
-  font-size: 36px;
-  font-weight: 400;
-  text-align: center;
-  letter-spacing: 0.05em;
-  font-variant-numeric: initial;
-}
-#guess-distribution {
+.guess-distribution {
   color: var(--color-tone-1);
   width: 80%;
-  padding-bottom: 10px;
-}
-.highlight {
-  background-color: var(--color-correct);
-}
-.align-right {
-  justify-content: flex-end;
-  padding-right: 8px;
-}
-.footer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-.countdown {
-  border-right: 1px solid var(--color-tone-1);
-  padding-right: 12px;
-  width: 50%;
-}
-.share {
-  width: 50%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#share-button {
-  background-color: var(--key-bg-correct);
-  color: var(--key-evaluated-text-color);
-  font-family: inherit;
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-  border: none;
-  user-select: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-transform: uppercase;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
-  width: 80%;
-  font-size: 20px;
-  height: 52px;
 }
 </style>
