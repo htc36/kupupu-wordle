@@ -4,7 +4,6 @@ import { CardGameStats, GameNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
 
 const cardStats = getStats('cardStats') as CardGameStats;
-console.log('cardStats', cardStats);
 </script>
 <template>
   <div class="container">
@@ -12,7 +11,9 @@ console.log('cardStats', cardStats);
     <div class="modal-middle">
       <div class="stat-group">
         <div class="label">Last game time</div>
+
         <div class="label number">
+          <!-- TODO: Bring it to separate helpers -->
           {{
             cardStats.lastGameTime.minutesFinished === 0 &&
             cardStats.lastGameTime.secondsFinished === 0

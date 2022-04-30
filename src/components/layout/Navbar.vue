@@ -6,11 +6,11 @@ import CardsStatistics from '../cards/GameStatistics.vue';
 import Tabs from '../ui/Tabs.vue';
 import Tab from '../ui/Tab.vue';
 import { ref } from 'vue';
-import { ModalNames } from '../../types';
+import { ModalNames, GameNames } from '../../types';
 import { useModalStore } from '../../stores/modal';
 import { useCardGameStore } from '../../stores/cardGame';
 const { stopCardGame } = useCardGameStore();
-const modal = useModalStore();
+const modal = ref(useModalStore());
 const isMenuActive = ref(false);
 </script>
 <template>
@@ -20,9 +20,9 @@ const isMenuActive = ref(false);
     </Modal>
 
     <Modal :modal-name="ModalNames.statsModal">
-      <Tabs>
-        <Tab title="Kupu"><WordleStatistics /></Tab>
-        <Tab title="Rerenga"><CardsStatistics /></Tab>
+      <Tabs :current-game="modal.getCurrentGamePlaying()">
+        <Tab :title="GameNames.Kupu"><WordleStatistics /></Tab>
+        <Tab :title="GameNames.Rerenga"><CardsStatistics /></Tab>
       </Tabs>
     </Modal>
     <nav id="nav">

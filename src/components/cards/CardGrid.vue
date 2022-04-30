@@ -3,8 +3,8 @@ import Card from './Card.vue';
 import Modal from '../layout/Modal.vue';
 import { shuffleArray } from '../../helpers/randomiseArray';
 import { cards } from '../../helpers/assetMapping';
-import { ref } from 'vue';
-import { CardObj } from '../../types';
+import { ref, onMounted } from 'vue';
+import { CardObj, GameNames } from '../../types';
 import { useClockStore } from '../../stores/clock';
 import { useCardGameStore } from '../../stores/cardGame';
 import { useModalStore } from '../../stores/modal';
@@ -14,12 +14,17 @@ import { setCardStats } from '../../helpers/localStorage';
 
 //Adding and destructuring store to refs to get reactivity without getters
 const modal = useModalStore();
+const emit = defineEmits<{
+  (e: 'updateBestTime'): void;
+}>();
 const clockStore = useClockStore();
 const { clockSeconds, clockMinutes } = storeToRefs(clockStore);
 const cardGameStore = useCardGameStore();
 const { startCardGame, stopCardGame } = cardGameStore;
 const { isCardGameStarted } = storeToRefs(cardGameStore);
-
+onMounted(() => {
+  modal.setGamePlaying(GameNames.Rerenga);
+});
 //Generating and shuffling cards from the cards array
 function createPlayingCards() {
   const playingCards: CardObj[] = [];
@@ -78,6 +83,7 @@ function cardOpened(index: number) {
         };
         stopCardGame();
         setCardStats(statObject);
+        emit('updateBestTime');
         modal.toggleModal(ModalNames.cardGameFinishedModal);
       }
       return;

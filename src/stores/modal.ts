@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ModalNames } from '../types';
+import { ModalNames, GameNames } from '../types';
 import { useCardGameStore } from './cardGame';
 
 export const useModalStore = defineStore('modal', {
@@ -10,6 +10,7 @@ export const useModalStore = defineStore('modal', {
       isWordDefinitionModalShown: false,
       isCardGameFinishedModal: false,
       isDonationModalShown: false,
+      gamePlaying: GameNames.Rerenga,
     };
   },
   actions: {
@@ -37,6 +38,9 @@ export const useModalStore = defineStore('modal', {
           break;
       }
     },
+    setGamePlaying(gameName: GameNames) {
+      this.gamePlaying = gameName;
+    },
     getCurrentModalState(modalName: ModalNames) {
       switch (modalName) {
         case ModalNames.donationModal:
@@ -50,6 +54,9 @@ export const useModalStore = defineStore('modal', {
         case ModalNames.cardGameFinishedModal:
           return this.isCardGameFinishedModal;
       }
+    },
+    getCurrentGamePlaying() {
+      return this.gamePlaying;
     },
   },
 });

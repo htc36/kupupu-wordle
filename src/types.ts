@@ -61,7 +61,7 @@ export interface WordleGameStats {
   averageGuesses: number;
 }
 
-interface Clock {
+export interface Clock {
   secondsFinished: number;
   minutesFinished: number;
 }

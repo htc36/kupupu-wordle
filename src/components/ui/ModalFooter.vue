@@ -33,7 +33,7 @@ function onShare() {
     } else {
       const messageToCopy = `#rerenga ${new Date().toLocaleDateString(
         'en-NZ'
-      )}\n\n Best time: ${cardStats.lastGameTime.minutesFinished}m ${
+      )}\n\n Last game time: ${cardStats.lastGameTime.minutesFinished}m ${
         cardStats.lastGameTime.secondsFinished
       }s`;
       navigator.clipboard.writeText(messageToCopy);

@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { useClockStore } from '../../stores/clock';
 import { storeToRefs } from 'pinia';
+import { Clock } from '../../types';
+import { toRef } from 'vue';
 
+const props = defineProps<{
+  bestTime: Clock;
+}>();
+
+const bestTime = toRef(props, 'bestTime');
 const clockStore = useClockStore();
 const { clockSeconds, clockMinutes } = storeToRefs(clockStore);
 </script>
@@ -11,26 +18,29 @@ const { clockSeconds, clockMinutes } = storeToRefs(clockStore);
       <div class="clock-title">Current time:</div>
       <div class="clock-digits">
         <div class="clock-text">
-          {{ clockMinutes < 10 ? `0${clockMinutes}` : clockMinutes }}
-        </div>
-        <div class="clock-text">:</div>
-        <div class="clock-text">
-          {{ clockSeconds < 10 ? `0${clockSeconds}` : clockSeconds }}
+          {{
+            (clockMinutes < 10 ? `0${clockMinutes}` : clockMinutes) +
+            ':' +
+            (clockSeconds < 10 ? `0${clockSeconds}` : clockSeconds)
+          }}
         </div>
       </div>
     </div>
     <div class="clock-wrapper">
-      <!-- Should come from localStorage GameStats -->
       <div class="clock-title">Best time:</div>
       <div class="clock-digits">
         <div class="clock-text">
-          <!-- {{ minutes < 10 ? `0${minutes}` : minutes }} -->
-          00
-        </div>
-        <div class="clock-text">:</div>
-        <div class="clock-text">
-          12
-          <!-- {{ seconds < 10 ? `0${seconds}` : seconds }} -->
+          {{
+            bestTime
+              ? (bestTime.minutesFinished < 10
+                  ? `0${bestTime.minutesFinished}`
+                  : bestTime.minutesFinished) +
+                ':' +
+                (bestTime.secondsFinished < 10
+                  ? `0${bestTime.secondsFinished}`
+                  : bestTime.secondsFinished)
+              : 'No best time yet'
+          }}
         </div>
       </div>
     </div>
