@@ -8,7 +8,9 @@ const props = defineProps<{
   isTextCard?: boolean;
   maxCardHeight?: string;
 }>();
-const emit = defineEmits(['cardOpened']);
+const emit = defineEmits<{
+  (e: 'cardOpened', index: number): void;
+}>();
 const isActive = ref(false);
 const isShake = ref(false);
 const isLocked = ref(false);

@@ -1,15 +1,20 @@
 const vowels = 'aeiouāēīōū';
 
-function getSuggestion(s: string, board: string[], i: number, allWords: string[]) {
+function getSuggestion(
+  s: string,
+  board: string[],
+  i: number,
+  allWords: string[]
+) {
   console.log(s);
   console.log(board);
   console.log(i);
-  var guess = board[i];
-  var lowest = 1e50;
-  var bestguess = '';
+  const guess = board[i];
+  let lowest = 1e50;
+  let bestguess = '';
   for (const x of allWords) {
     if (!board.includes(x) && x != s) {
-      var c = wayneDistance(guess, x);
+      const c = wayneDistance(guess, x);
       if (c < lowest) {
         lowest = c;
         bestguess = x;
@@ -18,13 +23,13 @@ function getSuggestion(s: string, board: string[], i: number, allWords: string[]
   }
   return bestguess;
 }
-function wayneDistance(x: String, y: String) {
-  var c = 0;
-  for (var i = 0; i < 5; i += 1) {
-    var a = x[i];
-    var b = y[i];
+function wayneDistance(x: string, y: string) {
+  let c = 0;
+  for (let i = 0; i < 5; i += 1) {
+    const a = x[i];
+    const b = y[i];
     if (a != b) {
-      var d = 0;
+      let d = 0;
       const v = vowels.indexOf(a);
       const w = vowels.indexOf(b);
       if (v >= 0) {

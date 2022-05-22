@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BuyCoffeeButton from '../utils/BuyCoffeeButton.vue';
+import BuyCoffeeButton from '../ui/BuyCoffeeButton.vue';
 </script>
 <template>
   <div class="footerWrapper">

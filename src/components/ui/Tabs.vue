@@ -1,24 +1,35 @@
 <script setup lang="ts">
-import { ref, provide, useSlots } from 'vue';
+import { ref, provide, useSlots, Ref } from 'vue';
+import { GameNames } from '../../types';
 const slots = useSlots();
-const tabTitles = ref(
+const props = defineProps<{ currentGame: GameNames }>();
+const tabTitles: Ref<GameNames[]> = ref(
   slots.default
-    ? slots.default().map((tab) => (tab.props ? tab.props.title : 'Tab Title'))
-    : []
+    ? slots
+        .default()
+        .map((tab) => (tab.props ? tab.props.title : GameNames.Rerenga))
+    : [GameNames.Rerenga]
 );
-const selectedTitle = ref(tabTitles.value[0]);
+let selectedTitle = ref(props.currentGame);
+
 const tabWidth = ref(100 / tabTitles.value.length);
-provide('selectedTitle', selectedTitle);
+function handleClick(title: GameNames) {
+  selectedTitle.value = title;
+}
+provide('tabToShow', selectedTitle);
 </script>
 
 <template>
   <div class="tabs">
     <ul class="tabs-header">
       <li
-        :class="['tabs-header-item', title == selectedTitle ? 'activeTab' : '']"
         v-for="title in tabTitles"
+        :class="[
+          'tabs-header-item',
+          title === selectedTitle ? 'activeTab' : '',
+        ]"
         :key="title"
-        @click="selectedTitle = title"
+        @click="handleClick(title)"
       >
         {{ title }}
       </li>

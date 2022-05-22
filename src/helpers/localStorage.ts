@@ -1,6 +1,14 @@
+// ESlint has a bug with typescript, so we need to disable it for this file
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { LetterState } from '../types';
-import { AllGameStats, GameState, GameSettings, WordResponse } from '../types';
-const defaultStats: AllGameStats = {
+import {
+  WordleGameStats,
+  GameState,
+  GameSettings,
+  WordResponse,
+  CardGameStats,
+} from '../types';
+const wordleStatsDefault: WordleGameStats = {
   currentStreak: 0,
   maxStreak: 0,
   guesses: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, F: 0 },
@@ -8,17 +16,24 @@ const defaultStats: AllGameStats = {
   gamesWon: 0,
   averageGuesses: 0,
 };
+const cardStatsDefault: CardGameStats = {
+  lastGameTime: { secondsFinished: 0, minutesFinished: 0 },
+};
 export const defaultGameSettings: GameSettings = {
   shouldPlaySound: true,
   shouldShowImage: true,
 };
-export function getStats(): AllGameStats {
-  const statsString = window.localStorage.getItem('wordleStats');
-  return statsString ? JSON.parse(statsString) : defaultStats;
+export function getStats(
+  gameName: 'wordleStats' | 'cardStats'
+): WordleGameStats | CardGameStats {
+  const statsString = window.localStorage.getItem(gameName);
+  if (!statsString) {
+    return gameName === 'wordleStats' ? wordleStatsDefault : cardStatsDefault;
+  }
+  return JSON.parse(statsString) as WordleGameStats | CardGameStats;
 }
-export function setStats(statsObj: AllGameStats, guessLine: number) {
+export function setWordleStats(statsObj: WordleGameStats, guessLine: number) {
   if (guessLine < 5) {
-    console.log('Has won the game');
     statsObj.currentStreak += 1;
     statsObj.guesses[guessLine + 1] += 1;
     statsObj.maxStreak =
@@ -31,8 +46,36 @@ export function setStats(statsObj: AllGameStats, guessLine: number) {
     statsObj.guesses['F'] += 1;
   }
   statsObj.gamesPlayed += 1;
-  console.log('Setting new stats', statsObj);
   window.localStorage.setItem('wordleStats', JSON.stringify(statsObj));
+}
+export function setCardStats(statsObj: CardGameStats) {
+  const { lastGameTime } = statsObj;
+  const gameStats = getStats('cardStats') as CardGameStats;
+
+  if (!gameStats.bestTime) {
+    window.localStorage.setItem(
+      'cardStats',
+      JSON.stringify({ ...statsObj, bestTime: { ...lastGameTime } })
+    );
+    return;
+  } else {
+    const currentTotalSeconds =
+      lastGameTime.minutesFinished * 60 + lastGameTime.secondsFinished;
+    const bestTotalSeconds =
+      gameStats.bestTime.minutesFinished * 60 +
+      gameStats.bestTime.secondsFinished;
+    if (currentTotalSeconds < bestTotalSeconds) {
+      window.localStorage.setItem(
+        'cardStats',
+        JSON.stringify({ ...statsObj, bestTime: { ...lastGameTime } })
+      );
+    } else {
+      window.localStorage.setItem(
+        'cardStats',
+        JSON.stringify({ ...gameStats, ...statsObj })
+      );
+    }
+  }
 }
 export function getSolutionObject() {
   const solutionObjectString = window.localStorage.getItem('solutionObject');

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Switch from '../utils/Switch.vue';
+import Switch from '../ui/Switch.vue';
 import { ref } from 'vue';
 import { GameSettings } from '../../types';
 import { setGameSettings, getGameSettings } from '../../helpers/localStorage';
@@ -123,6 +123,8 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background-color: white;
+  border-radius: 10px;
 }
 .setting {
   display: flex;

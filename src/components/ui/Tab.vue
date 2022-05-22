@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { inject } from 'vue';
-defineProps<{
-  title: string;
+import { inject, ref } from 'vue';
+import { GameNames } from '../../types';
+const props = defineProps<{
+  title: GameNames;
 }>();
-const selectedTitle = inject('selectedTitle');
+const selectedTitle = inject('tabToShow');
 </script>
 
 <template>
-  <div class="tab-content" v-show="title == selectedTitle">
+  <div class="tab-content" v-show="props.title === selectedTitle">
     <slot class="slot" />
   </div>
 </template>

@@ -3,7 +3,7 @@ import { onBeforeMount, onUnmounted } from 'vue';
 import { getAllWords, getWordOfTheDayFromAPI } from '../../words';
 import {
   getStats,
-  setStats,
+  setWordleStats,
   getGameState,
   setGameState,
   setGameSettings,
@@ -13,7 +13,14 @@ import Modal from '../layout/Modal.vue';
 import WordDefinition from './WordDefinition.vue';
 import { defaultGameSettings } from '../../helpers/localStorage';
 import Keyboard from './Keyboard.vue';
-import { LetterState, Board, GameState } from '../../types';
+import {
+  LetterState,
+  Board,
+  GameState,
+  WordleGameStats,
+  CardGameStats,
+  GameNames,
+} from '../../types';
 import getSuggestion from '../../helpers/suggestion';
 import { onMounted } from 'vue';
 import { ModalNames } from '../../types';
@@ -37,34 +44,33 @@ function handleGameState() {
     setGameState(gameState);
   }
 }
+const modal = useModalStore();
 onBeforeMount(async () => {
   answer.value = await getWordOfTheDayFromAPI();
   console.log(answer.value);
-
   handleGameState();
-
   board.value = gameState.board;
   letterStates.value = gameState.letterState;
   currentRowIndex.value = gameState.currentRowIndex;
   allowInput = !gameState.isGameFinished;
 });
 
-const modal = useModalStore();
-
 // Get word of the day
 const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
-const stats = getStats();
+const wordleStats: WordleGameStats | CardGameStats | object =
+  getStats('wordleStats');
 
 // Board state. Each tile is represented as { letter, state }
 const currentRow = $computed(() => board.value[currentRowIndex.value]);
 
-defineEmits(['setStats']);
-let grid = $ref('');
-let shakeRowIndex = $ref(-1);
-let success = $ref(false);
+defineEmits(['setWordleStats']);
+let grid = ref('');
+let shakeRowIndex = ref(-1);
+let success = ref(false);
 const messageStore = useMessageStore();
 onMounted(() => {
+  modal.setGamePlaying(GameNames.Kupu);
   const existingSettings = JSON.parse(
     window.localStorage.getItem('gameSettings') as string
   );
@@ -190,20 +196,20 @@ function completeRow() {
   });
 
   allowInput = false;
-  console.log(answer);
+  console.log(answer.value);
   if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
-    setStats(stats, currentRowIndex.value);
+    setWordleStats(wordleStats as WordleGameStats, currentRowIndex.value);
     gameState.isGameFinished = true;
     // yay!
     setTimeout(() => {
-      grid = messageStore.genResultGrid();
+      grid.value = messageStore.genResultGrid();
       messageStore.showMessage(
         ['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][
           currentRowIndex.value
         ],
-        grid
+        grid.value
       );
-      success = true;
+      success.value = true;
       modal.toggleModal(ModalNames.wordDefinitionModal);
     }, 1600);
   } else if (currentRowIndex.value < board.value.length - 1) {
@@ -213,7 +219,7 @@ function completeRow() {
       allowInput = true;
     }, 1600);
   } else {
-    setStats(stats, currentRowIndex.value);
+    setWordleStats(wordleStats as WordleGameStats, currentRowIndex.value);
     modal.toggleModal(ModalNames.wordDefinitionModal);
     gameState.isGameFinished = true;
     // game over :(
@@ -228,9 +234,9 @@ function completeRow() {
 }
 
 function shake() {
-  shakeRowIndex = currentRowIndex.value;
+  shakeRowIndex.value = currentRowIndex.value;
   setTimeout(() => {
-    shakeRowIndex = -1;
+    shakeRowIndex.value = -1;
   }, 1000);
 }
 </script>
