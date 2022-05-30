@@ -15,6 +15,7 @@ const selectedTitle = inject('tabToShow');
 
 <style scoped>
 .tab-content {
+  padding-top: 10px;
   background-color: white;
   border-radius: 0 0 10px 10px;
   flex-grow: 1;

@@ -3,12 +3,15 @@ import { useMessageStore } from '../../stores/message';
 import BuyCoffeeButton from './BuyCoffeeButton.vue';
 import { CardGameStats, GameNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
+import { useCardGameStore } from '../../stores/cardGame';
 
 const props = defineProps<{
   forModal: GameNames;
 }>();
 
 const messageStore = useMessageStore();
+const cardGameStore = useCardGameStore();
+const { dateToGameTime } = cardGameStore;
 
 function onShare() {
   if (props.forModal === GameNames.Kupu) {
@@ -25,17 +28,13 @@ function onShare() {
   }
   if (props.forModal === GameNames.Rerenga) {
     const cardStats = getStats('cardStats') as CardGameStats;
-    if (
-      cardStats.lastGameTime.minutesFinished === 0 &&
-      cardStats.lastGameTime.secondsFinished === 0
-    ) {
+    const cardMilliseconds = cardStats.times.prevTime.value;
+    if (cardMilliseconds === 0) {
       messageStore.showMessage('Nothing To Share!');
     } else {
       const messageToCopy = `#rerenga ${new Date().toLocaleDateString(
         'en-NZ'
-      )}\n\n Last game time: ${cardStats.lastGameTime.minutesFinished}m ${
-        cardStats.lastGameTime.secondsFinished
-      }s`;
+      )}\n\n Last game time: ${dateToGameTime(cardMilliseconds)}`;
       navigator.clipboard.writeText(messageToCopy);
       messageStore.showMessage('Copied To Clipboard!', messageToCopy);
     }

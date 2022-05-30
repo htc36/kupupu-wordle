@@ -4,6 +4,13 @@ export const enum LetterState {
   PRESENT = 'present',
   ABSENT = 'absent',
 }
+export const enum statsTitle {
+  PREVTIME = 'Prev. Time',
+  BESTTIME = 'Best Time',
+  AVGTIME = 'Avg Time',
+  PREVCLICKS = 'Prev. Clicks',
+  AVGCLICKS = 'Avg Clicks',
+}
 
 export const enum ModalNames {
   donationModal = 'donationModal',
@@ -66,7 +73,24 @@ export interface Clock {
   minutesFinished: number;
 }
 
+export interface StatObject {
+  value: number;
+  title: string;
+}
+export interface StatListObject {
+  value: number[];
+  title: string;
+}
 export interface CardGameStats {
+  times: {
+    prevTime: StatObject;
+    bestTime: StatObject;
+    avgTime: StatListObject;
+  };
+  clicks: { prevClicks: StatObject; avgClicks: StatListObject };
+}
+
+export interface CardGameStatsOld {
   lastGameTime: Clock;
   bestTime?: Clock;
 }

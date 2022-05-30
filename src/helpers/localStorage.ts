@@ -17,7 +17,15 @@ const wordleStatsDefault: WordleGameStats = {
   averageGuesses: 0,
 };
 const cardStatsDefault: CardGameStats = {
-  lastGameTime: { secondsFinished: 0, minutesFinished: 0 },
+  times: {
+    prevTime: { value: 0, title: 'Prev. Time' },
+    bestTime: { value: 0, title: 'Best Time' },
+    avgTime: { value: [], title: 'Avg Time' },
+  },
+  clicks: {
+    prevClicks: { value: 0, title: 'Prev. Clicks' },
+    avgClicks: { value: [], title: 'Avg Clicks' },
+  },
 };
 export const defaultGameSettings: GameSettings = {
   shouldPlaySound: true,
@@ -48,34 +56,26 @@ export function setWordleStats(statsObj: WordleGameStats, guessLine: number) {
   statsObj.gamesPlayed += 1;
   window.localStorage.setItem('wordleStats', JSON.stringify(statsObj));
 }
-export function setCardStats(statsObj: CardGameStats) {
-  const { lastGameTime } = statsObj;
-  const gameStats = getStats('cardStats') as CardGameStats;
+export function setCardStats(startTime: number, clicks: number) {
+  const now = new Date().getTime();
+  const startTimeObj = new Date(startTime).getTime();
+  const gameTime = new Date(now - startTimeObj);
 
-  if (!gameStats.bestTime) {
-    window.localStorage.setItem(
-      'cardStats',
-      JSON.stringify({ ...statsObj, bestTime: { ...lastGameTime } })
-    );
-    return;
-  } else {
-    const currentTotalSeconds =
-      lastGameTime.minutesFinished * 60 + lastGameTime.secondsFinished;
-    const bestTotalSeconds =
-      gameStats.bestTime.minutesFinished * 60 +
-      gameStats.bestTime.secondsFinished;
-    if (currentTotalSeconds < bestTotalSeconds) {
-      window.localStorage.setItem(
-        'cardStats',
-        JSON.stringify({ ...statsObj, bestTime: { ...lastGameTime } })
-      );
-    } else {
-      window.localStorage.setItem(
-        'cardStats',
-        JSON.stringify({ ...gameStats, ...statsObj })
-      );
-    }
-  }
+  // const { lastGameTime } = statsObj;
+  const gameStats = getStats('cardStats') as CardGameStats;
+  gameStats.times.bestTime.value =
+    gameStats.times.bestTime.value == 0
+      ? gameTime.getTime()
+      : (gameStats.times.bestTime.value = Math.min(
+          gameTime.getTime(),
+          gameStats.times.bestTime.value
+        ));
+  gameStats.times.prevTime.value = gameTime.getTime();
+  gameStats.clicks.prevClicks.value = clicks;
+  gameStats.times.avgTime.value.push(gameTime.getTime());
+  gameStats.clicks.avgClicks.value.push(clicks);
+
+  window.localStorage.setItem('cardStats', JSON.stringify(gameStats));
 }
 export function getSolutionObject() {
   const solutionObjectString = window.localStorage.getItem('solutionObject');

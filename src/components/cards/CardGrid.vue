@@ -5,7 +5,6 @@ import { shuffleArray } from '../../helpers/randomiseArray';
 import { cards } from '../../helpers/assetMapping';
 import { ref, onMounted } from 'vue';
 import { CardObj, GameNames } from '../../types';
-import { useClockStore } from '../../stores/clock';
 import { useCardGameStore } from '../../stores/cardGame';
 import { useModalStore } from '../../stores/modal';
 import { storeToRefs } from 'pinia';
@@ -17,11 +16,11 @@ const modal = useModalStore();
 const emit = defineEmits<{
   (e: 'updateBestTime'): void;
 }>();
-const clockStore = useClockStore();
-const { clockSeconds, clockMinutes } = storeToRefs(clockStore);
 const cardGameStore = useCardGameStore();
-const { startCardGame, stopCardGame } = cardGameStore;
-const { isCardGameStarted } = storeToRefs(cardGameStore);
+const { startCardGame, stopCardGame, incrementClicks, getGameTime } =
+  cardGameStore;
+
+const { isCardGameStarted, startTime, clicks } = storeToRefs(cardGameStore);
 onMounted(() => {
   modal.setGamePlaying(GameNames.Rerenga);
 });
@@ -41,7 +40,6 @@ function createPlayingCards() {
   return shuffleArray(playingCards);
 }
 const playingCards = createPlayingCards();
-
 //Calculate height of each card
 //Assume that we gonna have two cards columns and 1 percent as a gap
 const maxCardHeight = (100 / playingCards.length) * 2 - 1 + '%';
@@ -51,12 +49,11 @@ type cardsRefType = typeof cardsRef;
 const allCards = ref<CardObj[]>(playingCards);
 const matchedPairs = ref<number>(0);
 let selectedCards: CardObj[] = [];
-let secondsFinished = ref(0);
-let minutesFinished = ref(0);
 function cardOpened(index: number) {
   if (!isCardGameStarted.value) {
     startCardGame();
   }
+  incrementClicks();
   selectedCards.push({ ...allCards.value[index], index });
   const { answer } = allCards.value[index];
   if (selectedCards.length === 2) {
@@ -73,16 +70,8 @@ function cardOpened(index: number) {
         }, 500);
       }
       if (matchedPairs.value === allCards.value.length / 2) {
-        secondsFinished.value = clockSeconds.value;
-        minutesFinished.value = clockMinutes.value;
-        const statObject = {
-          lastGameTime: {
-            secondsFinished: secondsFinished.value,
-            minutesFinished: minutesFinished.value,
-          },
-        };
         stopCardGame();
-        setCardStats(statObject);
+        setCardStats(startTime.value, clicks.value);
         emit('updateBestTime');
         modal.toggleModal(ModalNames.cardGameFinishedModal);
       }
@@ -119,11 +108,20 @@ function cardOpened(index: number) {
             </div>
           </li>
         </ul>
-        <h3 class="words-time">
-          Time
-          {{ minutesFinished < 10 ? `0${minutesFinished}` : minutesFinished }} :
-          {{ secondsFinished < 10 ? `0${secondsFinished}` : secondsFinished }}
-        </h3>
+        <div class="footer">
+          <h3 class="words-time">
+            Time : {{ getGameTime(new Date().getTime()) }}
+          </h3>
+          <button
+            class="next-button"
+            @click="
+              modal.toggleModal(ModalNames.cardGameFinishedModal);
+              modal.toggleModal(ModalNames.statsModal);
+            "
+          >
+            Next
+          </button>
+        </div>
       </div>
     </Modal>
     <Card
@@ -138,6 +136,30 @@ function cardOpened(index: number) {
   </div>
 </template>
 <style scoped>
+.footer {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+}
+.next-button {
+  background-color: var(--green);
+  color: var(--key-evaluated-text-color);
+  font-family: inherit;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
+  width: 40%;
+  font-size: 20px;
+  height: 52px;
+}
 .gridWrapper {
   display: flex;
   flex-direction: row;

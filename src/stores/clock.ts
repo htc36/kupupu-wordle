@@ -12,6 +12,8 @@ export const useClockStore = defineStore('clock', {
   },
   actions: {
     startClock() {
+      this.clockSeconds = 0;
+      this.clockMinutes = 0;
       this.clockIntervalId = setInterval(() => {
         this.clockSeconds = ++this.clockSeconds % 60;
         this.clockMinutes = Math.floor(this.clockSeconds / 60);
@@ -19,8 +21,6 @@ export const useClockStore = defineStore('clock', {
     },
     stopClock() {
       if (this.clockIntervalId !== 0) {
-        this.clockSeconds = 0;
-        this.clockMinutes = 0;
         clearInterval(this.clockIntervalId);
       }
       this.clockIntervalId = 0;

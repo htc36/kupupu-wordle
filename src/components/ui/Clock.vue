@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { useClockStore } from '../../stores/clock';
 import { storeToRefs } from 'pinia';
-import { Clock } from '../../types';
+import { Clock, StatObject } from '../../types';
 import { toRef } from 'vue';
 
 const props = defineProps<{
-  bestTime: Clock;
+  bestTime: StatObject;
 }>();
 
 const bestTime = toRef(props, 'bestTime');
+const time = new Date(bestTime.value.value);
+console.log(time);
+
 const clockStore = useClockStore();
 const { clockSeconds, clockMinutes } = storeToRefs(clockStore);
 </script>
@@ -32,13 +35,13 @@ const { clockSeconds, clockMinutes } = storeToRefs(clockStore);
         <div class="clock-text">
           {{
             bestTime
-              ? (bestTime.minutesFinished < 10
-                  ? `0${bestTime.minutesFinished}`
-                  : bestTime.minutesFinished) +
+              ? (time.getMinutes() < 10
+                  ? `0${time.getMinutes()}`
+                  : time.getMinutes()) +
                 ':' +
-                (bestTime.secondsFinished < 10
-                  ? `0${bestTime.secondsFinished}`
-                  : bestTime.secondsFinished)
+                (time.getSeconds() < 10
+                  ? `0${time.getSeconds()}`
+                  : time.getSeconds())
               : 'No best time yet'
           }}
         </div>
