@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useClockStore } from '../../stores/clock';
 import { storeToRefs } from 'pinia';
-import { Clock, StatObject } from '../../types';
+import { StatObject } from '../../types';
 import { toRef } from 'vue';
 
 const props = defineProps<{
