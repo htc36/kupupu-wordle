@@ -172,17 +172,6 @@ function playSound(sound?: string) {
   padding-top: 10px;
   cursor: pointer;
 }
-.btn.btn-primary {
-  background-color: purple;
-  border-color: purple;
-  outline: none;
-}
-.btn-sm {
-  font-size: 22px;
-  padding: 2px 1px 2px 4px;
-  line-height: 12px;
-  margin-right: 10px;
-}
 .footer {
   display: flex;
   width: 100%;
@@ -251,36 +240,12 @@ function playSound(sound?: string) {
   font-weight: bold;
   font-size: 1.5rem;
 }
-.audio {
-  width: 100%;
-  height: 45px;
-}
-.audio-figure {
-  margin: 10px 0;
-  width: 70%;
-  flex-shrink: 0;
-}
 .words-time {
   text-align: center;
   font-size: 1.6rem;
   font-weight: 500;
 }
 @media (max-width: 450px) {
-  audio::-webkit-media-controls-current-time-display,
-  audio::-webkit-media-controls-time-remaining-display,
-  audio::-webkit-media-controls-volume-control-container,
-  audio::-webkit-media-controls-timeline {
-    display: none;
-  }
-  audio::-webkit-media-controls-panel {
-    justify-content: space-between;
-  }
-  .audio {
-    width: 100%;
-  }
-  .audio-figure {
-    max-width: 100px;
-  }
   .modal-title {
     font-size: 1.4rem;
   }

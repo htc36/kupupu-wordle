@@ -87,10 +87,6 @@ const cardClickStats = cardStats.clicks;
   </div>
 </template>
 <style scoped>
-h2 {
-  padding-top: 20px;
-  padding-bottom: 15px;
-}
 .container {
   color: black;
   display: flex;
@@ -110,20 +106,6 @@ h2 {
   display: flex;
   flex-direction: column;
 }
-.stat-group {
-  display: flex;
-  flex-direction: column;
-}
-.label {
-  align-self: center;
-  justify-self: center;
-  color: var(--color-tone-1);
-  font-size: 1.5em;
-  text-align: center;
-}
-.number {
-  font-size: 36px;
-}
 .container {
   color: black;
   display: flex;
@@ -143,46 +125,11 @@ h2 {
   flex-direction: column;
   align-items: center;
 }
-.statistics-container {
-  display: flex;
-  align-items: flex-end;
-}
-.stat-group {
-  display: flex;
-  flex-direction: column;
-  flex-basis: 55px;
-  height: 100%;
-  justify-content: space-between;
-}
-.stat-group:nth-child(4) {
-  padding-right: 10px;
-}
-@media (min-width: 600px) {
-  .stat-group {
-    flex-basis: 100px;
-  }
-  .statistics-container {
-    width: 80%;
-  }
-}
-.time-group {
-  justify-content: space-between;
-  border-left: 1px solid var(--color-absent);
-  padding: 0px 15px;
-}
-.label {
-  align-self: center;
-  justify-self: center;
-  color: var(--color-tone-1);
-  font-size: 12px;
-  text-align: center;
-}
-.number {
-  font-size: 36px;
-}
 .guess-title {
   font-size: 16px;
   text-align: center;
+  padding-top: 20px;
+  padding-bottom: 15px;
 }
 .graph-container {
   color: var(--color-tone-1);

@@ -3,7 +3,8 @@ import { useMessageStore } from '../../stores/message';
 import BuyCoffeeButton from './BuyCoffeeButton.vue';
 import { CardGameStats, GameNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
-import { useCardGameStore } from '../../stores/cardGame';
+import { useClockStore } from '../../stores/clock';
+const clockStore = useClockStore();
 
 const props = defineProps<{
   forModal: GameNames;
@@ -32,7 +33,7 @@ function onShare() {
     } else {
       const messageToCopy = `#rerenga ${new Date().toLocaleDateString(
         'en-NZ'
-      )}\n\n Last game time: ${getGameTime(cardMilliseconds)}`;
+      )}\n\n Last game time: ${clockStore.getGameTime(cardMilliseconds)}`;
       navigator.clipboard.writeText(messageToCopy);
       messageStore.showMessage('Copied To Clipboard!', messageToCopy);
     }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useClockStore } from '../../stores/clock';
 import { StatObject } from '../../types';
-import { ref, toRef } from 'vue';
+import { toRef } from 'vue';
 
 const props = defineProps<{
   bestTime: StatObject;
@@ -33,15 +33,9 @@ const clockStore = useClockStore();
 </template>
 <style scoped>
 .clock-container,
-.current-clock,
 .clock-wrapper,
 .clock-digits {
   display: flex;
-}
-.clock-container,
-.current-clock {
-  justify-content: space-between;
-  align-items: center;
 }
 .clock-wrapper {
   align-items: center;
@@ -50,6 +44,8 @@ const clockStore = useClockStore();
 .clock-container {
   margin: 10px 0 10px 0;
   width: 100%;
+  justify-content: space-between;
+  align-items: center;
 }
 @media screen and (max-width: 500px) {
   .clock-container {
