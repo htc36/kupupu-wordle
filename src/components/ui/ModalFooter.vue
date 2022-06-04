@@ -10,8 +10,6 @@ const props = defineProps<{
 }>();
 
 const messageStore = useMessageStore();
-const cardGameStore = useCardGameStore();
-const { dateToGameTime } = cardGameStore;
 
 function onShare() {
   if (props.forModal === GameNames.Kupu) {
@@ -34,7 +32,7 @@ function onShare() {
     } else {
       const messageToCopy = `#rerenga ${new Date().toLocaleDateString(
         'en-NZ'
-      )}\n\n Last game time: ${dateToGameTime(cardMilliseconds)}`;
+      )}\n\n Last game time: ${getGameTime(cardMilliseconds)}`;
       navigator.clipboard.writeText(messageToCopy);
       messageStore.showMessage('Copied To Clipboard!', messageToCopy);
     }
@@ -54,6 +52,8 @@ function onShare() {
   justify-content: space-around;
   align-items: center;
   width: 100%;
+  padding-top: 15px;
+  border-top: 1px solid rgb(238, 238, 238);
 }
 .share-button {
   background-color: var(--key-bg-correct);

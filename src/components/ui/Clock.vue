@@ -1,19 +1,15 @@
 <script setup lang="ts">
 import { useClockStore } from '../../stores/clock';
-import { storeToRefs } from 'pinia';
 import { StatObject } from '../../types';
-import { toRef } from 'vue';
+import { ref, toRef } from 'vue';
 
 const props = defineProps<{
   bestTime: StatObject;
 }>();
 
 const bestTime = toRef(props, 'bestTime');
-const time = new Date(bestTime.value.value);
-console.log(time);
 
 const clockStore = useClockStore();
-const { clockSeconds, clockMinutes } = storeToRefs(clockStore);
 </script>
 <template>
   <div class="clock-container">
@@ -21,11 +17,7 @@ const { clockSeconds, clockMinutes } = storeToRefs(clockStore);
       <div class="clock-title">Current time:</div>
       <div class="clock-digits">
         <div class="clock-text">
-          {{
-            (clockMinutes < 10 ? `0${clockMinutes}` : clockMinutes) +
-            ':' +
-            (clockSeconds < 10 ? `0${clockSeconds}` : clockSeconds)
-          }}
+          {{ clockStore.getGameTime() }}
         </div>
       </div>
     </div>
@@ -33,17 +25,7 @@ const { clockSeconds, clockMinutes } = storeToRefs(clockStore);
       <div class="clock-title">Best time:</div>
       <div class="clock-digits">
         <div class="clock-text">
-          {{
-            bestTime
-              ? (time.getMinutes() < 10
-                  ? `0${time.getMinutes()}`
-                  : time.getMinutes()) +
-                ':' +
-                (time.getSeconds() < 10
-                  ? `0${time.getSeconds()}`
-                  : time.getSeconds())
-              : 'No best time yet'
-          }}
+          {{ clockStore.getGameTime(bestTime.value) }}
         </div>
       </div>
     </div>

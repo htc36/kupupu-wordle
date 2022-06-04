@@ -56,23 +56,19 @@ export function setWordleStats(statsObj: WordleGameStats, guessLine: number) {
   statsObj.gamesPlayed += 1;
   window.localStorage.setItem('wordleStats', JSON.stringify(statsObj));
 }
-export function setCardStats(startTime: number, clicks: number) {
-  const now = new Date().getTime();
-  const startTimeObj = new Date(startTime).getTime();
-  const gameTime = new Date(now - startTimeObj);
-
+export function setCardStats(gameTime: number, clicks: number) {
   // const { lastGameTime } = statsObj;
   const gameStats = getStats('cardStats') as CardGameStats;
   gameStats.times.bestTime.value =
     gameStats.times.bestTime.value == 0
-      ? gameTime.getTime()
+      ? gameTime
       : (gameStats.times.bestTime.value = Math.min(
-          gameTime.getTime(),
+          gameTime,
           gameStats.times.bestTime.value
         ));
-  gameStats.times.prevTime.value = gameTime.getTime();
+  gameStats.times.prevTime.value = gameTime;
   gameStats.clicks.prevClicks.value = clicks;
-  gameStats.times.avgTime.value.push(gameTime.getTime());
+  gameStats.times.avgTime.value.push(gameTime);
   gameStats.clicks.avgClicks.value.push(clicks);
 
   window.localStorage.setItem('cardStats', JSON.stringify(gameStats));

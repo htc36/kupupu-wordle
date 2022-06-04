@@ -6,9 +6,6 @@ function getSuggestion(
   i: number,
   allWords: string[]
 ) {
-  console.log(s);
-  console.log(board);
-  console.log(i);
   const guess = board[i];
   let lowest = 1e50;
   let bestguess = '';

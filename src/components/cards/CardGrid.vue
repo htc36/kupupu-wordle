@@ -10,20 +10,25 @@ import { useModalStore } from '../../stores/modal';
 import { storeToRefs } from 'pinia';
 import { ModalNames } from '../../types';
 import { setCardStats } from '../../helpers/localStorage';
-
+import '../../css/tooltip.css';
+import { useClockStore } from '../../stores/clock';
 //Adding and destructuring store to refs to get reactivity without getters
 const modal = useModalStore();
 const emit = defineEmits<{
   (e: 'updateBestTime'): void;
 }>();
 const cardGameStore = useCardGameStore();
-const { startCardGame, stopCardGame, incrementClicks, getGameTime } =
-  cardGameStore;
+const clockStore = useClockStore();
+const { startCardGame, stopCardGame, incrementClicks } = cardGameStore;
 
-const { isCardGameStarted, startTime, clicks } = storeToRefs(cardGameStore);
+const { getGameTime } = clockStore;
+const { clockTime } = storeToRefs(clockStore);
+
+const { isCardGameStarted, clicks } = storeToRefs(cardGameStore);
 onMounted(() => {
   modal.setGamePlaying(GameNames.Rerenga);
 });
+const playingSound = ref('');
 //Generating and shuffling cards from the cards array
 function createPlayingCards() {
   const playingCards: CardObj[] = [];
@@ -71,7 +76,7 @@ function cardOpened(index: number) {
       }
       if (matchedPairs.value === allCards.value.length / 2) {
         stopCardGame();
-        setCardStats(startTime.value, clicks.value);
+        setCardStats(clockTime.value, clicks.value);
         emit('updateBestTime');
         modal.toggleModal(ModalNames.cardGameFinishedModal);
       }
@@ -89,6 +94,16 @@ function cardOpened(index: number) {
     selectedCards = [{ ...allCards.value[index], index }];
   }
 }
+function playSound(sound?: string) {
+  if (sound && !playingSound.value) {
+    playingSound.value = sound;
+    var audio = new Audio(`/assets/${sound}`);
+    audio.play();
+    audio.onended = function () {
+      playingSound.value = '';
+    };
+  }
+}
 </script>
 <template>
   <div class="gridWrapper">
@@ -99,19 +114,33 @@ function cardOpened(index: number) {
           <li v-for="card in cards" :key="card.answer">
             <div class="words-list-item">
               <p class="word-item">{{ card.answer }}</p>
-              <figure class="audio-figure">
-                <audio class="audio" controls :src="`/assets/${card.sound}`">
-                  Your browser does not support the
-                  <code>audio</code> element.
-                </audio>
-              </figure>
+              <div>
+                <img
+                  v-if="playingSound == card.sound"
+                  src="/assets/pause.svg"
+                  class="play-pause"
+                  @click.prevent="playSound(card.sound)"
+                />
+                <img
+                  v-else
+                  src="/assets/play.svg"
+                  class="play-pause"
+                  @click.prevent="playSound(card.sound)"
+                />
+                <a href="#" data-tooltip="Feature coming soon..">
+                  <img
+                    data-tooltip="I am a tooltip"
+                    src="/assets/plus.svg"
+                    style="cursor: default"
+                    class="play-pause"
+                  />
+                </a>
+              </div>
             </div>
           </li>
         </ul>
         <div class="footer">
-          <h3 class="words-time">
-            Time : {{ getGameTime(new Date().getTime()) }}
-          </h3>
+          <h3 class="words-time">Time : {{ getGameTime() }}</h3>
           <button
             class="next-button"
             @click="
@@ -136,6 +165,24 @@ function cardOpened(index: number) {
   </div>
 </template>
 <style scoped>
+.play-pause {
+  margin-left: 10px;
+  height: 3.5em;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  cursor: pointer;
+}
+.btn.btn-primary {
+  background-color: purple;
+  border-color: purple;
+  outline: none;
+}
+.btn-sm {
+  font-size: 22px;
+  padding: 2px 1px 2px 4px;
+  line-height: 12px;
+  margin-right: 10px;
+}
 .footer {
   display: flex;
   width: 100%;
@@ -194,13 +241,15 @@ function cardOpened(index: number) {
 .words-list-item {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-between;
+  margin-right: 20px;
+  margin-left: 20px;
+  border-bottom: 1px solid rgb(238, 238, 238);
 }
 .word-item {
   text-transform: uppercase;
-  color: var(--red);
   font-weight: bold;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
 }
 .audio {
   width: 100%;

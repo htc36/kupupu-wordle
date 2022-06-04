@@ -2,21 +2,15 @@ import { defineStore } from 'pinia';
 
 export const useClockStore = defineStore('clock', {
   state: () => ({
-    clockSeconds: 0,
-    clockMinutes: 0,
+    clockTime: 0,
+    clockStartTime: 0,
     clockIntervalId: 0,
   }),
-  getters: {
-    getSeconds: (state) => state.clockSeconds,
-    getMinutes: (state) => state.clockMinutes,
-  },
   actions: {
     startClock() {
-      this.clockSeconds = 0;
-      this.clockMinutes = 0;
+      this.clockStartTime = new Date().getTime();
       this.clockIntervalId = setInterval(() => {
-        this.clockSeconds = ++this.clockSeconds % 60;
-        this.clockMinutes = Math.floor(this.clockSeconds / 60);
+        this.clockTime = new Date().getTime() - this.clockStartTime;
       }, 1000);
     },
     stopClock() {
@@ -24,6 +18,16 @@ export const useClockStore = defineStore('clock', {
         clearInterval(this.clockIntervalId);
       }
       this.clockIntervalId = 0;
+      return this.clockTime;
+    },
+    getGameTime(time?: number) {
+      const timeMilliseconds = time ? time : this.clockTime;
+      const timeObj = new Date(timeMilliseconds);
+      const seconds =
+        timeObj.getSeconds() < 10
+          ? '0' + timeObj.getSeconds().toString()
+          : timeObj.getSeconds().toString();
+      return `${timeObj.getMinutes()}:${seconds}`;
     },
   },
 });
