@@ -10,17 +10,13 @@ import { getStats } from '../../helpers/localStorage';
 const cardGameStore = useCardGameStore();
 const { cardComponentKey } = storeToRefs(cardGameStore);
 const cardStats = getStats('cardStats') as CardGameStats;
-const bestTime = ref(cardStats.bestTime ? cardStats.bestTime : undefined);
+const bestTime = ref(cardStats.times.bestTime);
 function updateBestTime() {
-  bestTime.value = (getStats('cardStats') as CardGameStats).bestTime;
+  bestTime.value = (getStats('cardStats') as CardGameStats).times.bestTime;
 }
 </script>
 <template>
-  <Clock
-    :best-time="
-      bestTime ? bestTime : { secondsFinished: 0, minutesFinished: 0 }
-    "
-  />
+  <Clock :best-time="bestTime" />
   <CardGrid @update-best-time="updateBestTime" :key="cardComponentKey" />
 </template>
 <style scoped></style>

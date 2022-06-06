@@ -6,11 +6,13 @@ export const useCardGameStore = defineStore('cardGame', {
     return {
       isCardGameStarted: false,
       cardComponentKey: 0,
+      clicks: 0,
     };
   },
   actions: {
     startCardGame() {
       const { startClock } = useClockStore();
+      this.clicks = 0;
       this.isCardGameStarted = true;
       startClock();
     },
@@ -18,6 +20,9 @@ export const useCardGameStore = defineStore('cardGame', {
       const { stopClock } = useClockStore();
       this.isCardGameStarted = false;
       stopClock();
+    },
+    incrementClicks() {
+      this.clicks++;
     },
     reRenderCardGameComponent() {
       this.cardComponentKey++;
