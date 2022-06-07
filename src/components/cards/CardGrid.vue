@@ -5,26 +5,30 @@ import { shuffleArray } from '../../helpers/randomiseArray';
 import { cards } from '../../helpers/assetMapping';
 import { ref, onMounted } from 'vue';
 import { CardObj, GameNames } from '../../types';
-import { useClockStore } from '../../stores/clock';
 import { useCardGameStore } from '../../stores/cardGame';
 import { useModalStore } from '../../stores/modal';
 import { storeToRefs } from 'pinia';
 import { ModalNames } from '../../types';
 import { setCardStats } from '../../helpers/localStorage';
-
+import '../../css/tooltip.css';
+import { useClockStore } from '../../stores/clock';
 //Adding and destructuring store to refs to get reactivity without getters
 const modal = useModalStore();
 const emit = defineEmits<{
   (e: 'updateBestTime'): void;
 }>();
-const clockStore = useClockStore();
-const { clockSeconds, clockMinutes } = storeToRefs(clockStore);
 const cardGameStore = useCardGameStore();
-const { startCardGame, stopCardGame } = cardGameStore;
-const { isCardGameStarted } = storeToRefs(cardGameStore);
+const clockStore = useClockStore();
+const { startCardGame, stopCardGame, incrementClicks } = cardGameStore;
+
+const { getGameTime } = clockStore;
+const { clockTime } = storeToRefs(clockStore);
+
+const { isCardGameStarted, clicks } = storeToRefs(cardGameStore);
 onMounted(() => {
   modal.setGamePlaying(GameNames.Rerenga);
 });
+const playingSound = ref('');
 //Generating and shuffling cards from the cards array
 function createPlayingCards() {
   const playingCards: CardObj[] = [];
@@ -41,7 +45,6 @@ function createPlayingCards() {
   return shuffleArray(playingCards);
 }
 const playingCards = createPlayingCards();
-
 //Calculate height of each card
 //Assume that we gonna have two cards columns and 1 percent as a gap
 const maxCardHeight = (100 / playingCards.length) * 2 - 1 + '%';
@@ -51,12 +54,11 @@ type cardsRefType = typeof cardsRef;
 const allCards = ref<CardObj[]>(playingCards);
 const matchedPairs = ref<number>(0);
 let selectedCards: CardObj[] = [];
-let secondsFinished = ref(0);
-let minutesFinished = ref(0);
 function cardOpened(index: number) {
   if (!isCardGameStarted.value) {
     startCardGame();
   }
+  incrementClicks();
   selectedCards.push({ ...allCards.value[index], index });
   const { answer } = allCards.value[index];
   if (selectedCards.length === 2) {
@@ -73,16 +75,8 @@ function cardOpened(index: number) {
         }, 500);
       }
       if (matchedPairs.value === allCards.value.length / 2) {
-        secondsFinished.value = clockSeconds.value;
-        minutesFinished.value = clockMinutes.value;
-        const statObject = {
-          lastGameTime: {
-            secondsFinished: secondsFinished.value,
-            minutesFinished: minutesFinished.value,
-          },
-        };
         stopCardGame();
-        setCardStats(statObject);
+        setCardStats(clockTime.value, clicks.value);
         emit('updateBestTime');
         modal.toggleModal(ModalNames.cardGameFinishedModal);
       }
@@ -100,6 +94,16 @@ function cardOpened(index: number) {
     selectedCards = [{ ...allCards.value[index], index }];
   }
 }
+function playSound(sound?: string) {
+  if (sound && !playingSound.value) {
+    playingSound.value = sound;
+    var audio = new Audio(`/assets/${sound}`);
+    audio.play();
+    audio.onended = function () {
+      playingSound.value = '';
+    };
+  }
+}
 </script>
 <template>
   <div class="gridWrapper">
@@ -110,20 +114,43 @@ function cardOpened(index: number) {
           <li v-for="card in cards" :key="card.answer">
             <div class="words-list-item">
               <p class="word-item">{{ card.answer }}</p>
-              <figure class="audio-figure">
-                <audio class="audio" controls :src="`/assets/${card.sound}`">
-                  Your browser does not support the
-                  <code>audio</code> element.
-                </audio>
-              </figure>
+              <div>
+                <img
+                  v-if="playingSound == card.sound"
+                  src="/assets/pause.svg"
+                  class="play-pause"
+                  @click.prevent="playSound(card.sound)"
+                />
+                <img
+                  v-else
+                  src="/assets/play.svg"
+                  class="play-pause"
+                  @click.prevent="playSound(card.sound)"
+                />
+                <a href="#" data-tooltip="Feature coming soon..">
+                  <img
+                    data-tooltip="I am a tooltip"
+                    src="/assets/plus.svg"
+                    style="cursor: default"
+                    class="play-pause"
+                  />
+                </a>
+              </div>
             </div>
           </li>
         </ul>
-        <h3 class="words-time">
-          Time
-          {{ minutesFinished < 10 ? `0${minutesFinished}` : minutesFinished }} :
-          {{ secondsFinished < 10 ? `0${secondsFinished}` : secondsFinished }}
-        </h3>
+        <div class="footer">
+          <h3 class="words-time">Time : {{ getGameTime() }}</h3>
+          <button
+            class="next-button"
+            @click="
+              modal.toggleModal(ModalNames.cardGameFinishedModal);
+              modal.toggleModal(ModalNames.statsModal);
+            "
+          >
+            Next
+          </button>
+        </div>
       </div>
     </Modal>
     <Card
@@ -138,6 +165,37 @@ function cardOpened(index: number) {
   </div>
 </template>
 <style scoped>
+.play-pause {
+  margin-left: 10px;
+  height: 3.5em;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  cursor: pointer;
+}
+.footer {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+}
+.next-button {
+  background-color: var(--green);
+  color: var(--key-evaluated-text-color);
+  font-family: inherit;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
+  width: 40%;
+  font-size: 20px;
+  height: 52px;
+}
 .gridWrapper {
   display: flex;
   flex-direction: row;
@@ -172,22 +230,15 @@ function cardOpened(index: number) {
 .words-list-item {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-between;
+  margin-right: 20px;
+  margin-left: 20px;
+  border-bottom: 1px solid rgb(238, 238, 238);
 }
 .word-item {
   text-transform: uppercase;
-  color: var(--red);
   font-weight: bold;
-  font-size: 1.8rem;
-}
-.audio {
-  width: 100%;
-  height: 45px;
-}
-.audio-figure {
-  margin: 10px 0;
-  width: 70%;
-  flex-shrink: 0;
+  font-size: 1.5rem;
 }
 .words-time {
   text-align: center;
@@ -195,21 +246,6 @@ function cardOpened(index: number) {
   font-weight: 500;
 }
 @media (max-width: 450px) {
-  audio::-webkit-media-controls-current-time-display,
-  audio::-webkit-media-controls-time-remaining-display,
-  audio::-webkit-media-controls-volume-control-container,
-  audio::-webkit-media-controls-timeline {
-    display: none;
-  }
-  audio::-webkit-media-controls-panel {
-    justify-content: space-between;
-  }
-  .audio {
-    width: 100%;
-  }
-  .audio-figure {
-    max-width: 100px;
-  }
   .modal-title {
     font-size: 1.4rem;
   }

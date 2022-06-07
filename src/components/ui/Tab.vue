@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref } from 'vue';
+import { inject } from 'vue';
 import { GameNames } from '../../types';
 const props = defineProps<{
   title: GameNames;
@@ -15,6 +15,7 @@ const selectedTitle = inject('tabToShow');
 
 <style scoped>
 .tab-content {
+  padding-top: 10px;
   background-color: white;
   border-radius: 0 0 10px 10px;
   flex-grow: 1;

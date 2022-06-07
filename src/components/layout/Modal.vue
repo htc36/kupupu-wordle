@@ -53,7 +53,7 @@ const modal = useModalStore();
 
 .help-modal-content {
   width: 96%;
-  max-width: 530px;
+  max-width: var(--game-max-width);
   height: 100%;
   max-height: 500px;
   position: relative;

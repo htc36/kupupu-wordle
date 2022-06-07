@@ -159,27 +159,4 @@ const modal = ref(useModalStore());
   stroke-dashoffset: -134;
   stroke-width: 6;
 }
-.hamburger-open-menu {
-  display: none;
-  padding-right: 1rem;
-  align-items: center;
-}
-.hamburger-open-menu.menuActive {
-  display: flex;
-}
-
-.slide-bottom-enter-active,
-.slide-bottom-leave-active {
-  transition: all 0.25s ease-out;
-}
-
-.slide-bottom-enter-from {
-  opacity: 0;
-  transform: translateY(50px);
-}
-
-.slide-bottom-leave-to {
-  opacity: 0;
-  transform: translateY(50px);
-}
 </style>
