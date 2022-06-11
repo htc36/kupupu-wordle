@@ -117,7 +117,7 @@ export default {
   color: var(--color-tone-1);
   padding: 0 32px;
   max-width: var(--game-max-width);
-  width: 95%;
+  width: 100%;
   overflow-y: auto;
   height: 100%;
   display: flex;
