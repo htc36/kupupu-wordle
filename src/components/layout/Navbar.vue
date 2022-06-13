@@ -9,6 +9,7 @@ import { ref } from 'vue';
 import { ModalNames, GameNames } from '../../types';
 import { useModalStore } from '../../stores/modal';
 import { useCardGameStore } from '../../stores/cardGame';
+import VoiceRecordModal from '../globalComponents/VoiceRecordModal.vue';
 const { stopCardGame } = useCardGameStore();
 const modal = ref(useModalStore());
 const isMenuActive = ref(false);
@@ -25,6 +26,7 @@ const isMenuActive = ref(false);
         <Tab :title="GameNames.Rerenga"><CardsStatistics /></Tab>
       </Tabs>
     </Modal>
+    <VoiceRecordModal />
     <nav id="nav">
       <button
         :class="[{ opened: isMenuActive }, 'hamburger']"
@@ -74,6 +76,12 @@ const isMenuActive = ref(false);
         </div>
       </Transition>
     </nav>
+    <button
+      class="hamburger-nav-icon"
+      @click="modal.toggleModal(ModalNames.voiceRecordModal)"
+    >
+      Hey
+    </button>
     <router-link class="nav-title" to="/">kupupu</router-link>
     <div class="nav-links-group">
       <button
