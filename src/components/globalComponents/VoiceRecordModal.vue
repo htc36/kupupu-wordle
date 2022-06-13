@@ -3,6 +3,7 @@ import Modal from '../layout/Modal.vue';
 import { ModalNames, CardAudio } from '../../types';
 import { cards } from '../../helpers/assetMapping';
 import { ref } from 'vue';
+import '../../css/tooltip.css';
 let mediaRecorder: MediaRecorder,
   chunks: Blob[] = [],
   audio = new Audio(),
@@ -90,21 +91,35 @@ function download() {
   <div>
     <Modal :modal-name="ModalNames.voiceRecordModal">
       <div class="modal-finished-wrapper">
-        <h3 class="modal-title">Voice Record</h3>
-        <ul class="words-list">
+        <div class="center">
+          <div>
+            <a
+              href="#"
+              data-tooltip="Once submitted recording is saved to database"
+            >
+              <img
+                src="/assets/info.svg"
+                style="cursor: default; width: 25px"
+                class="modal-icon"
+              />
+            </a>
+          </div>
+          <h3 class="modal-title">Voice Record</h3>
+        </div>
+        <ul>
           <li v-for="card in cards" :key="card.answer">
             <div class="words-list-item">
               <p class="word-item">{{ card.answer }}</p>
               <img
                 v-if="wordRecordingLocation[card.answer]"
                 src="/assets/tick.svg"
-                class="play-pause"
+                class="modal-icon"
                 style="cursor: default"
               />
               <img
                 v-else-if="wordBeingRecorded != card.sound"
                 src="/assets/record.png"
-                class="play-pause"
+                class="modal-icon"
                 @click.prevent="startRecording(card.sound)"
               />
               <img
@@ -112,7 +127,7 @@ function download() {
                   wordBeingRecorded == card.sound && !isNewSoundRecorded
                 "
                 src="/assets/stopRecording.png"
-                class="play-pause"
+                class="modal-icon"
                 @click.prevent="stopRecording()"
               />
               <div v-else class="review-recording-container">
@@ -122,19 +137,19 @@ function download() {
                 <img
                   src="/assets/cross.svg"
                   style="width: 28px"
-                  class="play-pause"
+                  class="modal-icon"
                   @click.prevent="deleteSound()"
                 />
                 <img
                   v-if="!isPlaying"
                   src="/assets/playGreen.png"
-                  class="play-pause"
+                  class="modal-icon"
                   @click.prevent="playRecording()"
                 />
                 <img
                   v-else
                   src="/assets/pause.svg"
-                  class="play-pause"
+                  class="modal-icon"
                   @click.prevent="pauseRecording()"
                 />
               </div>
@@ -151,6 +166,11 @@ function download() {
   </div>
 </template>
 <style scoped>
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .share-button {
   background-color: var(--blue);
   color: var(--key-evaluated-text-color);
@@ -184,7 +204,7 @@ function download() {
   border-radius: 10px;
   padding: 20px;
 }
-.play-pause {
+.modal-icon {
   margin-left: 10px;
   height: 3.5em;
   padding-bottom: 10px;
@@ -223,6 +243,7 @@ function download() {
   padding: 30px;
 }
 .modal-title {
+  padding-left: 10px;
   font-size: 1.7rem;
   font-weight: bold;
   text-align: center;
