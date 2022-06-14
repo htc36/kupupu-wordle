@@ -26,6 +26,7 @@ const cardStatsDefault: CardGameStats = {
     prevClicks: { value: 0, title: 'Prev. Clicks' },
     avgClicks: { value: [], title: 'Avg Clicks' },
   },
+  gamesPlayed: 0,
 };
 export const defaultGameSettings: GameSettings = {
   shouldPlaySound: true,
@@ -70,6 +71,7 @@ export function setCardStats(gameTime: number, clicks: number) {
   gameStats.clicks.prevClicks.value = clicks;
   gameStats.times.avgTime.value.push(gameTime);
   gameStats.clicks.avgClicks.value.push(clicks);
+  gameStats.gamesPlayed += 1;
 
   window.localStorage.setItem('cardStats', JSON.stringify(gameStats));
 }

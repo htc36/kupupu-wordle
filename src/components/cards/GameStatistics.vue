@@ -81,6 +81,7 @@ const cardClickStats = cardStats.clicks;
           </div>
         </div>
       </div>
+      <h1>Games Played :</h1>
       <!-- <hr /> -->
     </div>
     <ModalFooter :for-modal="GameNames.Rerenga" />

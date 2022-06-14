@@ -20,8 +20,8 @@ export const enum ModalNames {
   cardGameFinishedModal = 'cardGameFinishedModal',
 }
 export const enum GameNames {
-  Kupu = 'Kupu',
-  Rerenga = 'Rerenga',
+  Kupu = 'ngā kupu',
+  Rerenga = 'tā tauanga',
 }
 
 export interface WordResponse {
@@ -88,6 +88,7 @@ export interface CardGameStats {
     avgTime: StatListObject;
   };
   clicks: { prevClicks: StatObject; avgClicks: StatListObject };
+  gamesPlayed: number;
 }
 
 export interface CardGameStatsOld {
