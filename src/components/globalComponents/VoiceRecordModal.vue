@@ -9,7 +9,7 @@ let mediaRecorder: MediaRecorder,
   audio = new Audio(),
   audioSrc: string,
   type = {
-    type: 'audio/ogg,codecs=opus',
+    type: 'audio/mp3',
   },
   blob;
 const wordBeingRecorded = ref('');
@@ -92,10 +92,11 @@ function download() {
     <Modal :modal-name="ModalNames.voiceRecordModal">
       <div class="modal-finished-wrapper">
         <div class="center">
+          <h3 class="modal-title">Record Your Voice</h3>
           <div>
             <a
               href="#"
-              data-tooltip="Once submitted recording is saved to database"
+              data-tooltip="Once submitted recording is saved to our database"
             >
               <img
                 src="/assets/info.svg"
@@ -104,7 +105,6 @@ function download() {
               />
             </a>
           </div>
-          <h3 class="modal-title">Voice Record</h3>
         </div>
         <ul>
           <li v-for="card in cards" :key="card.answer">
@@ -243,7 +243,7 @@ function download() {
   padding: 30px;
 }
 .modal-title {
-  padding-left: 10px;
+  padding-right: 10px;
   font-size: 1.7rem;
   font-weight: bold;
   text-align: center;
