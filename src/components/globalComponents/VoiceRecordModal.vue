@@ -8,44 +8,63 @@ let mediaRecorder: MediaRecorder,
   chunks: Blob[] = [],
   audio = new Audio(),
   audioSrc: string,
-  type = {
-    type: 'audio/mp3',
-  },
-  blob;
+  blob,
+  intervalId: ReturnType<typeof setInterval>;
 const wordBeingRecorded = ref('');
 const isNewSoundRecorded = ref(false);
 const isPlaying = ref(false);
 const wordRecordingLocation = ref<CardAudio>({});
+const mimeType = ref('audio/wav');
 
 function startRecording(word?: string) {
+  //TODO: Add automatic stop of recording after a certain time
   if (wordBeingRecorded.value) return;
   if (word) wordBeingRecorded.value = word;
   navigator.mediaDevices
     .getUserMedia({ audio: true })
     .then(function (stream) {
-      mediaRecorder = new MediaRecorder(stream);
+      // Type of audio recorder has also initialisation options with type
+      //And we can't be sure that it's supported by user's browser
+      //https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder/MediaRecorder
+      const mime = ref([
+        'audio/wav',
+        'audio/mpeg',
+        'audio/webm',
+        'audio/ogg',
+        'audio/mp4',
+      ]).value.filter(MediaRecorder.isTypeSupported)[0];
+      mimeType.value = mime;
+      const options = {
+        mimeType: mime,
+      };
+      mediaRecorder = new MediaRecorder(stream, options);
 
       if (navigator.vibrate) navigator.vibrate(150);
 
       mediaRecorder.ondataavailable = function (event) {
-        chunks.push(event.data);
+        if (event.data.size > 0) chunks.push(event.data);
       };
 
       mediaRecorder.onstop = function () {
+        if (intervalId) clearInterval(intervalId);
         stream.getTracks().forEach(function (track) {
           track.stop();
         });
-
-        blob = new Blob(chunks, type);
+        blob = new Blob(chunks, { type: mimeType.value });
         audioSrc = window.URL.createObjectURL(blob);
-
         audio.src = audioSrc;
-
         chunks = [];
+      };
+      mediaRecorder.onstart = function () {
+        // Have a look - maybe worth to set interval so we can stop if recording last for too long
+        intervalId = setInterval(() => {
+          stopRecording();
+        }, 5000);
       };
       mediaRecorder.start();
     })
     .catch(function (error) {
+      // TODO: Add pop-up with error message
       console.log(error);
     });
 }
@@ -65,6 +84,7 @@ function pauseRecording() {
   isPlaying.value = false;
 }
 function deleteSound() {
+  // You are not deleting the stream itself, should we?
   if (!isPlaying.value) {
     wordBeingRecorded.value = '';
     isNewSoundRecorded.value = false;
@@ -75,15 +95,24 @@ function onSubmit(name: string) {
   isNewSoundRecorded.value = false;
   wordRecordingLocation.value[name] = audioSrc;
 }
-function download() {
-  Object.keys(wordRecordingLocation.value).forEach((word) => {
-    var a = document.createElement('a');
-    a.download = `${word}.ogg`;
-    a.href = wordRecordingLocation.value[word];
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  });
+
+function createDownloadable(name: string) {
+  const link = document.createElement('a');
+  link.href = wordRecordingLocation.value[name];
+  link.download = `${name}.webm`;
+  link.click();
+  link.remove();
+}
+
+function download(name?: string) {
+  if (name) {
+    createDownloadable(name);
+  } else {
+    // Here is some cleaner way to iterate:
+    for (const key in wordRecordingLocation.value) {
+      createDownloadable(key);
+    }
+  }
 }
 </script>
 
@@ -110,17 +139,28 @@ function download() {
           <li v-for="card in cards" :key="card.answer">
             <div class="words-list-item">
               <p class="word-item">{{ card.answer }}</p>
-              <img
-                v-if="wordRecordingLocation[card.answer]"
-                src="/assets/tick.svg"
-                class="modal-icon"
-                style="cursor: default"
-              />
+              <div v-if="wordRecordingLocation[card.answer]">
+                <img
+                  src="/assets/download.png"
+                  class="modal-icon"
+                  style="cursor: pointer"
+                  alt="Download recording"
+                  @click="download(card.answer)"
+                />
+                <!-- Do we need a tick if there will be download? -->
+                <img
+                  src="/assets/tick.svg"
+                  class="modal-icon"
+                  style="cursor: default"
+                  alt="Recording completed"
+                />
+              </div>
               <img
                 v-else-if="wordBeingRecorded != card.sound"
                 src="/assets/record.png"
                 class="modal-icon"
                 @click.prevent="startRecording(card.sound)"
+                alt="Start recording"
               />
               <img
                 v-else-if="
@@ -129,6 +169,7 @@ function download() {
                 src="/assets/stopRecording.png"
                 class="modal-icon"
                 @click.prevent="stopRecording()"
+                alt="Stop recording"
               />
               <div v-else class="review-recording-container">
                 <button class="next-button" @click="onSubmit(card.answer)">
@@ -139,18 +180,21 @@ function download() {
                   style="width: 28px"
                   class="modal-icon"
                   @click.prevent="deleteSound()"
+                  alt="Delete recording"
                 />
                 <img
                   v-if="!isPlaying"
                   src="/assets/playGreen.png"
                   class="modal-icon"
                   @click.prevent="playRecording()"
+                  alt="Play recording"
                 />
                 <img
                   v-else
                   src="/assets/pause.svg"
                   class="modal-icon"
                   @click.prevent="pauseRecording()"
+                  alt="Pause recording"
                 />
               </div>
             </div>
@@ -158,7 +202,7 @@ function download() {
         </ul>
         <div class="footer">
           <button type="button" class="share-button" @click="download()">
-            Download
+            Download all
           </button>
         </div>
       </div>
@@ -195,15 +239,6 @@ function download() {
   width: 60%;
 }
 
-.container {
-  height: 100%;
-  width: 100%;
-  justify-content: center;
-  display: flex;
-  background-color: white;
-  border-radius: 10px;
-  padding: 20px;
-}
 .modal-icon {
   margin-left: 10px;
   height: 3.5em;
@@ -248,14 +283,7 @@ function download() {
   font-weight: bold;
   text-align: center;
 }
-.words-list-item,
-.words-list {
-  display: flex;
-}
-.words-list {
-  flex-direction: column;
-  align-items: stretch;
-}
+
 .words-list-item {
   display: flex;
   align-items: center;
