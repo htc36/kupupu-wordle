@@ -15,9 +15,10 @@ const isNewSoundRecorded = ref(false);
 const isPlaying = ref(false);
 const wordRecordingLocation = ref<CardAudio>({});
 const mimeType = ref('audio/wav');
+const maxRecordingTime = 5000;
+const isRecordingFailed = ref(false);
 
 function startRecording(word?: string) {
-  //TODO: Add automatic stop of recording after a certain time
   if (wordBeingRecorded.value) return;
   if (word) wordBeingRecorded.value = word;
   navigator.mediaDevices
@@ -56,15 +57,14 @@ function startRecording(word?: string) {
         chunks = [];
       };
       mediaRecorder.onstart = function () {
-        // Have a look - maybe worth to set interval so we can stop if recording last for too long
         intervalId = setInterval(() => {
           stopRecording();
-        }, 5000);
+        }, maxRecordingTime);
       };
       mediaRecorder.start();
     })
     .catch(function (error) {
-      // TODO: Add pop-up with error message
+      isRecordingFailed.value = true;
       console.log(error);
     });
 }
@@ -84,7 +84,6 @@ function pauseRecording() {
   isPlaying.value = false;
 }
 function deleteSound() {
-  // You are not deleting the stream itself, should we?
   if (!isPlaying.value) {
     wordBeingRecorded.value = '';
     isNewSoundRecorded.value = false;
@@ -141,19 +140,15 @@ function download(name?: string) {
               <p class="word-item">{{ card.answer }}</p>
               <div v-if="wordRecordingLocation[card.answer]">
                 <img
-                  src="/assets/download.png"
+                  src="/assets/download.svg"
                   class="modal-icon"
                   style="cursor: pointer"
                   alt="Download recording"
                   @click="download(card.answer)"
                 />
-                <!-- Do we need a tick if there will be download? -->
-                <img
-                  src="/assets/tick.svg"
-                  class="modal-icon"
-                  style="cursor: default"
-                  alt="Recording completed"
-                />
+              </div>
+              <div v-else-if="isRecordingFailed" class="errorMessageContainer">
+                Recording failed
               </div>
               <img
                 v-else-if="wordBeingRecorded != card.sound"
@@ -237,6 +232,12 @@ function download(name?: string) {
   display: flex;
   justify-content: space-between;
   width: 60%;
+}
+.errorMessageContainer {
+  display: flex;
+  align-items: center;
+  height: 3.5em;
+  color: red;
 }
 
 .modal-icon {
