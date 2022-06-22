@@ -60,7 +60,7 @@ const modal = ref(useModalStore());
         </svg>
       </button>
     </div>
-    <router-link class="nav-title" to="/">kupupu</router-link>
+    <router-link class="nav-title" to="/">kupupū</router-link>
     <SideBar />
   </header>
 </template>

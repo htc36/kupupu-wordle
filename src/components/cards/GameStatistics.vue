@@ -2,6 +2,8 @@
 import ModalFooter from '../ui/ModalFooter.vue';
 import { CardGameStats, GameNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
+import { onBeforeUnmount, ref } from 'vue';
+import { timeToNextGame } from '../../helpers';
 
 function getAvg(arr: number[]) {
   return arr.reduce((a: number, b: number) => a + b, 0) / arr.length;
@@ -30,6 +32,11 @@ function formatTime(time: number | number[]) {
       : timeObj.getSeconds().toString();
   return `${timeObj.getMinutes()}:${seconds}`;
 }
+let timeToNextSet = ref(timeToNextGame(12));
+let clockIntervalId = setInterval(() => {
+  timeToNextSet.value = timeToNextGame(12);
+}, 1000);
+onBeforeUnmount(() => clearInterval(clockIntervalId));
 
 let cardStats = getStats('cardStats') as CardGameStats;
 const cardTimeStats = cardStats.times;
@@ -80,6 +87,18 @@ const cardClickStats = cardStats.clicks;
             </div>
           </div>
         </div>
+        <div class="bottomStats">
+          <h1>
+            Games Played:
+            <span style="font-weight: bold">{{
+              cardStats.times.avgTime.value.length
+            }}</span>
+          </h1>
+          <h1>
+            New Cards In:
+            <span style="font-weight: bold">{{ timeToNextSet }}</span>
+          </h1>
+        </div>
       </div>
       <!-- <hr /> -->
     </div>
@@ -87,6 +106,13 @@ const cardClickStats = cardStats.clicks;
   </div>
 </template>
 <style scoped>
+.bottomStats {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
 .container {
   color: black;
   display: flex;

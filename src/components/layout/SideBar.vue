@@ -71,7 +71,7 @@ const isMenuActive = ref(false);
               alt="Card front"
               class="gameIcon"
             />
-            kupupu
+            kupupū
           </router-link>
           <router-link
             @click="() => (isMenuActive = !isMenuActive)"
@@ -136,7 +136,7 @@ const isMenuActive = ref(false);
             "
           >
             <img src="/assets/mic.svg" alt="CardsIcon" class="gameIcon" />
-            record sound
+            kupukō
           </div>
         </div>
       </div>

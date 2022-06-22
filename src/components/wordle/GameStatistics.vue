@@ -3,8 +3,14 @@ import { WordleGameStats, Guesses } from '../../types';
 import ModalFooter from '../ui/ModalFooter.vue';
 import { GameNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
+import { timeToNextGame } from '../../helpers';
+import { ref } from 'vue';
 
 const wordleStats = getStats('wordleStats') as WordleGameStats;
+let timeToNext = ref(timeToNextGame(24));
+setInterval(() => {
+  timeToNext.value = timeToNextGame(24);
+}, 1000);
 </script>
 
 <template>
@@ -40,9 +46,7 @@ const wordleStats = getStats('wordleStats') as WordleGameStats;
         <div class="stat-group time-group">
           <h1 class="label">Next Wordle</h1>
           <div class="label number">
-            {{
-              `${timeToNextGame.hours}:${timeToNextGame.minutes}:${timeToNextGame.seconds}`
-            }}
+            {{ timeToNext.replace(/ /g, '') }}
           </div>
         </div>
       </div>
@@ -75,7 +79,7 @@ export default {
   data() {
     return {
       isOpen: true,
-      timeToNextGame: { hours: '0', minutes: '0', seconds: '0' },
+      // timeToNextGame: { hours: '0', minutes: '0', seconds: '0' },
     };
   },
   methods: {
@@ -88,53 +92,10 @@ export default {
       const percentage = (guessAmount / topAmount) * 100;
       return percentage.toString() + '%';
     },
-
-    getTimeToNextGame() {
-      const epochMs = new Date('January 1, 2022 00:00:00').valueOf();
-      const now2 = Date.now();
-      const msInDay = 86400000;
-      const index = Math.floor((now2 - epochMs) / msInDay);
-      const nextday = (index + 1) * msInDay + epochMs;
-
-      // Get today's date and time
-      var now = new Date().getTime();
-
-      // Find the distance between now and the count down date
-      var distance = nextday - now;
-
-      // Time calculations for days, hours, minutes and seconds
-      const hours = Math.floor(
-        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      ).toString();
-      const minutes = Math.floor(
-        (distance % (1000 * 60 * 60)) / (1000 * 60)
-      ).toString();
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000).toString();
-      this.timeToNextGame.hours = hours.length === 1 ? '0' + hours : hours;
-      this.timeToNextGame.minutes =
-        minutes.length === 1 ? '0' + minutes : minutes;
-      this.timeToNextGame.seconds =
-        seconds.length === 1 ? '0' + seconds : seconds;
-    },
-  },
-  mounted() {
-    this.getTimeToNextGame();
-    setInterval(() => {
-      this.getTimeToNextGame();
-    }, 1000);
   },
 };
 </script>
 <style scoped>
-/* hr {
-  border: none;
-  width: 100%;
-  background-color: var(--color-absent);
-  overflow: visible;
-  text-align: center;
-  height: 1px;
-} */
-
 .container {
   color: black;
   display: flex;
