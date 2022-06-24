@@ -4,7 +4,7 @@ import BuyCoffeeButton from '../ui/BuyCoffeeButton.vue';
 <template>
   <div class="footerWrapper">
     <div class="left">
-      <h1 class="copyright">2022 Kupupu. &copy; All rights reserved.</h1>
+      <h1 class="copyright">2022 kupupū. &copy; All rights reserved.</h1>
     </div>
     <div class="right">
       <BuyCoffeeButton />

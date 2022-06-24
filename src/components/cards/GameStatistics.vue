@@ -2,6 +2,13 @@
 import ModalFooter from '../ui/ModalFooter.vue';
 import { CardGameStats, GameNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
+import { inject } from 'vue';
+type timeToNextType = { wordleNextTime: string; cardsNextTime: string };
+
+const timeToNext = inject<timeToNextType>('timeToNext', {
+  wordleNextTime: '00:00:00',
+  cardsNextTime: '00:00:00',
+});
 
 function getAvg(arr: number[]) {
   return arr.reduce((a: number, b: number) => a + b, 0) / arr.length;
@@ -14,7 +21,7 @@ function getWidth(value: number | number[], statObj: object) {
     return Array.isArray(stat.value) ? getAvg(stat.value) : stat.value;
   });
   const maxScore = Math.max(...stats);
-  let percentage = Math.max((result / maxScore) * 100, 10);
+  const percentage = Math.max((result / maxScore) * 100, 10);
   const colors = ['var(--green)', 'var(--gray)', 'var(--gray)'];
   stats.sort((a, b) => a - b);
 
@@ -24,14 +31,14 @@ function getWidth(value: number | number[], statObj: object) {
 }
 function formatTime(time: number | number[]) {
   const timeObj = new Date(Array.isArray(time) ? getAvg(time) : time);
-  let seconds =
+  const seconds =
     timeObj.getSeconds() < 10
       ? '0' + timeObj.getSeconds().toString()
       : timeObj.getSeconds().toString();
   return `${timeObj.getMinutes()}:${seconds}`;
 }
 
-let cardStats = getStats('cardStats') as CardGameStats;
+const cardStats = getStats('cardStats') as CardGameStats;
 const cardTimeStats = cardStats.times;
 const cardClickStats = cardStats.clicks;
 </script>
@@ -80,6 +87,20 @@ const cardClickStats = cardStats.clicks;
             </div>
           </div>
         </div>
+        <div class="bottomStats">
+          <h1>
+            Games Played:
+            <span style="font-weight: bold">{{
+              cardStats.times.avgTime.value.length
+            }}</span>
+          </h1>
+          <h1>
+            New Cards In:
+            <span style="font-weight: bold">{{
+              timeToNext.cardsNextTime
+            }}</span>
+          </h1>
+        </div>
       </div>
       <!-- <hr /> -->
     </div>
@@ -87,6 +108,13 @@ const cardClickStats = cardStats.clicks;
   </div>
 </template>
 <style scoped>
+.bottomStats {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
 .container {
   color: black;
   display: flex;
@@ -128,7 +156,7 @@ const cardClickStats = cardStats.clicks;
 .guess-title {
   font-size: 16px;
   text-align: center;
-  padding-top: 20px;
+  padding-top: 10px;
   padding-bottom: 15px;
 }
 .graph-container {

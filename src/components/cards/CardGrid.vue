@@ -118,13 +118,13 @@ function playSound(sound?: string) {
                 <img
                   v-if="playingSound == card.sound"
                   src="/assets/pause.svg"
-                  class="play-pause"
+                  class="modal-icon"
                   @click.prevent="playSound(card.sound)"
                 />
                 <img
                   v-else
                   src="/assets/play.svg"
-                  class="play-pause"
+                  class="modal-icon"
                   @click.prevent="playSound(card.sound)"
                 />
                 <a href="#" data-tooltip="Feature coming soon..">
@@ -132,7 +132,7 @@ function playSound(sound?: string) {
                     data-tooltip="I am a tooltip"
                     src="/assets/plus.svg"
                     style="cursor: default"
-                    class="play-pause"
+                    class="modal-icon"
                   />
                 </a>
               </div>
@@ -165,7 +165,7 @@ function playSound(sound?: string) {
   </div>
 </template>
 <style scoped>
-.play-pause {
+.modal-icon {
   margin-left: 10px;
   height: 3.5em;
   padding-bottom: 10px;

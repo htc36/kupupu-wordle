@@ -18,7 +18,7 @@ const modal = ref(useModalStore());
     </Modal>
 
     <Modal :modal-name="ModalNames.statsModal">
-      <Tabs :current-game="modal.getCurrentGamePlaying()">
+      <Tabs :current-game="modal.getCurrentGamePlaying()" isStatistic>
         <Tab :title="GameNames.Kupu"><WordleStatistics /></Tab>
         <Tab :title="GameNames.Rerenga"><CardsStatistics /></Tab>
       </Tabs>
@@ -60,7 +60,7 @@ const modal = ref(useModalStore());
         </svg>
       </button>
     </div>
-    <router-link class="nav-title" to="/">kupupu</router-link>
+    <router-link class="nav-title" to="/">kupupū</router-link>
     <SideBar />
   </header>
 </template>

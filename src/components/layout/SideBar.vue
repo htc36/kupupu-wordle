@@ -3,8 +3,10 @@ import { ref } from 'vue';
 import { useCardGameStore } from '../../stores/cardGame';
 import { useModalStore } from '../../stores/modal';
 import { ModalNames } from '../../types';
+import VoiceRecordModal from '../globalComponents/VoiceRecordModal.vue';
 const modalStore = useModalStore();
 const { stopCardGame } = useCardGameStore();
+const modal = ref(useModalStore());
 
 const isMenuActive = ref(false);
 </script>
@@ -69,7 +71,7 @@ const isMenuActive = ref(false);
               alt="Card front"
               class="gameIcon"
             />
-            kupupu
+            kupupū
           </router-link>
           <router-link
             @click="() => (isMenuActive = !isMenuActive)"
@@ -126,9 +128,20 @@ const isMenuActive = ref(false);
             <img src="/assets/bmac.png" alt="CardsIcon" class="gameIcon" />
             buy us a coffee
           </div>
+          <div
+            class="nav-link"
+            @click="
+              isMenuActive = false;
+              modal.toggleModal(ModalNames.voiceRecordModal);
+            "
+          >
+            <img src="/assets/mic.svg" alt="CardsIcon" class="gameIcon" />
+            kupukō
+          </div>
         </div>
       </div>
     </Transition>
+    <VoiceRecordModal />
   </nav>
 </template>
 <style scoped>
