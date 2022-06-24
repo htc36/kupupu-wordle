@@ -3,11 +3,11 @@ import ModalFooter from '../ui/ModalFooter.vue';
 import { CardGameStats, GameNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
 import { inject } from 'vue';
-type timeToNextType = { wordleNextTime: string; cardsNExtTime: string };
+type timeToNextType = { wordleNextTime: string; cardsNextTime: string };
 
 const timeToNext = inject<timeToNextType>('timeToNext', {
   wordleNextTime: '00:00:00',
-  cardsNExtTime: '00:00:00',
+  cardsNextTime: '00:00:00',
 });
 
 function getAvg(arr: number[]) {
@@ -96,7 +96,9 @@ const cardClickStats = cardStats.clicks;
           </h1>
           <h1>
             New Cards In:
-            <span style="font-weight: bold">{{ timeToNext.cardsNExtTime }}</span>
+            <span style="font-weight: bold">{{
+              timeToNext.cardsNextTime
+            }}</span>
           </h1>
         </div>
       </div>

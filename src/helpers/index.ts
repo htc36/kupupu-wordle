@@ -27,6 +27,6 @@ export function timeToNextGame() {
 
   return {
     wordleNextTime: `${wordleHours}:${timeObj.minutes}:${timeObj.seconds}`,
-    cardsNExtTime: `${cardHours}:${timeObj.minutes}:${timeObj.seconds}`,
+    cardsNextTime: `${cardHours}:${timeObj.minutes}:${timeObj.seconds}`,
   };
 }

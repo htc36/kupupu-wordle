@@ -5,12 +5,12 @@ import { GameNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
 // import { timeToNextGame } from '../../helpers';
 import { inject } from 'vue';
-type timeToNextType = { wordleNextTime: string; cardsNExtTime: string };
+type timeToNextType = { wordleNextTime: string; cardsNextTime: string };
 
 const wordleStats = getStats('wordleStats') as WordleGameStats;
 const timeToNext = inject<timeToNextType>('timeToNext', {
   wordleNextTime: '00:00:00',
-  cardsNExtTime: '00:00:00',
+  cardsNextTime: '00:00:00',
 });
 </script>
 
