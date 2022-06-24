@@ -8,16 +8,25 @@ export const shuffleArray = (array: any) => {
   return array;
 };
 
-export function timeToNextGame(hourPeriod: number) {
+export function timeToNextGame() {
   const currentDate = new Date().toLocaleTimeString('en-nz', {
     timeZone: 'Pacific/Auckland',
     hour12: false,
   });
   const time = currentDate.split(':');
   const timeObj = {
-    hours: String((24 - parseInt(time[0])) % hourPeriod).padStart(2, '0'),
     minutes: String((60 - parseInt(time[1])) % 60).padStart(2, '0'),
     seconds: String((60 - parseInt(time[2])) % 60).padStart(2, '0'),
   };
-  return `${timeObj.hours}: ${timeObj.minutes}: ${timeObj.seconds}`;
+  // I assume that they will be the same at the end and this mess will be fixed later
+  const wordleHours = `${String((24 - parseInt(time[0])) % 24).padStart(
+    2,
+    '0'
+  )}`;
+  const cardHours = `${String((24 - parseInt(time[0])) % 12).padStart(2, '0')}`;
+
+  return {
+    wordleNextTime: `${wordleHours}:${timeObj.minutes}:${timeObj.seconds}`,
+    cardsNExtTime: `${cardHours}:${timeObj.minutes}:${timeObj.seconds}`,
+  };
 }

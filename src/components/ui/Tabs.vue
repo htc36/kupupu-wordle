@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { ref, provide, useSlots, Ref } from 'vue';
+import { ref, provide, useSlots, Ref, readonly, onBeforeUnmount } from 'vue';
 import { GameNames } from '../../types';
+import { timeToNextGame } from '../../helpers';
+
 const slots = useSlots();
-const props = defineProps<{ currentGame: GameNames }>();
+const timeToNext = ref({});
+const props = defineProps<{
+  currentGame: GameNames;
+  isStatistic: boolean;
+}>();
 const tabTitles: Ref<GameNames[]> = ref(
   slots.default
     ? slots
@@ -11,12 +17,20 @@ const tabTitles: Ref<GameNames[]> = ref(
     : [GameNames.Rerenga]
 );
 let selectedTitle = ref(props.currentGame);
-
+let clockIntervalIdNew: number;
+if (props.isStatistic) {
+  timeToNext.value = timeToNextGame();
+  clockIntervalIdNew = setInterval(() => {
+    timeToNext.value = timeToNextGame();
+  }, 1000);
+}
+onBeforeUnmount(() => clearInterval(clockIntervalIdNew));
 const tabWidth = ref(100 / tabTitles.value.length);
 function handleClick(title: GameNames) {
   selectedTitle.value = title;
 }
 provide('tabToShow', selectedTitle);
+provide('timeToNext', readonly(timeToNext));
 </script>
 
 <template>

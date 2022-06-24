@@ -18,7 +18,7 @@ const modal = ref(useModalStore());
     </Modal>
 
     <Modal :modal-name="ModalNames.statsModal">
-      <Tabs :current-game="modal.getCurrentGamePlaying()">
+      <Tabs :current-game="modal.getCurrentGamePlaying()" isStatistic>
         <Tab :title="GameNames.Kupu"><WordleStatistics /></Tab>
         <Tab :title="GameNames.Rerenga"><CardsStatistics /></Tab>
       </Tabs>

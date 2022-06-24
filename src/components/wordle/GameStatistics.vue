@@ -3,14 +3,15 @@ import { WordleGameStats, Guesses } from '../../types';
 import ModalFooter from '../ui/ModalFooter.vue';
 import { GameNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
-import { timeToNextGame } from '../../helpers';
-import { ref } from 'vue';
+// import { timeToNextGame } from '../../helpers';
+import { inject } from 'vue';
+type timeToNextType = { wordleNextTime: string; cardsNExtTime: string };
 
 const wordleStats = getStats('wordleStats') as WordleGameStats;
-let timeToNext = ref(timeToNextGame(24));
-setInterval(() => {
-  timeToNext.value = timeToNextGame(24);
-}, 1000);
+const timeToNext = inject<timeToNextType>('timeToNext', {
+  wordleNextTime: '00:00:00',
+  cardsNExtTime: '00:00:00',
+});
 </script>
 
 <template>
@@ -46,7 +47,7 @@ setInterval(() => {
         <div class="stat-group time-group">
           <h1 class="label">Next Wordle</h1>
           <div class="label number">
-            {{ timeToNext.replace(/ /g, '') }}
+            {{ timeToNext.wordleNextTime }}
           </div>
         </div>
       </div>

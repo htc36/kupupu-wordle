@@ -2,8 +2,13 @@
 import ModalFooter from '../ui/ModalFooter.vue';
 import { CardGameStats, GameNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
-import { onBeforeUnmount, ref } from 'vue';
-import { timeToNextGame } from '../../helpers';
+import { inject } from 'vue';
+type timeToNextType = { wordleNextTime: string; cardsNExtTime: string };
+
+const timeToNext = inject<timeToNextType>('timeToNext', {
+  wordleNextTime: '00:00:00',
+  cardsNExtTime: '00:00:00',
+});
 
 function getAvg(arr: number[]) {
   return arr.reduce((a: number, b: number) => a + b, 0) / arr.length;
@@ -16,7 +21,7 @@ function getWidth(value: number | number[], statObj: object) {
     return Array.isArray(stat.value) ? getAvg(stat.value) : stat.value;
   });
   const maxScore = Math.max(...stats);
-  let percentage = Math.max((result / maxScore) * 100, 10);
+  const percentage = Math.max((result / maxScore) * 100, 10);
   const colors = ['var(--green)', 'var(--gray)', 'var(--gray)'];
   stats.sort((a, b) => a - b);
 
@@ -26,19 +31,14 @@ function getWidth(value: number | number[], statObj: object) {
 }
 function formatTime(time: number | number[]) {
   const timeObj = new Date(Array.isArray(time) ? getAvg(time) : time);
-  let seconds =
+  const seconds =
     timeObj.getSeconds() < 10
       ? '0' + timeObj.getSeconds().toString()
       : timeObj.getSeconds().toString();
   return `${timeObj.getMinutes()}:${seconds}`;
 }
-let timeToNextSet = ref(timeToNextGame(12));
-let clockIntervalId = setInterval(() => {
-  timeToNextSet.value = timeToNextGame(12);
-}, 1000);
-onBeforeUnmount(() => clearInterval(clockIntervalId));
 
-let cardStats = getStats('cardStats') as CardGameStats;
+const cardStats = getStats('cardStats') as CardGameStats;
 const cardTimeStats = cardStats.times;
 const cardClickStats = cardStats.clicks;
 </script>
@@ -96,7 +96,7 @@ const cardClickStats = cardStats.clicks;
           </h1>
           <h1>
             New Cards In:
-            <span style="font-weight: bold">{{ timeToNextSet }}</span>
+            <span style="font-weight: bold">{{ timeToNext.cardsNExtTime }}</span>
           </h1>
         </div>
       </div>
