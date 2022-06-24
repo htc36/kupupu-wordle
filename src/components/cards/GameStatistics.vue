@@ -154,7 +154,7 @@ const cardClickStats = cardStats.clicks;
 .guess-title {
   font-size: 16px;
   text-align: center;
-  padding-top: 20px;
+  padding-top: 10px;
   padding-bottom: 15px;
 }
 .graph-container {
