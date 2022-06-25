@@ -1,23 +1,25 @@
 import { maoriWords } from './maoriWords';
 import { allWords } from './engWords';
-import { WordResponse } from '../types';
-import axios from 'axios';
+import { apiResponseTypes } from '../types';
+import useApi from '../helpers/useApi';
 import { getSolutionObject, setSolutionObject } from '../helpers/localStorage';
-
-async function getWordFromApi() {
-  const response = await axios.get('https://whanau.tv/api/kupupu');
-  const word: WordResponse = response.data.kupupu[0];
-  return word;
-}
 
 export async function getWordOfTheDayFromAPI() {
   const currentDate = new Date().toLocaleDateString('en-nz', {
     timeZone: 'Pacific/Auckland',
   });
   let localSolutionObject = getSolutionObject();
-  if (!localSolutionObject || localSolutionObject.date != currentDate) {
-    localSolutionObject = await getWordFromApi();
-    setSolutionObject(localSolutionObject, currentDate);
+  if (!localSolutionObject || localSolutionObject.date !== currentDate) {
+    const { result, error } = await useApi(
+      'https://whanau.tv/api/kupupu',
+      apiResponseTypes.wordle
+    );
+    //TODO: need to handle error from API
+    if (error) return { error: error };
+    if (result) {
+      localSolutionObject = result.kupupu[0];
+      setSolutionObject(localSolutionObject, currentDate);
+    }
   }
   return localSolutionObject.name_tereo;
 }

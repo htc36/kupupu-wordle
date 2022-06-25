@@ -4,6 +4,9 @@ import { ModalNames, CardAudio } from '../../types';
 import { cards } from '../../helpers/assetMapping';
 import { ref } from 'vue';
 import '../../css/tooltip.css';
+// import { useFetch } from '../../helpers/useFetch';
+import MessageAlert from '../ui/MessageAlert.vue';
+
 let mediaRecorder: MediaRecorder,
   chunks: Blob[] = [],
   audio = new Audio(),
@@ -17,6 +20,16 @@ const wordRecordingLocation = ref<CardAudio>({});
 const mimeType = ref('audio/wav');
 const maxRecordingTime = 5000;
 const isRecordingFailed = ref(false);
+
+//Need to know api endpoint config to handle it right,
+// for now it's dummy data
+
+const themeOfAGame = ref('Wellbeing');
+// const apiEndpoint = 'http://localhost:3000/api/dummy';
+// const { data, error, retry } = useFetch(apiEndpoint);
+// if (data) {
+//   themeOfAGame.value = data;
+// }
 
 function startRecording(word?: string) {
   if (wordBeingRecorded.value) return;
@@ -107,7 +120,6 @@ function download(name?: string) {
   if (name) {
     createDownloadable(name);
   } else {
-    // Here is some cleaner way to iterate:
     for (const key in wordRecordingLocation.value) {
       createDownloadable(key);
     }
@@ -118,22 +130,24 @@ function download(name?: string) {
 <template>
   <div>
     <Modal :modal-name="ModalNames.voiceRecordModal">
+      <!-- Error handling for actual api calls -->
+      <!-- <message-alert :message="`Voice modal: ${error.message}`" v-if="error" /> -->
       <div class="modal-finished-wrapper">
         <div class="center">
           <h3 class="modal-title">Record Your Voice</h3>
-          <div>
-            <a
-              href="#"
-              data-tooltip="Once submitted recording is saved to our database"
-            >
-              <img
-                src="/assets/info.svg"
-                style="cursor: default; width: 25px"
-                class="modal-icon"
-              />
-            </a>
+          <div
+            data-tooltipvoice="Once submitted recording is saved to our database"
+          >
+            <img
+              src="/assets/info.svg"
+              style="cursor: pointer; width: 25px"
+              class="modal-icon"
+            />
           </div>
         </div>
+        <h4 class="focusing-on">
+          Focusing on: <span class="theme-title">{{ themeOfAGame }}</span>
+        </h4>
         <ul>
           <li v-for="card in cards" :key="card.answer">
             <div class="words-list-item">
@@ -196,8 +210,17 @@ function download(name?: string) {
           </li>
         </ul>
         <div class="footer">
+          <div class="footer-download">
+            <h5>Download PDF of today`s kupu</h5>
+            <img
+              src="/assets/download.svg"
+              class="modal-icon"
+              style="cursor: pointer"
+              alt="Download PDF"
+            />
+          </div>
           <button type="button" class="share-button" @click="download()">
-            Download all
+            Download all records
           </button>
         </div>
       </div>
@@ -211,6 +234,7 @@ function download(name?: string) {
   justify-content: center;
 }
 .share-button {
+  margin-top: 10px;
   background-color: var(--blue);
   color: var(--key-evaluated-text-color);
   font-family: inherit;
@@ -242,16 +266,23 @@ function download(name?: string) {
 
 .modal-icon {
   margin-left: 10px;
-  height: 3.5em;
+  height: 3em;
   padding-bottom: 10px;
   padding-top: 10px;
   cursor: pointer;
 }
 .footer {
   display: flex;
+  flex-direction: column;
   width: 100%;
   justify-content: space-around;
   align-items: center;
+}
+.footer-download {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
 }
 .next-button {
   background-color: var(--blue);
@@ -276,7 +307,7 @@ function download(name?: string) {
   justify-content: space-around;
   background-color: white;
   border-radius: 10px;
-  padding: 30px;
+  padding: 10px;
 }
 .modal-title {
   padding-right: 10px;
@@ -302,5 +333,16 @@ function download(name?: string) {
   .modal-title {
     font-size: 1.4rem;
   }
+}
+
+.focusing-on {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0 20px;
+  text-align: center;
+}
+.theme-title {
+  color: var(--orange);
+  padding-left: 20px;
 }
 </style>

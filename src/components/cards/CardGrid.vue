@@ -127,9 +127,8 @@ function playSound(sound?: string) {
                   class="modal-icon"
                   @click.prevent="playSound(card.sound)"
                 />
-                <a href="#" data-tooltip="Feature coming soon..">
+                <a href="#" data-tooltipfeature="Feature coming soon..">
                   <img
-                    data-tooltip="I am a tooltip"
                     src="/assets/plus.svg"
                     style="cursor: default"
                     class="modal-icon"

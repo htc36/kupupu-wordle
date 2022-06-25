@@ -82,6 +82,8 @@ body {
   --gray: #86888a;
   --darkGray: #939598;
   --white: #fff;
+  --error: #f8746df7;
+  --error-asc: #981e1e;
   --black: #212121;
   --orange: #f5793a;
   --blue: #1b91ff;
