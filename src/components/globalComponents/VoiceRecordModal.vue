@@ -4,8 +4,6 @@ import { ModalNames, CardAudio } from '../../types';
 import { cards } from '../../helpers/assetMapping';
 import { ref } from 'vue';
 import '../../css/tooltip.css';
-// import { useFetch } from '../../helpers/useFetch';
-import MessageAlert from '../ui/MessageAlert.vue';
 
 let mediaRecorder: MediaRecorder,
   chunks: Blob[] = [],
@@ -20,16 +18,6 @@ const wordRecordingLocation = ref<CardAudio>({});
 const mimeType = ref('audio/wav');
 const maxRecordingTime = 5000;
 const isRecordingFailed = ref(false);
-
-//Need to know api endpoint config to handle it right,
-// for now it's dummy data
-
-const themeOfAGame = ref('Wellbeing');
-// const apiEndpoint = 'http://localhost:3000/api/dummy';
-// const { data, error, retry } = useFetch(apiEndpoint);
-// if (data) {
-//   themeOfAGame.value = data;
-// }
 
 function startRecording(word?: string) {
   if (wordBeingRecorded.value) return;
@@ -130,8 +118,6 @@ function download(name?: string) {
 <template>
   <div>
     <Modal :modal-name="ModalNames.voiceRecordModal">
-      <!-- Error handling for actual api calls -->
-      <!-- <message-alert :message="`Voice modal: ${error.message}`" v-if="error" /> -->
       <div class="modal-finished-wrapper">
         <div class="center">
           <h3 class="modal-title">Record Your Voice</h3>
@@ -145,9 +131,6 @@ function download(name?: string) {
             />
           </div>
         </div>
-        <h4 class="focusing-on">
-          Focusing on: <span class="theme-title">{{ themeOfAGame }}</span>
-        </h4>
         <ul>
           <li v-for="card in cards" :key="card.answer">
             <div class="words-list-item">
@@ -210,17 +193,8 @@ function download(name?: string) {
           </li>
         </ul>
         <div class="footer">
-          <div class="footer-download">
-            <h5>Download PDF of today`s kupu</h5>
-            <img
-              src="/assets/download.svg"
-              class="modal-icon"
-              style="cursor: pointer"
-              alt="Download PDF"
-            />
-          </div>
           <button type="button" class="share-button" @click="download()">
-            Download all records
+            Download
           </button>
         </div>
       </div>
@@ -266,7 +240,7 @@ function download(name?: string) {
 
 .modal-icon {
   margin-left: 10px;
-  height: 3em;
+  height: 3.5em;
   padding-bottom: 10px;
   padding-top: 10px;
   cursor: pointer;
@@ -333,16 +307,5 @@ function download(name?: string) {
   .modal-title {
     font-size: 1.4rem;
   }
-}
-
-.focusing-on {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin: 0 20px;
-  text-align: center;
-}
-.theme-title {
-  color: var(--orange);
-  padding-left: 20px;
 }
 </style>

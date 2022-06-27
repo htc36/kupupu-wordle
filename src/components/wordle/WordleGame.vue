@@ -48,7 +48,6 @@ function handleGameState() {
 const modal = useModalStore();
 onBeforeMount(async () => {
   const getAnswer = await getWordOfTheDayFromAPI();
-  console.log(getAnswer);
   if (getAnswer && !getAnswer.error) {
     answer.value = getAnswer;
     handleGameState();
