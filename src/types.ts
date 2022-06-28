@@ -23,6 +23,12 @@ export const enum GameNames {
   Kupu = 'Kupu',
   Rerenga = 'Rerenga',
 }
+export const enum TabNames {
+  KupuStats = 'Kupu',
+  RerengaStats = 'Rerenga',
+  Settings = 'Settings',
+  AboutUs = 'About Us',
+}
 
 export interface WordResponse {
   date?: string;

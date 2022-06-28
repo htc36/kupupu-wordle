@@ -1,21 +1,33 @@
 <script setup lang="ts">
 import { inject } from 'vue';
-import { GameNames } from '../../types';
+import { TabNames } from '../../types';
+import ModalFooter from './ModalFooter.vue';
 const props = defineProps<{
-  title: GameNames;
+  title: TabNames;
 }>();
 const selectedTitle = inject('tabToShow');
 </script>
 
 <template>
-  <div class="tab-content" v-show="props.title === selectedTitle">
-    <slot class="slot" />
+  <div
+    v-show="props.title === selectedTitle"
+    style="
+      height: 100%;
+      display: flex;
+      align-items: space-between;
+      flex-direction: column;
+    "
+  >
+    <div class="tab-content">
+      <slot class="slot" />
+    </div>
+    <ModalFooter :for-tab="title"></ModalFooter>
   </div>
 </template>
 
 <style scoped>
 .tab-content {
-  padding-top: 10px;
+  padding: 20px 30px 20px 30px;
   background-color: white;
   border-radius: 0 0 10px 10px;
   flex-grow: 1;

@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { ref, provide, useSlots, Ref } from 'vue';
-import { GameNames } from '../../types';
+import { GameNames, TabNames } from '../../types';
 const slots = useSlots();
-const props = defineProps<{ currentGame: GameNames }>();
-const tabTitles: Ref<GameNames[]> = ref(
+const props = defineProps<{ currentTabType: TabNames | GameNames }>();
+const tabTitles: Ref<TabNames[]> = ref(
   slots.default
     ? slots
         .default()
-        .map((tab) => (tab.props ? tab.props.title : GameNames.Rerenga))
-    : [GameNames.Rerenga]
+        .map((tab) => (tab.props ? tab.props.title : TabNames.RerengaStats))
+    : [TabNames.RerengaStats]
 );
-let selectedTitle = ref(props.currentGame);
+let selectedTitle = ref(props.currentTabType);
 
 const tabWidth = ref(100 / tabTitles.value.length);
-function handleClick(title: GameNames) {
+function handleClick(title: TabNames) {
   selectedTitle.value = title;
 }
 provide('tabToShow', selectedTitle);
