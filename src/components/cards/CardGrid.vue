@@ -153,12 +153,11 @@ function playSound(sound?: string) {
             </div>
           </li>
         </ul>
-        <div class="footer">
+        <div class="pdf-container">
           <h3 class="pdf-title">Download PDF of today`s kupu</h3>
           <img
             src="/assets/download.svg"
             class="download-icon"
-            style="cursor: pointer"
             alt="Download PDF"
           />
         </div>
@@ -190,17 +189,25 @@ function playSound(sound?: string) {
 <style scoped>
 .modal-icon,
 .download-icon {
+  cursor: pointer;
   margin-left: 10px;
   height: 3em;
   padding-bottom: 10px;
   padding-top: 10px;
-  cursor: pointer;
 }
 
 .footer {
   display: flex;
   width: 100%;
-  justify-content: space-evenly;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.pdf-container {
+  display: flex;
+  width: 100%;
+  justify-content: center;
   align-items: center;
 }
 
@@ -278,10 +285,11 @@ function playSound(sound?: string) {
   }
 }
 .pdf-title {
-  font-size: 1.2em;
+  cursor: pointer;
+  font-size: 0.9em;
 }
 .focusing-on {
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   font-weight: bold;
   margin: 0 20px;
   text-align: center;
