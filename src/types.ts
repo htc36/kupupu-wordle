@@ -1,3 +1,6 @@
+export interface CardAudio {
+  [key: string]: string;
+}
 export const enum LetterState {
   INITIAL = 0,
   CORRECT = 'correct',
@@ -13,6 +16,7 @@ export const enum statsTitle {
 }
 
 export const enum ModalNames {
+  voiceRecordModal = 'voiceRecordModal',
   donationModal = 'donationModal',
   settingsModal = 'settingsModal',
   statsModal = 'statsModal',
@@ -109,4 +113,9 @@ export interface Guesses {
   5: number;
   6: number;
   F: number;
+}
+
+export interface TimeToNextType {
+  wordleNextTime: string;
+  cardsNextTime: string;
 }

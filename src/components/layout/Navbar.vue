@@ -15,14 +15,17 @@ const modal = ref(useModalStore());
 <template>
   <header class="header">
     <Modal :modal-name="ModalNames.settingsModal">
-      <Tabs :current-tab-type="TabNames.Settings">
+      <Tabs :current-tab-type="TabNames.Settings" :is-statistic="true">
         <Tab :title="TabNames.Settings"><GameSettings /></Tab>
         <Tab :title="TabNames.AboutUs"><AboutUs /></Tab>
       </Tabs>
     </Modal>
 
     <Modal :modal-name="ModalNames.statsModal">
-      <Tabs :current-tab-type="modal.getCurrentGamePlaying()">
+      <Tabs
+        :current-tab-type="modal.getCurrentGamePlaying()"
+        :is-statistic="true"
+      >
         <Tab :title="TabNames.KupuStats"><WordleStatistics /></Tab>
         <Tab :title="TabNames.RerengaStats"><CardsStatistics /></Tab>
       </Tabs>
@@ -64,7 +67,7 @@ const modal = ref(useModalStore());
         </svg>
       </button>
     </div>
-    <router-link class="nav-title" to="/">kupupu</router-link>
+    <router-link class="nav-title" to="/">kupupū</router-link>
     <SideBar />
   </header>
 </template>

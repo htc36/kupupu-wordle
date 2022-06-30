@@ -10,6 +10,7 @@ export const useModalStore = defineStore('modal', {
       isWordDefinitionModalShown: false,
       isCardGameFinishedModal: false,
       isDonationModalShown: false,
+      isVoiceRecordModalShown: false,
       gamePlaying: GameNames.Rerenga,
     };
   },
@@ -26,6 +27,9 @@ export const useModalStore = defineStore('modal', {
           break;
         case ModalNames.wordDefinitionModal:
           this.isWordDefinitionModalShown = !this.isWordDefinitionModalShown;
+          break;
+        case ModalNames.voiceRecordModal:
+          this.isVoiceRecordModalShown = !this.isVoiceRecordModalShown;
           break;
         case ModalNames.cardGameFinishedModal:
           if (this.isCardGameFinishedModal) {
@@ -53,6 +57,8 @@ export const useModalStore = defineStore('modal', {
           return this.isWordDefinitionModalShown;
         case ModalNames.cardGameFinishedModal:
           return this.isCardGameFinishedModal;
+        case ModalNames.voiceRecordModal:
+          return this.isVoiceRecordModalShown;
       }
     },
     getCurrentGamePlaying() {
