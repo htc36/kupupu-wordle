@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, onUnmounted } from 'vue';
+import { onBeforeMount, onUnmounted, onMounted, ref } from 'vue';
 import { getAllWords, getWordOfTheDayFromAPI } from '../../words';
 import {
   getStats,
@@ -20,13 +20,12 @@ import {
   WordleGameStats,
   CardGameStats,
   GameNames,
+  ModalNames,
 } from '../../types';
 import getSuggestion from '../../helpers/suggestion';
-import { onMounted } from 'vue';
-import { ModalNames } from '../../types';
 import { useModalStore } from '../../stores/modal';
 import { useMessageStore } from '../../stores/message';
-import { ref } from 'vue';
+import MessageAlert from '../ui/MessageAlert.vue';
 
 let answer = ref<string>('');
 let gameState: GameState = getDefaultGameState();
@@ -34,6 +33,8 @@ let board = ref<Board[][]>([]);
 let letterStates = ref<Record<string, LetterState>>({});
 let currentRowIndex = ref<number>(0);
 let allowInput: boolean;
+const apiError = ref(false);
+const errorMessage = ref({});
 
 function handleGameState() {
   const savedGameState = getGameState(answer.value);
@@ -46,13 +47,19 @@ function handleGameState() {
 }
 const modal = useModalStore();
 onBeforeMount(async () => {
-  answer.value = await getWordOfTheDayFromAPI();
-  console.log(answer.value);
-  handleGameState();
-  board.value = gameState.board;
-  letterStates.value = gameState.letterState;
-  currentRowIndex.value = gameState.currentRowIndex;
-  allowInput = !gameState.isGameFinished;
+  const getAnswer = await getWordOfTheDayFromAPI();
+  if (getAnswer && !getAnswer.error) {
+    answer.value = getAnswer;
+    handleGameState();
+    board.value = gameState.board;
+    letterStates.value = gameState.letterState;
+    currentRowIndex.value = gameState.currentRowIndex;
+    allowInput = !gameState.isGameFinished;
+  } else if (getAnswer?.error) {
+    //TODO: Need to agree on what to do if error occurs
+    apiError.value = true;
+    errorMessage.value = getAnswer.error;
+  }
 });
 
 // Get word of the day
@@ -242,6 +249,7 @@ function shake() {
 </script>
 
 <template>
+  <message-alert v-if="apiError" :message="errorMessage" />
   <div class="gameContainer" v-if="answer != ''">
     <Modal :modal-name="ModalNames.wordDefinitionModal">
       <WordDefinition

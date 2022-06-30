@@ -12,6 +12,16 @@ import { ModalNames } from '../../types';
 import { setCardStats } from '../../helpers/localStorage';
 import '../../css/tooltip.css';
 import { useClockStore } from '../../stores/clock';
+
+//Need to know api endpoint config to handle it right,
+// for now it's dummy data
+const themeOfAGame = ref('Wellbeing');
+// const apiEndpoint = 'http://localhost:3000/api/dummy';
+// const { data, error, retry } = useFetch(apiEndpoint);
+// if (data) {
+//   themeOfAGame.value = data;
+// }
+
 //Adding and destructuring store to refs to get reactivity without getters
 const modal = useModalStore();
 const emit = defineEmits<{
@@ -107,9 +117,14 @@ function playSound(sound?: string) {
 </script>
 <template>
   <div class="gridWrapper">
+    <!-- Error handling for actual api calls -->
+    <!-- <message-alert :message="`Voice modal: ${error.message}`" v-if="error" /> -->
     <Modal :modal-name="ModalNames.cardGameFinishedModal">
       <div class="modal-finished-wrapper">
         <h3 class="modal-title">Game Completed</h3>
+        <h4 class="focusing-on">
+          Focusing on: <span class="theme-title">{{ themeOfAGame }}</span>
+        </h4>
         <ul class="words-list">
           <li v-for="card in cards" :key="card.answer">
             <div class="words-list-item">
@@ -127,9 +142,8 @@ function playSound(sound?: string) {
                   class="modal-icon"
                   @click.prevent="playSound(card.sound)"
                 />
-                <a href="#" data-tooltip="Feature coming soon..">
+                <a href="#" data-tooltipfeature="Feature coming soon..">
                   <img
-                    data-tooltip="I am a tooltip"
                     src="/assets/plus.svg"
                     style="cursor: default"
                     class="modal-icon"
@@ -139,6 +153,14 @@ function playSound(sound?: string) {
             </div>
           </li>
         </ul>
+        <div class="pdf-container">
+          <h3 class="pdf-title">Download PDF of today`s kupu</h3>
+          <img
+            src="/assets/download.svg"
+            class="download-icon"
+            alt="Download PDF"
+          />
+        </div>
         <div class="footer">
           <h3 class="words-time">Time : {{ getGameTime() }}</h3>
           <button
@@ -165,19 +187,30 @@ function playSound(sound?: string) {
   </div>
 </template>
 <style scoped>
-.modal-icon {
+.modal-icon,
+.download-icon {
+  cursor: pointer;
   margin-left: 10px;
-  height: 3.5em;
+  height: 3em;
   padding-bottom: 10px;
   padding-top: 10px;
-  cursor: pointer;
 }
+
 .footer {
   display: flex;
   width: 100%;
-  justify-content: space-around;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.pdf-container {
+  display: flex;
+  width: 100%;
+  justify-content: center;
   align-items: center;
 }
+
 .next-button {
   background-color: var(--green);
   color: var(--key-evaluated-text-color);
@@ -194,7 +227,7 @@ function playSound(sound?: string) {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
   width: 40%;
   font-size: 20px;
-  height: 52px;
+  height: 40px;
 }
 .gridWrapper {
   display: flex;
@@ -212,7 +245,7 @@ function playSound(sound?: string) {
   justify-content: space-around;
   background-color: white;
   border-radius: 10px;
-  padding: 30px;
+  padding: 20px;
 }
 .modal-title {
   font-size: 1.7rem;
@@ -244,10 +277,25 @@ function playSound(sound?: string) {
   text-align: center;
   font-size: 1.6rem;
   font-weight: 500;
+  justify-self: flex-start;
 }
 @media (max-width: 450px) {
   .modal-title {
     font-size: 1.4rem;
   }
+}
+.pdf-title {
+  cursor: pointer;
+  font-size: 0.9em;
+}
+.focusing-on {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin: 0 20px;
+  text-align: center;
+}
+.theme-title {
+  color: var(--orange);
+  padding-left: 20px;
 }
 </style>

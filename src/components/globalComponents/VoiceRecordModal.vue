@@ -4,6 +4,7 @@ import { ModalNames, CardAudio } from '../../types';
 import { cards } from '../../helpers/assetMapping';
 import { ref } from 'vue';
 import '../../css/tooltip.css';
+
 let mediaRecorder: MediaRecorder,
   chunks: Blob[] = [],
   audio = new Audio(),
@@ -107,7 +108,6 @@ function download(name?: string) {
   if (name) {
     createDownloadable(name);
   } else {
-    // Here is some cleaner way to iterate:
     for (const key in wordRecordingLocation.value) {
       createDownloadable(key);
     }
@@ -121,17 +121,14 @@ function download(name?: string) {
       <div class="modal-finished-wrapper">
         <div class="center">
           <h3 class="modal-title">Record Your Voice</h3>
-          <div>
-            <a
-              href="#"
-              data-tooltip="Once submitted recording is saved to our database"
-            >
-              <img
-                src="/assets/info.svg"
-                style="cursor: default; width: 25px"
-                class="modal-icon"
-              />
-            </a>
+          <div
+            data-tooltipvoice="Once submitted recording is saved to our database"
+          >
+            <img
+              src="/assets/info.svg"
+              style="cursor: pointer; width: 25px"
+              class="modal-icon"
+            />
           </div>
         </div>
         <ul>
@@ -197,7 +194,7 @@ function download(name?: string) {
         </ul>
         <div class="footer">
           <button type="button" class="share-button" @click="download()">
-            Download all
+            Download
           </button>
         </div>
       </div>
@@ -211,6 +208,7 @@ function download(name?: string) {
   justify-content: center;
 }
 .share-button {
+  margin-top: 10px;
   background-color: var(--blue);
   color: var(--key-evaluated-text-color);
   font-family: inherit;
@@ -249,9 +247,16 @@ function download(name?: string) {
 }
 .footer {
   display: flex;
+  flex-direction: column;
   width: 100%;
   justify-content: space-around;
   align-items: center;
+}
+.footer-download {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
 }
 .next-button {
   background-color: var(--blue);
@@ -276,7 +281,7 @@ function download(name?: string) {
   justify-content: space-around;
   background-color: white;
   border-radius: 10px;
-  padding: 30px;
+  padding: 10px;
 }
 .modal-title {
   padding-right: 10px;
