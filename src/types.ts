@@ -1,3 +1,4 @@
+import { cards } from './helpers/assetMapping';
 export interface CardAudio {
   [key: string]: string;
 }
@@ -42,6 +43,16 @@ export interface WordResponse {
   image: string;
   audio: string;
   description: string;
+}
+
+export interface CardsThemeResponse {
+  id?: number;
+  theme?: string;
+}
+
+export const enum apiResponseTypes {
+  cards = 'cards',
+  wordle = 'wordle',
 }
 
 export interface CardObj {
