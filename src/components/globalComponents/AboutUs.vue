@@ -1,6 +1,5 @@
 <script setup lang="ts"></script>
 <template>
-  <!-- Share button on wordle settings dosent work when its empty!!! -->
   <div class="about-us-container">
     <div class="top-coloumn-container">
       <div>

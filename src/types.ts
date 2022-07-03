@@ -31,8 +31,8 @@ export const enum GameNames {
 export const enum TabNames {
   KupuStats = 'Kupu',
   RerengaStats = 'Rerenga',
-  Settings = 'Settings',
-  AboutUs = 'About Us',
+  Settings = 'ngā tautuhi',
+  AboutUs = 'mo mātau',
 }
 
 export interface WordResponse {

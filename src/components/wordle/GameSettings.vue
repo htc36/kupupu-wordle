@@ -27,7 +27,6 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
           <div class="title">oro mātiti - play sound</div>
         </div>
         <div class="control">
-          <!-- <game-switch id="dark-theme" name="dark-theme"></game-switch> -->
           <Switch
             setting-name="shouldPlaySound"
             :toggleSwitch="toggleSwitch"
@@ -53,8 +52,7 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
         </div>
         <div class="control">
           <a
-            href="https://kapaigroup.ideas.aha.io"
-            target="_blank"
+            onclick="window.open('https:kapaigroup.ideas.aha.io')"
             name="kaipai"
             class="externalSitesContainer"
           >
@@ -73,8 +71,7 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
         </div>
         <div>
           <a
-            href="https://mehau.whanau.tv"
-            target="blank"
+            onclick="window.open('https:mehau.whanau.tv')"
             class="externalSitesContainer"
           >
             <img
@@ -96,33 +93,56 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
           <div class="title">pātai maori - common questions</div>
         </div>
         <a
-          href="https://help.nytimes.com/hc/en-us/articles/360029050872-Word-Games-and-Logic-Puzzles#h_01FVGCB2Z00ZQMDMCYWBPWJNXB"
-          target="_blank"
+          onclick="window.open('https:whanau.tv')"
           class="externalSitesContainer"
         >
-          hey
-          <!-- <img
-              src="/assets/kapaigroup.ico"
-              alt="cardsicon"
-              class="icon"
-              style="width: 25px"
-            />
-            <img
-              src="/assets/ext.svg"
-              alt="cardsicon"
-              class="externalLinkIcon"
-            /> -->
+          <img
+            src="/assets/kapaigroup.ico"
+            alt="cardsicon"
+            class="icon"
+            style="width: 25px"
+          />
+          <img src="/assets/ext.svg" alt="cardsicon" class="externalLinkIcon" />
         </a>
       </div>
     </section>
-    <div style="display: flex; justify-content: space-between">
-      <h1>Download worksheet</h1>
-      <h1>Time to next game: 12:02</h1>
+    <div class="pdf-container">
+      <div class="bottomContainer" style="cursor: pointer">
+        <img
+          src="/assets/download.svg"
+          class="download-icon"
+          alt="Download PDF"
+        />
+        <h3 class="pdf-title">Download Worksheet</h3>
+      </div>
+      <div class="bottomContainer">
+        <h3 class="download-icon" style="padding-top: 20px">
+          {{ timeToNext.cardsNextTime }}
+        </h3>
+        <h3>Time to next game</h3>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.bottomContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pdf-container {
+  align-items: center;
+  justify-content: space-evenly;
+  display: flex;
+}
+.download-icon {
+  font-weight: bold;
+  margin-left: 10px;
+  height: 3em;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
 .externalSitesContainer {
   cursor: pointer;
   display: flex;
