@@ -52,7 +52,7 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
         </div>
         <div class="control">
           <a
-            onclick="window.open('https:kapaigroup.ideas.aha.io')"
+            onclick="window.open('https:\/\/kapaigroup.ideas.aha.io', '_blank')"
             name="kaipai"
             class="externalSitesContainer"
           >
@@ -71,7 +71,7 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
         </div>
         <div>
           <a
-            onclick="window.open('https:mehau.whanau.tv')"
+            onclick="window.open('https:\/\/mehau.whanau.tv', '_blank')"
             class="externalSitesContainer"
           >
             <img
@@ -93,7 +93,7 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
           <div class="title">pātai maori - common questions</div>
         </div>
         <a
-          onclick="window.open('https:whanau.tv')"
+          onclick="window.open('https:\/\/whanau.tv')"
           class="externalSitesContainer"
         >
           <img
