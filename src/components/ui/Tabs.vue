@@ -67,6 +67,8 @@ provide('timeToNext', readonly(timeToNext));
   list-style: none;
   padding: 0;
   flex-direction: row;
+  background-color: grey;
+  border-radius: 10px 10px 0 0;
 }
 
 .tabs-header-item {

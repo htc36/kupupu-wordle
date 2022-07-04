@@ -14,13 +14,13 @@
         aliquam maximus dui, ac maximus odio pellentesque ac. Vestibulum
       </p>
     </div>
-    <h1 class="title" style="">What we stand for</h1>
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eget
-      tempus nisi, vitae elementum augue. Maecenas eget ullamcorper leo. Cras
-      aliquam maximus dui, ac maximus odio pellentesque ac. Vestibulum elementum
-      aliquam ante, quis pharetra ante finibus eget. Ut quis ex
-    </p>
+    <div>
+      <h1 class="title" style="">What we stand for</h1>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eget
+        aliquam ante, quis pharetra ante finibus eget. Ut quis ex
+      </p>
+    </div>
   </div>
 </template>
 <style scoped>
