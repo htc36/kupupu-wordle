@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { GameSettings, TimeToNextType } from '../../types';
 import { setGameSettings, getGameSettings } from '../../helpers/localStorage';
 import { inject } from 'vue';
+import DownloadWorksheet from '../globalComponents/DownloadWorksheet.vue';
 const settings = ref<GameSettings>(getGameSettings());
 const toggleSwitch = (settingName: keyof GameSettings) => {
   settings.value[settingName] = !settings.value[settingName];
@@ -107,14 +108,7 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
       </div>
     </section>
     <div class="pdf-container">
-      <div class="bottomContainer" style="cursor: pointer">
-        <img
-          src="/assets/download.svg"
-          class="download-icon"
-          alt="Download PDF"
-        />
-        <h3 class="pdf-title">Download Worksheet</h3>
-      </div>
+      <DownloadWorksheet />
       <div class="bottomContainer">
         <h3 class="download-icon" style="padding-top: 20px">
           {{ timeToNext.cardsNextTime }}
