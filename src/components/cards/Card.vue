@@ -2,8 +2,8 @@
 import { ref } from 'vue';
 const props = defineProps<{
   textQuestion?: string;
-  image?: string;
-  answer: string;
+  word_img: string;
+  word_eng: string;
   index: number;
   isTextCard?: boolean;
   maxCardHeight?: string;
@@ -14,6 +14,7 @@ const emit = defineEmits<{
 const isActive = ref(false);
 const isShake = ref(false);
 const isLocked = ref(false);
+const apiBaseUrl = 'https://whanau.tv/eventMedia/';
 
 function close() {
   if (!isLocked.value) isActive.value = false;
@@ -56,7 +57,7 @@ defineExpose({
         />
       </div>
       <div v-if="isTextCard" class="flip-card-back">
-        <p class="card-text">{{ answer }}</p>
+        <p class="card-text">{{ word_eng }}</p>
         <img
           @click="clickCard"
           src="/assets/card_text_background.png"
@@ -64,7 +65,11 @@ defineExpose({
         />
       </div>
       <div v-else class="flip-card-back">
-        <img @click="clickCard" :src="`/assets/${image}`" class="card-img" />
+        <img
+          @click="clickCard"
+          :src="`${apiBaseUrl}${word_img}`"
+          class="card-img"
+        />
       </div>
     </div>
   </div>

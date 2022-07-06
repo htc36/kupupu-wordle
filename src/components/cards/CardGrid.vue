@@ -1,79 +1,60 @@
 <script setup lang="ts">
 import Card from './Card.vue';
 import Modal from '../layout/Modal.vue';
-import { shuffleArray } from '../../helpers/randomiseArray';
-import { cards } from '../../helpers/assetMapping';
-import { ref, onMounted } from 'vue';
-import { CardObj, GameNames } from '../../types';
+import { ref } from 'vue';
+import { CardObj } from '../../types';
 import { useCardGameStore } from '../../stores/cardGame';
+import { useApiStore } from '../../stores/apiStore';
 import { useModalStore } from '../../stores/modal';
 import { storeToRefs } from 'pinia';
 import { ModalNames } from '../../types';
 import { setCardStats } from '../../helpers/localStorage';
-import '../../css/tooltip.css';
 import { useClockStore } from '../../stores/clock';
+import MessageAlert from '../ui/MessageAlert.vue';
+import '../../css/tooltip.css';
 
-//Need to know api endpoint config to handle it right,
-// for now it's dummy data
-const themeOfAGame = ref('Wellbeing');
-// const apiEndpoint = 'http://localhost:3000/api/dummy';
-// const { data, error, retry } = useFetch(apiEndpoint);
-// if (data) {
-//   themeOfAGame.value = data;
-// }
-
-//Adding and destructuring store to refs to get reactivity without getters
-const modal = useModalStore();
 const emit = defineEmits<{
   (e: 'updateBestTime'): void;
 }>();
+
+const modal = useModalStore();
+const apiStore = useApiStore();
 const cardGameStore = useCardGameStore();
 const clockStore = useClockStore();
+const {
+  isApiFetched,
+  isApiFetching,
+  apiError,
+  cardsPrepared,
+  apiResponseCards,
+} = storeToRefs(apiStore);
 const { startCardGame, stopCardGame, incrementClicks } = cardGameStore;
-
 const { getGameTime } = clockStore;
 const { clockTime } = storeToRefs(clockStore);
-
 const { isCardGameStarted, clicks } = storeToRefs(cardGameStore);
-onMounted(() => {
-  modal.setGamePlaying(GameNames.Rerenga);
-});
-const playingSound = ref('');
-//Generating and shuffling cards from the cards array
-function createPlayingCards() {
-  const playingCards: CardObj[] = [];
-  cards.forEach((card) => {
-    playingCards.push({
-      ...card,
-      isTextCard: false,
-    });
-    playingCards.push({
-      ...card,
-      isTextCard: true,
-    });
-  });
-  return shuffleArray(playingCards);
-}
-const playingCards = createPlayingCards();
-//Calculate height of each card
-//Assume that we gonna have two cards columns and 1 percent as a gap
-const maxCardHeight = (100 / playingCards.length) * 2 - 1 + '%';
 
+const apiBaseUrl = 'https://whanau.tv/eventMedia/';
+const themeOfAGame = ref('Wellbeing');
+const playingSound = ref('');
+
+//Calling API and storing cards in Pinia
+apiStore.getCards();
+const cards = apiResponseCards;
 const cardsRef = ref<InstanceType<typeof Card>[]>([]);
 type cardsRefType = typeof cardsRef;
-const allCards = ref<CardObj[]>(playingCards);
 const matchedPairs = ref<number>(0);
 let selectedCards: CardObj[] = [];
+
 function cardOpened(index: number) {
   if (!isCardGameStarted.value) {
     startCardGame();
   }
   incrementClicks();
-  selectedCards.push({ ...allCards.value[index], index });
-  const { answer } = allCards.value[index];
+  selectedCards.push({ ...cardsPrepared.value[index], index });
+  const { word_eng } = cardsPrepared.value[index];
   if (selectedCards.length === 2) {
     const firstSelected = selectedCards[0];
-    if (firstSelected.answer === answer) {
+    if (firstSelected.word_eng === word_eng) {
       matchedPairs.value++;
       if (firstSelected.index !== undefined) {
         const firstIndex = firstSelected.index;
@@ -84,7 +65,7 @@ function cardOpened(index: number) {
           cardsRef.value[firstIndex].shakeCards();
         }, 500);
       }
-      if (matchedPairs.value === allCards.value.length / 2) {
+      if (matchedPairs.value === cardsPrepared.value.length / 2) {
         stopCardGame();
         setCardStats(clockTime.value, clicks.value);
         emit('updateBestTime');
@@ -101,13 +82,14 @@ function cardOpened(index: number) {
       cardsRef.value[selectedCards[0].index].close();
       cardsRef.value[selectedCards[1].index].close();
     }
-    selectedCards = [{ ...allCards.value[index], index }];
+    selectedCards = [{ ...cardsPrepared.value[index], index }];
   }
 }
+
 function playSound(sound?: string) {
   if (sound && !playingSound.value) {
     playingSound.value = sound;
-    var audio = new Audio(`/assets/${sound}`);
+    const audio = new Audio(`${apiBaseUrl}/${sound}`);
     audio.play();
     audio.onended = function () {
       playingSound.value = '';
@@ -116,9 +98,11 @@ function playSound(sound?: string) {
 }
 </script>
 <template>
-  <div class="gridWrapper">
-    <!-- Error handling for actual api calls -->
-    <!-- <message-alert :message="`Voice modal: ${error.message}`" v-if="error" /> -->
+  <div class="fetching" v-if="isApiFetching">
+    <div class="loading"></div>
+    <message-alert :message="apiError" v-if="apiError" />
+  </div>
+  <div class="gridWrapper" v-if="isApiFetched">
     <Modal :modal-name="ModalNames.cardGameFinishedModal">
       <div class="modal-finished-wrapper">
         <h3 class="modal-title">Game Completed</h3>
@@ -126,21 +110,21 @@ function playSound(sound?: string) {
           Focusing on: <span class="theme-title">{{ themeOfAGame }}</span>
         </h4>
         <ul class="words-list">
-          <li v-for="card in cards" :key="card.answer">
+          <li v-for="card in cards?.kupuhi" :key="card.word_eng">
             <div class="words-list-item">
-              <p class="word-item">{{ card.answer }}</p>
+              <p class="word-item">{{ card.word_eng }}</p>
               <div>
                 <img
-                  v-if="playingSound == card.sound"
+                  v-if="playingSound == card.word_aud"
                   src="/assets/pause.svg"
                   class="modal-icon"
-                  @click.prevent="playSound(card.sound)"
+                  @click.prevent="playSound(card.word_aud)"
                 />
                 <img
                   v-else
                   src="/assets/play.svg"
                   class="modal-icon"
-                  @click.prevent="playSound(card.sound)"
+                  @click.prevent="playSound(card.word_aud)"
                 />
                 <a href="#" data-tooltipfeature="Feature coming soon..">
                   <img
@@ -177,16 +161,17 @@ function playSound(sound?: string) {
       </div>
     </Modal>
     <Card
-      v-for="(card, index) in allCards"
+      v-for="(card, index) in cardsPrepared"
       :key="index"
       v-bind="card"
-      :max-card-height="maxCardHeight"
+      :max-card-height="`${(100 / cardsPrepared.length) * 2 - 1 + '%'}`"
       :ref="(el:cardsRefType) => cardsRef.push(el)"
       :index="index"
       @card-opened="(index) => cardOpened(index)"
     />
   </div>
 </template>
+
 <style scoped>
 .modal-icon,
 .download-icon {
@@ -196,7 +181,11 @@ function playSound(sound?: string) {
   padding-top: 10px;
   cursor: pointer;
 }
-
+.loading {
+  height: 100%;
+  width: 100%;
+  background: url('/assets/loader.svg') no-repeat center;
+}
 .footer {
   display: flex;
   width: 100%;
@@ -222,13 +211,17 @@ function playSound(sound?: string) {
   font-size: 20px;
   height: 40px;
 }
-.gridWrapper {
+.gridWrapper,
+.fetching {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-evenly;
   height: 95%; /* This height also needs to be calculated */
   width: 100%;
+}
+.fetching {
+  align-items: center;
 }
 .modal-finished-wrapper {
   display: flex;

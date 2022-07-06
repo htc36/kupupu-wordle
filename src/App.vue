@@ -17,7 +17,7 @@ import Footer from './components/layout/Footer.vue';
 .game-wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly; /* you might prefer flex-start */
+  justify-content: space-evenly;
   align-items: center;
   height: 100%;
   width: 100%;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onBeforeMount, onUnmounted, onMounted, ref } from 'vue';
-import { getAllWords, getWordOfTheDayFromAPI } from '../../words';
+import { onUnmounted, onMounted, ref } from 'vue';
+import { getAllWords } from '../../words';
 import {
   getStats,
   setWordleStats,
@@ -13,6 +13,7 @@ import Modal from '../layout/Modal.vue';
 import WordDefinition from './WordDefinition.vue';
 import { defaultGameSettings } from '../../helpers/localStorage';
 import Keyboard from './Keyboard.vue';
+import { storeToRefs } from 'pinia';
 import {
   LetterState,
   Board,
@@ -22,60 +23,18 @@ import {
   GameNames,
   ModalNames,
 } from '../../types';
+import { useApiStore } from '../../stores/apiStore';
+
 import getSuggestion from '../../helpers/suggestion';
 import { useModalStore } from '../../stores/modal';
 import { useMessageStore } from '../../stores/message';
 import MessageAlert from '../ui/MessageAlert.vue';
 
-let answer = ref<string>('');
-let gameState: GameState = getDefaultGameState();
-let board = ref<Board[][]>([]);
-let letterStates = ref<Record<string, LetterState>>({});
-let currentRowIndex = ref<number>(0);
-let allowInput: boolean;
-const apiError = ref(false);
-const errorMessage = ref({});
+const apiStore = useApiStore();
+const { wordleOfADay, isApiFetching, apiError } = storeToRefs(apiStore);
+//Calling API and storing cards in Pinia
+apiStore.getWordle();
 
-function handleGameState() {
-  const savedGameState = getGameState(answer.value);
-  if (savedGameState) {
-    gameState = savedGameState;
-  } else {
-    gameState.solution = answer.value;
-    setGameState(gameState);
-  }
-}
-const modal = useModalStore();
-onBeforeMount(async () => {
-  const getAnswer = await getWordOfTheDayFromAPI();
-  if (getAnswer && !getAnswer.error) {
-    answer.value = getAnswer;
-    handleGameState();
-    board.value = gameState.board;
-    letterStates.value = gameState.letterState;
-    currentRowIndex.value = gameState.currentRowIndex;
-    allowInput = !gameState.isGameFinished;
-  } else if (getAnswer?.error) {
-    //TODO: Need to agree on what to do if error occurs
-    apiError.value = true;
-    errorMessage.value = getAnswer.error;
-  }
-});
-
-// Get word of the day
-const currentLanguage = 'maori';
-const allWords = getAllWords(currentLanguage);
-const wordleStats: WordleGameStats | CardGameStats | object =
-  getStats('wordleStats');
-
-// Board state. Each tile is represented as { letter, state }
-const currentRow = $computed(() => board.value[currentRowIndex.value]);
-
-defineEmits(['setWordleStats']);
-let grid = ref('');
-let shakeRowIndex = ref(-1);
-let success = ref(false);
-const messageStore = useMessageStore();
 onMounted(() => {
   modal.setGamePlaying(GameNames.Kupu);
   const existingSettings = JSON.parse(
@@ -83,11 +42,50 @@ onMounted(() => {
   );
   if (!existingSettings) setGameSettings(defaultGameSettings);
 });
+
+let gameState: GameState = getDefaultGameState();
+let board = ref<Board[][]>([]);
+let letterStates = ref<Record<string, LetterState>>({});
+let currentRowIndex = ref<number>(0);
+let allowInput: boolean;
+
+function handleGameState() {
+  const savedGameState = getGameState(wordleOfADay.value);
+  if (savedGameState) {
+    gameState = savedGameState;
+  } else {
+    gameState.solution = wordleOfADay.value;
+    setGameState(gameState);
+  }
+}
+const modal = useModalStore();
+
+if (wordleOfADay?.value) {
+  handleGameState();
+  board.value = gameState.board;
+  letterStates.value = gameState.letterState;
+  currentRowIndex.value = gameState.currentRowIndex;
+  allowInput = !gameState.isGameFinished;
+}
+
+// Get word of the day
+// TODO: I suppose this should be an API endpoint as well
+const currentLanguage = 'maori';
+const allWords = getAllWords(currentLanguage);
+const wordleStats: WordleGameStats | CardGameStats | object =
+  getStats('wordleStats');
+
+// Board state. Each tile is represented as { letter, state }
+const currentRow = $computed(() => board.value[currentRowIndex.value]);
+defineEmits(['setWordleStats']);
+let grid = ref('');
+let shakeRowIndex = ref(-1);
+let success = ref(false);
+const messageStore = useMessageStore();
+
 // Handle keyboard input.
 const onKeyup = (e: KeyboardEvent) => onKey(e.key);
-
 window.addEventListener('keyup', onKeyup);
-
 onUnmounted(() => {
   window.removeEventListener('keyup', onKeyup);
 });
@@ -167,13 +165,13 @@ function markAbsentRows(tile: Board) {
  */
 function isValidWord() {
   const guess = currentRow.map((tile) => tile.letter).join('');
-  if (!allWords.includes(guess) && guess !== answer.value) {
+  if (!allWords.includes(guess) && guess !== wordleOfADay.value) {
     shake();
     let guesses = board.value.map((item) => {
       return item.map((letterObj) => letterObj.letter).join('');
     });
     const suggestion = getSuggestion(
-      answer.value,
+      wordleOfADay.value,
       guesses,
       currentRowIndex.value,
       allWords
@@ -193,7 +191,7 @@ function completeRow() {
   }
   if (!isValidWord()) return;
 
-  let answerLetters: (string | null)[] = answer.value.split('');
+  let answerLetters: (string | null)[] = wordleOfADay.value.split('');
 
   // Mark correct/present/absent letters
   currentRow.forEach((tile, i) => {
@@ -203,7 +201,6 @@ function completeRow() {
   });
 
   allowInput = false;
-  console.log(answer.value);
   if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
     setWordleStats(wordleStats as WordleGameStats, currentRowIndex.value);
     gameState.isGameFinished = true;
@@ -231,7 +228,7 @@ function completeRow() {
     gameState.isGameFinished = true;
     // game over :(
     setTimeout(() => {
-      messageStore.showMessage(answer.value.toUpperCase(), '', 2000);
+      messageStore.showMessage(wordleOfADay.value.toUpperCase(), '', 2000);
     }, 1600);
   }
   gameState.board = board.value;
@@ -246,14 +243,19 @@ function shake() {
     shakeRowIndex.value = -1;
   }, 1000);
 }
+
+console.log(wordleOfADay.value);
 </script>
 
 <template>
-  <message-alert v-if="apiError" :message="errorMessage" />
-  <div class="gameContainer" v-if="answer != ''">
+  <div class="gameContainer" v-if="isApiFetching">
+    <div class="loading"></div>
+    <message-alert :message="apiError" v-if="apiError" />
+  </div>
+  <div class="gameContainer" v-if="!isApiFetching && wordleOfADay">
     <Modal :modal-name="ModalNames.wordDefinitionModal">
       <WordDefinition
-        :word="answer"
+        :word="wordleOfADay"
         @hasSelectedNext="
           () => {
             modal.toggleModal(ModalNames.wordDefinitionModal);
@@ -298,7 +300,6 @@ function shake() {
       :language="currentLanguage"
     />
   </div>
-  <div v-else class="loading"></div>
 </template>
 
 <style scoped>

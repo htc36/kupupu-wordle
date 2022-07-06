@@ -50,14 +50,33 @@ export const enum apiResponseTypes {
 }
 
 export interface CardObj {
-  sound?: string;
-  image?: string;
-  answer: string;
   index?: number;
-  id?: number;
   isTextCard?: boolean;
-  cardLocked?: boolean;
+  game_id: number;
+  pdf_id: string;
+  word_id: string;
+  word_tereo: string;
+  word_eng: string;
+  word_img: string;
+  word_aud: string;
 }
+
+export interface ApiResponseWordle {
+  kupupu: {
+    id: number;
+    name_eng: string;
+    name_tereo: string;
+    image: string;
+    audio: string;
+    description: string;
+  }[];
+  count: number;
+}
+
+export interface ApiResponseCards {
+  kupuhi: CardObj[];
+}
+
 export interface Board {
   letter: string;
   state: LetterState;
