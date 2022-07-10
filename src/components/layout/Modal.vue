@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useModalStore } from '../../stores/modal';
-import { ModalNames } from '../../types';
+import { ModalNames, TabNames } from '../../types';
 import '/assets/cardsIcon.svg';
 const props = defineProps<{
   modalName: ModalNames;
@@ -14,7 +14,11 @@ const modal = useModalStore();
     @click="modal.toggleModal(props.modalName)"
     class="content"
   >
-    <div :class="['help-modal-content', props.modalName]" @click.prevent.stop>
+    <div
+      :class="['help-modal-content', props.modalName]"
+      @click.prevent.stop
+      style="background-color: white; display: flex; flex-direction: column"
+    >
       <div class="close-btn">
         <svg
           class="close-svg"

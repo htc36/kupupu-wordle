@@ -6,21 +6,28 @@ import CardsStatistics from '../cards/GameStatistics.vue';
 import Tabs from '../ui/Tabs.vue';
 import Tab from '../ui/Tab.vue';
 import { ref } from 'vue';
-import { ModalNames, GameNames } from '../../types';
+import { ModalNames, TabNames } from '../../types';
 import { useModalStore } from '../../stores/modal';
 import SideBar from './SideBar.vue';
+import AboutUs from '../globalComponents/AboutUs.vue';
 const modal = ref(useModalStore());
 </script>
 <template>
   <header class="header">
     <Modal :modal-name="ModalNames.settingsModal">
-      <GameSettings />
+      <Tabs :current-tab-type="TabNames.Settings" :is-statistic="true">
+        <Tab :title="TabNames.Settings"><GameSettings /></Tab>
+        <Tab :title="TabNames.AboutUs"><AboutUs /></Tab>
+      </Tabs>
     </Modal>
 
     <Modal :modal-name="ModalNames.statsModal">
-      <Tabs :current-game="modal.getCurrentGamePlaying()" isStatistic>
-        <Tab :title="GameNames.Kupu"><WordleStatistics /></Tab>
-        <Tab :title="GameNames.Rerenga"><CardsStatistics /></Tab>
+      <Tabs
+        :current-tab-type="modal.getCurrentGamePlaying()"
+        :is-statistic="true"
+      >
+        <Tab :title="TabNames.KupuStats"><WordleStatistics /></Tab>
+        <Tab :title="TabNames.RerengaStats"><CardsStatistics /></Tab>
       </Tabs>
     </Modal>
     <div class="nav-links-group">

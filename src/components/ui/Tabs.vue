@@ -1,22 +1,22 @@
 <script setup lang="ts">
+import { GameNames, TabNames } from '../../types';
 import { ref, provide, useSlots, Ref, readonly, onBeforeUnmount } from 'vue';
-import { GameNames } from '../../types';
 import { timeToNextGame } from '../../helpers';
-
 const slots = useSlots();
-const timeToNext = ref({});
 const props = defineProps<{
-  currentGame: GameNames;
+  currentTabType: TabNames | GameNames;
   isStatistic: boolean;
 }>();
-const tabTitles: Ref<GameNames[]> = ref(
+
+const timeToNext = ref({});
+const tabTitles: Ref<TabNames[]> = ref(
   slots.default
     ? slots
         .default()
-        .map((tab) => (tab.props ? tab.props.title : GameNames.Rerenga))
-    : [GameNames.Rerenga]
+        .map((tab) => (tab.props ? tab.props.title : TabNames.RerengaStats))
+    : [TabNames.RerengaStats]
 );
-let selectedTitle = ref(props.currentGame);
+let selectedTitle = ref(props.currentTabType);
 let clockIntervalIdNew: number;
 if (props.isStatistic) {
   timeToNext.value = timeToNextGame();
@@ -25,8 +25,9 @@ if (props.isStatistic) {
   }, 1000);
 }
 onBeforeUnmount(() => clearInterval(clockIntervalIdNew));
+
 const tabWidth = ref(100 / tabTitles.value.length);
-function handleClick(title: GameNames) {
+function handleClick(title: TabNames) {
   selectedTitle.value = title;
 }
 provide('tabToShow', selectedTitle);
@@ -66,6 +67,8 @@ provide('timeToNext', readonly(timeToNext));
   list-style: none;
   padding: 0;
   flex-direction: row;
+  background-color: grey;
+  border-radius: 10px 10px 0 0;
 }
 
 .tabs-header-item {

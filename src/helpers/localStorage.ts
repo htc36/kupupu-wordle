@@ -122,7 +122,10 @@ export function getBoard() {
   const existingGameState: GameState = JSON.parse(
     window.localStorage.getItem('gameState') as string
   );
-  return existingGameState.board;
+
+  return existingGameState?.board
+    ? existingGameState.board
+    : getDefaultGameState().board;
 }
 
 export function setGameSettings(gameSettingsObj: GameSettings) {

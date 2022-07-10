@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { useMessageStore } from '../../stores/message';
 import BuyCoffeeButton from './BuyCoffeeButton.vue';
-import { CardGameStats, GameNames } from '../../types';
+import { CardGameStats, TabNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
 import { useClockStore } from '../../stores/clock';
 const clockStore = useClockStore();
 
 const props = defineProps<{
-  forModal: GameNames;
+  forTab: TabNames;
 }>();
 
 const messageStore = useMessageStore();
 
 function onShare() {
-  if (props.forModal === GameNames.Kupu) {
+  if (props.forTab === TabNames.KupuStats) {
     const resultGrid = messageStore.genResultGrid();
     if (resultGrid != '') {
       const messageToCopy = `#kupupu ${new Date().toLocaleDateString(
@@ -25,7 +25,7 @@ function onShare() {
       messageStore.showMessage('Nothing To Share!');
     }
   }
-  if (props.forModal === GameNames.Rerenga) {
+  if (props.forTab === TabNames.RerengaStats) {
     const cardStats = getStats('cardStats') as CardGameStats;
     const cardMilliseconds = cardStats.times.prevTime.value;
     if (cardMilliseconds === 0) {
@@ -54,7 +54,11 @@ function onShare() {
   align-items: center;
   width: 100%;
   padding-top: 15px;
+  padding-bottom: 15px;
   border-top: 1px solid rgb(238, 238, 238);
+  background-color: white;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 .share-button {
   background-color: var(--key-bg-correct);

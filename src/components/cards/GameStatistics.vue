@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import ModalFooter from '../ui/ModalFooter.vue';
-import { CardGameStats, GameNames } from '../../types';
+import { CardGameStats } from '../../types';
 import { getStats } from '../../helpers/localStorage';
 import { inject } from 'vue';
-type timeToNextType = { wordleNextTime: string; cardsNextTime: string };
+import { TimeToNextType } from '../../types';
 
-const timeToNext = inject<timeToNextType>('timeToNext', {
+const timeToNext = inject<TimeToNextType>('timeToNext', {
   wordleNextTime: '00:00:00',
   cardsNextTime: '00:00:00',
 });
@@ -104,13 +103,11 @@ const cardClickStats = cardStats.clicks;
       </div>
       <!-- <hr /> -->
     </div>
-    <ModalFooter :for-modal="GameNames.Rerenga" />
   </div>
 </template>
 <style scoped>
 .bottomStats {
   margin-top: 20px;
-  margin-bottom: 20px;
   display: flex;
   justify-content: space-around;
   width: 100%;
@@ -125,7 +122,6 @@ const cardClickStats = cardStats.clicks;
   height: 100%;
   background-color: white;
   border-radius: 10px;
-  padding: 15px 0;
 }
 
 .modal-middle {
@@ -144,7 +140,6 @@ const cardClickStats = cardStats.clicks;
   height: 100%;
   background-color: white;
   border-radius: 10px;
-  padding: 15px 0;
 }
 .modal-middle {
   height: 100%;
@@ -203,6 +198,6 @@ const cardClickStats = cardStats.clicks;
 }
 .guess-distribution {
   color: var(--color-tone-1);
-  width: 80%;
+  width: 100%;
 }
 </style>
