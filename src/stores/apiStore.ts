@@ -77,7 +77,6 @@ export const useApiStore = defineStore('apiStore', {
         timeZone: 'Pacific/Auckland',
       });
       let localSolutionObject = getSolutionObject();
-      console.log('localSolutionObject', localSolutionObject);
       if (!localSolutionObject || localSolutionObject.date !== currentDate) {
         const apiResponse: ApiResponseWordle = await this.fetchApi(
           apiEndpoints.wordle

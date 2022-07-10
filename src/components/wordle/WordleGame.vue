@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onUnmounted, onMounted, ref } from 'vue';
+import { onUnmounted, watch, ref } from 'vue';
 import { getAllWords } from '../../words';
 import {
   getStats,
@@ -31,17 +31,16 @@ import { useMessageStore } from '../../stores/message';
 import MessageAlert from '../ui/MessageAlert.vue';
 
 const apiStore = useApiStore();
+const modal = useModalStore();
 const { wordleOfADay, isApiFetching, apiError } = storeToRefs(apiStore);
 //Calling API and storing cards in Pinia
 apiStore.getWordle();
 
-onMounted(() => {
-  modal.setGamePlaying(GameNames.Kupu);
-  const existingSettings = JSON.parse(
-    window.localStorage.getItem('gameSettings') as string
-  );
-  if (!existingSettings) setGameSettings(defaultGameSettings);
-});
+modal.setGamePlaying(GameNames.Kupu);
+const existingSettings = JSON.parse(
+  window.localStorage.getItem('gameSettings') as string
+);
+if (!existingSettings) setGameSettings(defaultGameSettings);
 
 let gameState: GameState = getDefaultGameState();
 let board = ref<Board[][]>([]);
@@ -58,18 +57,17 @@ function handleGameState() {
     setGameState(gameState);
   }
 }
-const modal = useModalStore();
 
-if (wordleOfADay?.value) {
-  handleGameState();
-  board.value = gameState.board;
-  letterStates.value = gameState.letterState;
-  currentRowIndex.value = gameState.currentRowIndex;
-  allowInput = !gameState.isGameFinished;
-}
+watch(wordleOfADay, () => {
+  if (wordleOfADay?.value) {
+    handleGameState();
+    board.value = gameState.board;
+    letterStates.value = gameState.letterState;
+    currentRowIndex.value = gameState.currentRowIndex;
+    allowInput = !gameState.isGameFinished;
+  }
+});
 
-// Get word of the day
-// TODO: I suppose this should be an API endpoint as well
 const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
 const wordleStats: WordleGameStats | CardGameStats | object =
@@ -244,7 +242,7 @@ function shake() {
   }, 1000);
 }
 
-console.log(wordleOfADay.value);
+console.log('Game solution:', wordleOfADay.value);
 </script>
 
 <template>
