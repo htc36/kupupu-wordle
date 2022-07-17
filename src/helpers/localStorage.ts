@@ -1,14 +1,14 @@
-// ESlint has a bug with typescript, so we need to disable it for this file
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { LetterState } from '../types';
+import { LetterState, GameNames, localCardsObject } from '../types';
 import {
   WordleGameStats,
-  GameState,
+  WordleGameState,
   GameSettings,
   WordResponse,
   CardGameStats,
+  CardsGameState,
 } from '../types';
-const wordleStatsDefault: WordleGameStats = {
+
+export const wordleStatsDefault: WordleGameStats = {
   currentStreak: 0,
   maxStreak: 0,
   guesses: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, F: 0 },
@@ -31,12 +31,14 @@ export const defaultGameSettings: GameSettings = {
   shouldPlaySound: true,
   shouldShowImage: true,
 };
-export function getStats(
-  gameName: 'wordleStats' | 'cardStats'
-): WordleGameStats | CardGameStats {
-  const statsString = window.localStorage.getItem(gameName);
+export function getStats(gameName: GameNames): WordleGameStats | CardGameStats {
+  const statsString = window.localStorage.getItem(`${gameName + 'Stats'}`);
   if (!statsString) {
-    return gameName === 'wordleStats' ? wordleStatsDefault : cardStatsDefault;
+    window.localStorage.setItem(
+      `${GameNames.Kupu + 'Stats'}`,
+      JSON.stringify(wordleStatsDefault)
+    );
+    return gameName === GameNames.Kupu ? wordleStatsDefault : cardStatsDefault;
   }
   return JSON.parse(statsString) as WordleGameStats | CardGameStats;
 }
@@ -54,11 +56,13 @@ export function setWordleStats(statsObj: WordleGameStats, guessLine: number) {
     statsObj.guesses['F'] += 1;
   }
   statsObj.gamesPlayed += 1;
-  window.localStorage.setItem('wordleStats', JSON.stringify(statsObj));
+  window.localStorage.setItem(
+    `${GameNames.Kupu + 'Stats'}`,
+    JSON.stringify(statsObj)
+  );
 }
 export function setCardStats(gameTime: number, clicks: number) {
-  // const { lastGameTime } = statsObj;
-  const gameStats = getStats('cardStats') as CardGameStats;
+  const gameStats = getStats(GameNames.Rerenga) as CardGameStats;
   gameStats.times.bestTime.value =
     gameStats.times.bestTime.value == 0
       ? gameTime
@@ -71,22 +75,22 @@ export function setCardStats(gameTime: number, clicks: number) {
   gameStats.times.avgTime.value.push(gameTime);
   gameStats.clicks.avgClicks.value.push(clicks);
 
-  window.localStorage.setItem('cardStats', JSON.stringify(gameStats));
-}
-export function getSolutionObject() {
-  const solutionObjectString = window.localStorage.getItem('solutionObject');
-  if (solutionObjectString) {
-    return JSON.parse(solutionObjectString);
-  }
-  return;
-}
-export function setSolutionObject(solutionObj: WordResponse, date: string) {
-  const solutionObjToSave = { ...solutionObj, ...{ date } };
   window.localStorage.setItem(
-    'solutionObject',
-    JSON.stringify(solutionObjToSave)
+    `${GameNames.Rerenga + 'Stats'}`,
+    JSON.stringify(gameStats)
   );
-  return;
+}
+export function getLocalStorage(gameName: GameNames) {
+  const localStorage = window.localStorage.getItem(gameName);
+  if (localStorage) {
+    return JSON.parse(localStorage);
+  }
+}
+export function setLocalStorage(
+  gameName: GameNames,
+  solutionObj: WordResponse | localCardsObject
+) {
+  window.localStorage.setItem(gameName, JSON.stringify(solutionObj));
 }
 
 export function getDefaultGameState() {
@@ -96,9 +100,9 @@ export function getDefaultGameState() {
       state: LetterState.INITIAL,
     }))
   );
-  const gameState: GameState = {
+  const gameState: WordleGameState = {
     solution: '',
-    lastCompleted: null,
+    lastCompletedId: null,
     isGameFinished: false,
     board: defaultBoard,
     letterState: {},
@@ -107,20 +111,60 @@ export function getDefaultGameState() {
   return gameState;
 }
 
-export function getGameState(solution: string) {
-  const existingGameState: GameState = JSON.parse(
-    window.localStorage.getItem('gameState') as string
+//TODO: possibly combine game state functions into one
+export function getCardsGameState(): CardsGameState | undefined {
+  const state = window.localStorage.getItem(`${GameNames.Rerenga + 'State'}`);
+  if (state) {
+    return JSON.parse(state);
+  } else {
+    setCardsGameState(true);
+  }
+}
+export function setCardsGameState(
+  isDefault: boolean,
+  newGameNumber?: number,
+  allowNextGame?: boolean
+) {
+  const defaultState = { gameNumber: 0, allowNextGame: false };
+  if (isDefault) {
+    window.localStorage.setItem(
+      `${GameNames.Rerenga + 'State'}`,
+      JSON.stringify(defaultState)
+    );
+    return getCardsGameState();
+  } else {
+    window.localStorage.setItem(
+      `${GameNames.Rerenga + 'State'}`,
+      JSON.stringify({
+        gameNumber: newGameNumber,
+        allowNextGame: allowNextGame,
+      })
+    );
+    return getCardsGameState();
+  }
+}
+
+export function getWordleGameState(solution: string) {
+  const existingGameState: WordleGameState = JSON.parse(
+    window.localStorage.getItem(`${GameNames.Kupu + 'State'}`) as string
   );
   if (existingGameState && existingGameState.solution === solution) {
     return JSON.parse(
-      window.localStorage.getItem('gameState') as string
-    ) as GameState;
+      window.localStorage.getItem(`${GameNames.Kupu + 'State'}`) as string
+    ) as WordleGameState;
   }
   return false;
 }
+export function setWorldeGameState(gameState: WordleGameState) {
+  window.localStorage.setItem(
+    `${GameNames.Kupu + 'State'}`,
+    JSON.stringify(gameState)
+  );
+}
+
 export function getBoard() {
-  const existingGameState: GameState = JSON.parse(
-    window.localStorage.getItem('gameState') as string
+  const existingGameState: WordleGameState = JSON.parse(
+    window.localStorage.getItem(`${GameNames.Kupu + 'State'}`) as string
   );
   return existingGameState.board;
 }
@@ -135,7 +179,4 @@ export function getGameSettings() {
   );
   if (!existingSettings) return defaultGameSettings;
   return existingSettings;
-}
-export function setGameState(gameState: GameState) {
-  window.localStorage.setItem('gameState', JSON.stringify(gameState));
 }

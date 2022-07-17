@@ -2,7 +2,7 @@
 import Card from './Card.vue';
 import Modal from '../layout/Modal.vue';
 import { ref } from 'vue';
-import { CardObj } from '../../types';
+import { CardObj, GameNames } from '../../types';
 import { useCardGameStore } from '../../stores/cardGame';
 import { useApiStore } from '../../stores/apiStore';
 import { useModalStore } from '../../stores/modal';
@@ -13,22 +13,21 @@ import { useClockStore } from '../../stores/clock';
 import MessageAlert from '../ui/MessageAlert.vue';
 import '../../css/tooltip.css';
 
-const emit = defineEmits<{
-  (e: 'updateBestTime'): void;
-}>();
-
 const modal = useModalStore();
 const apiStore = useApiStore();
 const cardGameStore = useCardGameStore();
 const clockStore = useClockStore();
+modal.setGamePlaying(GameNames.Rerenga);
+const { isApiFetching, apiError, cardsPrepared, apiResponseCards } =
+  storeToRefs(apiStore);
 const {
-  isApiFetched,
-  isApiFetching,
-  apiError,
-  cardsPrepared,
-  apiResponseCards,
-} = storeToRefs(apiStore);
-const { startCardGame, stopCardGame, incrementClicks } = cardGameStore;
+  startCardGame,
+  resetGamesPlayed,
+  stopCardGame,
+  incrementClicks,
+  incrementGamesPlayed,
+} = cardGameStore;
+const { allowNextGame } = storeToRefs(cardGameStore);
 const { getGameTime } = clockStore;
 const { clockTime } = storeToRefs(clockStore);
 const { isCardGameStarted, clicks } = storeToRefs(cardGameStore);
@@ -38,7 +37,7 @@ const themeOfAGame = ref('Wellbeing');
 const playingSound = ref('');
 
 //Calling API and storing cards in Pinia
-apiStore.getCards();
+apiStore.getCards(false);
 const cards = apiResponseCards;
 const cardsRef = ref<InstanceType<typeof Card>[]>([]);
 type cardsRefType = typeof cardsRef;
@@ -67,8 +66,8 @@ function cardOpened(index: number) {
       }
       if (matchedPairs.value === cardsPrepared.value.length / 2) {
         stopCardGame();
+        incrementGamesPlayed();
         setCardStats(clockTime.value, clicks.value);
-        emit('updateBestTime');
         modal.toggleModal(ModalNames.cardGameFinishedModal);
       }
       return;
@@ -102,7 +101,7 @@ function playSound(sound?: string) {
     <div class="loading"></div>
     <message-alert :message="apiError" v-if="apiError" />
   </div>
-  <div class="gridWrapper" v-if="isApiFetched">
+  <div class="gridWrapper" v-if="apiResponseCards && !isApiFetching">
     <Modal :modal-name="ModalNames.cardGameFinishedModal">
       <div class="modal-finished-wrapper">
         <h3 class="modal-title">Game Completed</h3>
@@ -149,13 +148,23 @@ function playSound(sound?: string) {
         <div class="footer">
           <h3 class="words-time">Time : {{ getGameTime() }}</h3>
           <button
+            v-if="allowNextGame"
             class="next-button"
             @click="
               modal.toggleModal(ModalNames.cardGameFinishedModal);
+              resetGamesPlayed();
+              apiStore.getCards(true);
               modal.toggleModal(ModalNames.statsModal);
             "
           >
-            Next
+            Next cards
+          </button>
+          <button
+            v-else
+            class="next-button"
+            @click="modal.toggleModal(ModalNames.cardGameFinishedModal)"
+          >
+            Play again
           </button>
         </div>
       </div>

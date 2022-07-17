@@ -1,4 +1,3 @@
-import { cards } from './helpers/assetMapping';
 export interface CardAudio {
   [key: string]: string;
 }
@@ -61,6 +60,13 @@ export interface CardObj {
   word_aud: string;
 }
 
+export interface localCardsObject {
+  cardsPrepared: CardObj[];
+  game_id: number;
+  date?: string;
+  apiResponseCards: ApiResponseCards;
+}
+
 export interface ApiResponseWordle {
   kupupu: {
     id: number;
@@ -81,9 +87,14 @@ export interface Board {
   letter: string;
   state: LetterState;
 }
-export interface GameState {
+
+export interface CardsGameState {
+  gameNumber: number;
+  allowNextGame: boolean;
+}
+export interface WordleGameState {
   solution: string;
-  lastCompleted: string | null;
+  lastCompletedId: number | null;
   isGameFinished: boolean;
   board: Board[][];
   letterState: Record<string, LetterState>;

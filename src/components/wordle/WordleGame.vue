@@ -4,8 +4,8 @@ import { getAllWords } from '../../words';
 import {
   getStats,
   setWordleStats,
-  getGameState,
-  setGameState,
+  getWordleGameState,
+  setWorldeGameState,
   setGameSettings,
   getDefaultGameState,
 } from '../../helpers/localStorage';
@@ -17,14 +17,12 @@ import { storeToRefs } from 'pinia';
 import {
   LetterState,
   Board,
-  GameState,
+  WordleGameState,
   WordleGameStats,
-  CardGameStats,
   GameNames,
   ModalNames,
 } from '../../types';
 import { useApiStore } from '../../stores/apiStore';
-
 import getSuggestion from '../../helpers/suggestion';
 import { useModalStore } from '../../stores/modal';
 import { useMessageStore } from '../../stores/message';
@@ -32,34 +30,41 @@ import MessageAlert from '../ui/MessageAlert.vue';
 
 const apiStore = useApiStore();
 const modal = useModalStore();
-const { wordleOfADay, isApiFetching, apiError } = storeToRefs(apiStore);
-//Calling API and storing cards in Pinia
-apiStore.getWordle();
+const { wordleOfADay, isApiFetching, apiError, restartGame } =
+  storeToRefs(apiStore);
 
+//Calling API and storing cards in Pinia
+apiStore.getWordle(true);
 modal.setGamePlaying(GameNames.Kupu);
 const existingSettings = JSON.parse(
   window.localStorage.getItem('gameSettings') as string
 );
 if (!existingSettings) setGameSettings(defaultGameSettings);
 
-let gameState: GameState = getDefaultGameState();
+let gameState: WordleGameState = getDefaultGameState();
 let board = ref<Board[][]>([]);
 let letterStates = ref<Record<string, LetterState>>({});
 let currentRowIndex = ref<number>(0);
 let allowInput: boolean;
 
 function handleGameState() {
-  const savedGameState = getGameState(wordleOfADay.value);
+  const savedGameState = getWordleGameState(wordleOfADay.value);
   if (savedGameState) {
     gameState = savedGameState;
   } else {
     gameState.solution = wordleOfADay.value;
-    setGameState(gameState);
+    setWorldeGameState(gameState);
   }
 }
 
+watch(restartGame, () => {
+  gameState = getDefaultGameState();
+  apiStore.getWordle(true);
+});
+
 watch(wordleOfADay, () => {
   if (wordleOfADay?.value) {
+    console.log('answer:', wordleOfADay?.value);
     handleGameState();
     board.value = gameState.board;
     letterStates.value = gameState.letterState;
@@ -70,12 +75,11 @@ watch(wordleOfADay, () => {
 
 const currentLanguage = 'maori';
 const allWords = getAllWords(currentLanguage);
-const wordleStats: WordleGameStats | CardGameStats | object =
-  getStats('wordleStats');
-
+const wordleStats: WordleGameStats = getStats(
+  GameNames.Kupu
+) as WordleGameStats;
 // Board state. Each tile is represented as { letter, state }
 const currentRow = $computed(() => board.value[currentRowIndex.value]);
-defineEmits(['setWordleStats']);
 let grid = ref('');
 let shakeRowIndex = ref(-1);
 let success = ref(false);
@@ -232,7 +236,7 @@ function completeRow() {
   gameState.board = board.value;
   gameState.currentRowIndex = currentRowIndex.value;
   gameState.letterState = letterStates.value;
-  setGameState(gameState);
+  setWorldeGameState(gameState);
 }
 
 function shake() {
@@ -241,8 +245,6 @@ function shake() {
     shakeRowIndex.value = -1;
   }, 1000);
 }
-
-console.log('Game solution:', wordleOfADay.value);
 </script>
 
 <template>
@@ -254,7 +256,7 @@ console.log('Game solution:', wordleOfADay.value);
     <Modal :modal-name="ModalNames.wordDefinitionModal">
       <WordDefinition
         :word="wordleOfADay"
-        @hasSelectedNext="
+        @has-selected-next="
           () => {
             modal.toggleModal(ModalNames.wordDefinitionModal);
             modal.toggleModal(ModalNames.statsModal);
