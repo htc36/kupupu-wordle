@@ -64,7 +64,6 @@ const gameId = getLocalStorage(GameNames.Kupu).id;
         </div>
       </div>
     </div>
-    <ModalFooter :for-modal="GameNames.Kupu" />
   </div>
 </template>
 
@@ -99,7 +98,6 @@ export default {
   height: 100%;
   background-color: white;
   border-radius: 10px;
-  padding: 15px 0;
 }
 .modal-middle {
   height: 100%;
@@ -187,6 +185,6 @@ export default {
 }
 .guess-distribution {
   color: var(--color-tone-1);
-  width: 80%;
+  width: 95%;
 }
 </style>

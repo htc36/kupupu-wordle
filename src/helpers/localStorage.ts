@@ -155,6 +155,15 @@ export function getWordleGameState(solution: string) {
   }
   return false;
 }
+export function getWordleGameState2() {
+  const existingGameState: WordleGameState = JSON.parse(
+    window.localStorage.getItem(`${GameNames.Kupu + 'State'}`) as string
+  );
+  if (!existingGameState) {
+    return getDefaultGameState();
+  }
+  return existingGameState;
+}
 export function setWorldeGameState(gameState: WordleGameState) {
   window.localStorage.setItem(
     `${GameNames.Kupu + 'State'}`,
@@ -166,7 +175,10 @@ export function getBoard() {
   const existingGameState: WordleGameState = JSON.parse(
     window.localStorage.getItem(`${GameNames.Kupu + 'State'}`) as string
   );
-  return existingGameState.board;
+
+  return existingGameState?.board
+    ? existingGameState.board
+    : getDefaultGameState().board;
 }
 
 export function setGameSettings(gameSettingsObj: GameSettings) {

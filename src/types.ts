@@ -27,6 +27,12 @@ export const enum GameNames {
   Kupu = 'Kupu',
   Rerenga = 'Rerenga',
 }
+export const enum TabNames {
+  KupuStats = 'Kupu',
+  RerengaStats = 'Rerenga',
+  Settings = 'ngā tautuhi',
+  AboutUs = 'mo mātau',
+}
 
 export interface WordResponse {
   date?: string;
@@ -148,4 +154,9 @@ export interface Guesses {
   5: number;
   6: number;
   F: number;
+}
+
+export interface TimeToNextType {
+  wordleNextTime: string;
+  cardsNextTime: string;
 }

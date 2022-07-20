@@ -2,13 +2,14 @@
 import { useMessageStore } from '../../stores/message';
 import BuyCoffeeButton from './BuyCoffeeButton.vue';
 import { CardGameStats, GameNames, ModalNames } from '../../types';
+import { TabNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
 import { useClockStore } from '../../stores/clock';
 import { useModalStore } from '../../stores/modal';
 import { useApiStore } from '../../stores/apiStore';
 
 const props = defineProps<{
-  forModal: GameNames;
+  forTab: TabNames;
 }>();
 
 const clockStore = useClockStore();
@@ -18,7 +19,7 @@ const apiStore = useApiStore();
 const messageStore = useMessageStore();
 
 function onShare() {
-  if (props.forModal === GameNames.Kupu) {
+  if (props.forTab === TabNames.KupuStats) {
     const resultGrid = messageStore.genResultGrid();
     if (resultGrid != '') {
       const messageToCopy = `#kupupu ${new Date().toLocaleDateString(
@@ -30,7 +31,7 @@ function onShare() {
       messageStore.showMessage('Nothing To Share!');
     }
   }
-  if (props.forModal === GameNames.Rerenga) {
+  if (props.forTab === TabNames.RerengaStats) {
     const cardStats = getStats(GameNames.Rerenga) as CardGameStats;
     const cardMilliseconds = cardStats.times.prevTime.value;
     if (cardMilliseconds === 0) {
@@ -57,7 +58,7 @@ function nextGame() {
     </div>
     <button
       v-if="
-        props.forModal === GameNames.Kupu &&
+        props.forTab === TabNames.KupuStats &&
         modalStore.gamePlaying === GameNames.Kupu
       "
       type="button"
@@ -76,7 +77,11 @@ function nextGame() {
   align-items: center;
   width: 100%;
   padding-top: 15px;
+  padding-bottom: 15px;
   border-top: 1px solid rgb(238, 238, 238);
+  background-color: white;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 .share-button {
   background-color: var(--key-bg-correct);

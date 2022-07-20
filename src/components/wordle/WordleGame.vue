@@ -8,6 +8,7 @@ import {
   setWorldeGameState,
   setGameSettings,
   getDefaultGameState,
+  getWordleGameState2,
 } from '../../helpers/localStorage';
 import Modal from '../layout/Modal.vue';
 import WordDefinition from './WordDefinition.vue';
@@ -34,27 +35,26 @@ const { wordleOfADay, isApiFetching, apiError, restartGame } =
   storeToRefs(apiStore);
 
 //Calling API and storing cards in Pinia
-apiStore.getWordle(true);
 modal.setGamePlaying(GameNames.Kupu);
 const existingSettings = JSON.parse(
   window.localStorage.getItem('gameSettings') as string
 );
 if (!existingSettings) setGameSettings(defaultGameSettings);
 
-let gameState: WordleGameState = getDefaultGameState();
+let gameState: WordleGameState = getWordleGameState2();
 let board = ref<Board[][]>([]);
 let letterStates = ref<Record<string, LetterState>>({});
 let currentRowIndex = ref<number>(0);
 let allowInput: boolean;
+updateGame();
 
-function handleGameState() {
-  const savedGameState = getWordleGameState(wordleOfADay.value);
-  if (savedGameState) {
-    gameState = savedGameState;
-  } else {
-    gameState.solution = wordleOfADay.value;
-    setWorldeGameState(gameState);
-  }
+function updateGame() {
+  if (!gameState.solution) apiStore.getWordle(true);
+  console.log(gameState);
+  board.value = gameState.board;
+  letterStates.value = gameState.letterState;
+  currentRowIndex.value = gameState.currentRowIndex;
+  allowInput = !gameState.isGameFinished;
 }
 
 watch(restartGame, () => {
@@ -65,11 +65,9 @@ watch(restartGame, () => {
 watch(wordleOfADay, () => {
   if (wordleOfADay?.value) {
     console.log('answer:', wordleOfADay?.value);
-    handleGameState();
-    board.value = gameState.board;
-    letterStates.value = gameState.letterState;
-    currentRowIndex.value = gameState.currentRowIndex;
-    allowInput = !gameState.isGameFinished;
+    gameState.solution = wordleOfADay.value;
+    setWorldeGameState(gameState);
+    updateGame();
   }
 });
 
@@ -167,13 +165,13 @@ function markAbsentRows(tile: Board) {
  */
 function isValidWord() {
   const guess = currentRow.map((tile) => tile.letter).join('');
-  if (!allWords.includes(guess) && guess !== wordleOfADay.value) {
+  if (!allWords.includes(guess) && guess !== gameState.solution) {
     shake();
     let guesses = board.value.map((item) => {
       return item.map((letterObj) => letterObj.letter).join('');
     });
     const suggestion = getSuggestion(
-      wordleOfADay.value,
+      gameState.solution,
       guesses,
       currentRowIndex.value,
       allWords
@@ -193,7 +191,7 @@ function completeRow() {
   }
   if (!isValidWord()) return;
 
-  let answerLetters: (string | null)[] = wordleOfADay.value.split('');
+  let answerLetters: (string | null)[] = gameState.solution.split('');
 
   // Mark correct/present/absent letters
   currentRow.forEach((tile, i) => {
@@ -230,7 +228,7 @@ function completeRow() {
     gameState.isGameFinished = true;
     // game over :(
     setTimeout(() => {
-      messageStore.showMessage(wordleOfADay.value.toUpperCase(), '', 2000);
+      messageStore.showMessage(gameState.solution.toUpperCase(), '', 2000);
     }, 1600);
   }
   gameState.board = board.value;
@@ -252,10 +250,10 @@ function shake() {
     <div class="loading"></div>
     <message-alert :message="apiError" v-if="apiError" />
   </div>
-  <div class="gameContainer" v-if="!isApiFetching && wordleOfADay">
+  <div class="gameContainer" v-if="!isApiFetching && gameState.solution">
     <Modal :modal-name="ModalNames.wordDefinitionModal">
       <WordDefinition
-        :word="wordleOfADay"
+        :word="gameState.solution"
         @has-selected-next="
           () => {
             modal.toggleModal(ModalNames.wordDefinitionModal);
