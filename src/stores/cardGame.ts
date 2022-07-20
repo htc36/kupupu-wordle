@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { getCardsGameState, setCardsGameState } from '../helpers/localStorage';
 import { useClockStore } from './clock';
 
 export const useCardGameStore = defineStore('cardGame', {
@@ -7,6 +8,8 @@ export const useCardGameStore = defineStore('cardGame', {
       isCardGameStarted: false,
       cardComponentKey: 0,
       clicks: 0,
+      gamesPlayed: getCardsGameState()?.gameNumber || 0,
+      allowNextGame: getCardsGameState()?.allowNextGame || false,
     };
   },
   actions: {
@@ -23,6 +26,21 @@ export const useCardGameStore = defineStore('cardGame', {
     },
     incrementClicks() {
       this.clicks++;
+    },
+    incrementGamesPlayed() {
+      const gamesTotal = 7;
+      this.gamesPlayed++;
+      if (this.gamesPlayed < gamesTotal) {
+        setCardsGameState(false, this.gamesPlayed, false);
+      } else {
+        this.allowNextGame = true;
+        setCardsGameState(false, gamesTotal, true);
+      }
+    },
+    resetGamesPlayed() {
+      this.gamesPlayed = 0;
+      this.allowNextGame = false;
+      this.reRenderCardGameComponent();
     },
     reRenderCardGameComponent() {
       this.cardComponentKey++;

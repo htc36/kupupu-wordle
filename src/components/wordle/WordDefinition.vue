@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { getGameSettings, getSolutionObject } from '../../helpers/localStorage';
-import { WordResponse } from '../../types';
+import { getGameSettings, getLocalStorage } from '../../helpers/localStorage';
+import { GameNames, WordResponse } from '../../types';
 defineProps<{
   word: string;
 }>();
 const gameSettings = ref(getGameSettings());
-const solutionObject = ref<WordResponse>(getSolutionObject());
+const solutionObject = ref<WordResponse>(getLocalStorage(GameNames.Kupu));
 function openLesson() {
   window.open('https://whanau.tv/', '_blank');
 }

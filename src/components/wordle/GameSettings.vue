@@ -15,10 +15,10 @@ const toggleSwitch = (settingName: keyof GameSettings) => {
   };
   setGameSettings(settingsToSave);
 };
-const timeToNext = inject<TimeToNextType>('timeToNext', {
-  wordleNextTime: '00:00:00',
-  cardsNextTime: '00:00:00',
-});
+// const timeToNext = inject<TimeToNextType>('timeToNext', {
+//   wordleNextTime: '00:00:00',
+//   cardsNextTime: '00:00:00',
+// });
 </script>
 <template>
   <div class="sections">
@@ -111,9 +111,9 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
       <DownloadWorksheet />
       <div class="bottomContainer">
         <h3 class="download-icon" style="padding-top: 20px">
-          {{ timeToNext.cardsNextTime }}
+          <!-- {{ timeToNext.cardsNextTime }} -->
         </h3>
-        <h3>Time to next game</h3>
+        <h3>Toggle Game</h3>
       </div>
     </div>
   </div>

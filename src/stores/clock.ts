@@ -20,8 +20,8 @@ export const useClockStore = defineStore('clock', {
       this.clockIntervalId = 0;
       return this.clockTime;
     },
-    getGameTime(time?: number) {
-      const timeMilliseconds = time ? time : this.clockTime;
+    getGameTime() {
+      const timeMilliseconds = this.clockTime;
       const timeObj = new Date(timeMilliseconds);
       const seconds =
         timeObj.getSeconds() < 10
