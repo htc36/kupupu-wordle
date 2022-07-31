@@ -69,6 +69,7 @@ export interface CardObj {
 export interface localCardsObject {
   cardsPrepared: CardObj[];
   game_id: number;
+  latest_game_id: number;
   date?: string;
   apiResponseCards: ApiResponseCards;
 }
@@ -97,6 +98,7 @@ export interface Board {
 export interface CardsGameState {
   gameNumber: number;
   allowNextGame: boolean;
+  maxGameNumber: boolean;
 }
 export interface WordleGameState {
   solution: string;

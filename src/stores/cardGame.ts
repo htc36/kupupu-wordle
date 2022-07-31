@@ -33,6 +33,7 @@ export const useCardGameStore = defineStore('cardGame', {
       if (this.gamesPlayed < gamesTotal) {
         setCardsGameState(false, this.gamesPlayed, false);
       } else {
+        console.log('allowed');
         this.allowNextGame = true;
         setCardsGameState(false, gamesTotal, true);
       }

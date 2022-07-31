@@ -11,6 +11,7 @@ import { shuffleArray } from '../helpers/randomiseArray';
 import {
   getLocalStorage,
   getStats,
+  setCardsGameState,
   setLocalStorage,
 } from '../helpers/localStorage';
 
@@ -25,8 +26,9 @@ interface apiStoreState {
   cardsPrepared: CardObj[];
   apiResponseCards: ApiResponseCards | null;
   apiResponseWordle: ApiResponseWordle | null;
-  wordleOfADay: string;
+  wordleSolution: string;
   cardsGameId: number;
+  latestCardsGameId: number;
   wordleGameId: number;
   restartGame: boolean;
 }
@@ -54,8 +56,9 @@ export const useApiStore = defineStore('apiStore', {
       cardsPrepared: [],
       apiResponseCards: null,
       apiResponseWordle: null,
-      wordleOfADay: '',
-      cardsGameId: 0,
+      wordleSolution: '',
+      cardsGameId: 1,
+      latestCardsGameId: 1,
       wordleGameId: 0,
       restartGame: false,
     } as apiStoreState;
@@ -79,17 +82,29 @@ export const useApiStore = defineStore('apiStore', {
         }
       }
     },
-    async getCards(isNextGame: boolean) {
-      const handleCardsApiResponse = (apiResponse: ApiResponseCards) => {
+    async getCards(isNextGame: boolean, gameId?: number) {
+      const handleCardsApiResponse = (
+        apiResponse: ApiResponseCards,
+        currentLocalSolutionObject: localCardsObject
+      ) => {
         this.cardsPrepared = prepareCards(apiResponse);
         this.apiResponseCards = apiResponse;
         this.cardsGameId = apiResponse.kupuhi[0].game_id;
+        this.latestCardsGameId = Math.max(
+          apiResponse.kupuhi[0].game_id,
+          currentLocalSolutionObject?.latest_game_id
+        );
         localSolutionObject = {
           cardsPrepared: this.cardsPrepared,
           apiResponseCards: this.apiResponseCards,
           game_id: apiResponse.kupuhi[0].game_id,
+          latest_game_id: Math.max(
+            apiResponse.kupuhi[0].game_id,
+            this.latestCardsGameId
+          ),
         };
         setLocalStorage(GameNames.Rerenga, localSolutionObject);
+        setCardsGameState(true);
       };
       let localSolutionObject = {} as localCardsObject;
       localSolutionObject = getLocalStorage(GameNames.Rerenga);
@@ -99,7 +114,7 @@ export const useApiStore = defineStore('apiStore', {
           1
         );
         if (apiResponse) {
-          handleCardsApiResponse(apiResponse);
+          handleCardsApiResponse(apiResponse, localSolutionObject);
         }
       } else {
         if (isNextGame) {
@@ -110,7 +125,15 @@ export const useApiStore = defineStore('apiStore', {
             this.cardsGameId + 1
           );
           if (apiResponse) {
-            handleCardsApiResponse(apiResponse);
+            handleCardsApiResponse(apiResponse, localSolutionObject);
+          }
+        } else if (gameId) {
+          const apiResponse: ApiResponseCards = await this.fetchApi(
+            apiEndpoints.cards,
+            gameId
+          );
+          if (apiResponse) {
+            handleCardsApiResponse(apiResponse, localSolutionObject);
           }
         }
       }
@@ -124,10 +147,11 @@ export const useApiStore = defineStore('apiStore', {
         localSolutionObject = apiResponse.kupupu[0];
         setLocalStorage(GameNames.Kupu, localSolutionObject);
         this.apiResponseWordle = apiResponse;
-        this.wordleOfADay = apiResponse.kupupu[0].name_tereo;
+        this.wordleSolution = apiResponse.kupupu[0].name_tereo;
         this.wordleGameId = apiResponse.kupupu[0].id;
       };
       let localSolutionObject = getLocalStorage(GameNames.Kupu);
+      console.log(localSolutionObject);
       if (!localSolutionObject) {
         const apiResponse: ApiResponseWordle = await this.fetchApi(
           apiEndpoints.wordle,
@@ -147,8 +171,11 @@ export const useApiStore = defineStore('apiStore', {
           if (apiResponse) {
             handleWordleApiResponse(apiResponse);
           }
+        } else {
+          this.wordleSolution = localSolutionObject.name_tereo;
+          this.wordleGameId = localSolutionObject.id;
+          this.apiResponseWordle = localSolutionObject;
         }
-        this.wordleOfADay = localSolutionObject.name_tereo;
       }
     },
   },

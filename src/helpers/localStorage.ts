@@ -55,6 +55,7 @@ export function setWordleStats(statsObj: WordleGameStats, guessLine: number) {
     statsObj.currentStreak = 0;
     statsObj.guesses['F'] += 1;
   }
+
   statsObj.gamesPlayed += 1;
   window.localStorage.setItem(
     `${GameNames.Kupu + 'Stats'}`,
@@ -93,7 +94,7 @@ export function setLocalStorage(
   window.localStorage.setItem(gameName, JSON.stringify(solutionObj));
 }
 
-export function getDefaultGameState() {
+export function getDefaultGameState(existingGameState?: WordleGameState) {
   const defaultBoard = Array.from({ length: 6 }, () =>
     Array.from({ length: 5 }, () => ({
       letter: '',
@@ -162,7 +163,7 @@ export function getWordleGameState2() {
   if (!existingGameState) {
     return getDefaultGameState();
   }
-  return existingGameState;
+  return { ...getDefaultGameState(), ...existingGameState };
 }
 export function setWorldeGameState(gameState: WordleGameState) {
   window.localStorage.setItem(

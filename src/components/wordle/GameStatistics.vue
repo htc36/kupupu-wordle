@@ -5,7 +5,7 @@ import { GameNames } from '../../types';
 import { getLocalStorage, getStats } from '../../helpers/localStorage';
 
 const wordleStats = getStats(GameNames.Kupu) as WordleGameStats;
-const gameId = getLocalStorage(GameNames.Kupu).id;
+const gameId = getLocalStorage(GameNames.Kupu)?.id;
 </script>
 
 <template>

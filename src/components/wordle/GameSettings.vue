@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import Switch from '../ui/Switch.vue';
+import { useApiStore } from '../../stores/apiStore';
 import { ref } from 'vue';
-import { GameSettings, TimeToNextType } from '../../types';
+import { GameSettings } from '../../types';
+import { storeToRefs } from 'pinia';
 import { setGameSettings, getGameSettings } from '../../helpers/localStorage';
-import { inject } from 'vue';
 import DownloadWorksheet from '../globalComponents/DownloadWorksheet.vue';
+import Dropdown from '../ui/Dropdown.vue';
+
+const apiStore = useApiStore();
+const { cardsGameId } = storeToRefs(apiStore);
 const settings = ref<GameSettings>(getGameSettings());
 const toggleSwitch = (settingName: keyof GameSettings) => {
   settings.value[settingName] = !settings.value[settingName];
@@ -110,10 +115,8 @@ const toggleSwitch = (settingName: keyof GameSettings) => {
     <div class="pdf-container">
       <DownloadWorksheet />
       <div class="bottomContainer">
-        <h3 class="download-icon" style="padding-top: 20px">
-          <!-- {{ timeToNext.cardsNextTime }} -->
-        </h3>
-        <h3>Toggle Game</h3>
+        <h3 class="download-icon" style="padding-top: 20px"></h3>
+        <Dropdown></Dropdown>
       </div>
     </div>
   </div>

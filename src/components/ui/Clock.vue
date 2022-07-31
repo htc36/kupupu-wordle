@@ -8,6 +8,7 @@ const cardGameStore = useCardGameStore();
 const apiStore = useApiStore();
 
 const { resetGamesPlayed } = cardGameStore;
+const { cardsGameId } = storeToRefs(apiStore);
 const { gamesPlayed, allowNextGame } = storeToRefs(cardGameStore);
 const clockStore = useClockStore();
 
@@ -19,17 +20,22 @@ function nextCardGame() {
 <template>
   <div class="clock-container">
     <div class="clock-wrapper">
-      <div class="clock-title">Current time:</div>
+      <div class="clock-title">Time:</div>
       <div class="clock-digits">
-        <div class="clock-text">
-          {{ clockStore.getGameTime() }}
-        </div>
+        <div class="clock-text">{{ clockStore.getGameTime() }}</div>
+      </div>
+    </div>
+    <div class="clock-wrapper">
+      <div class="clock-digits">
+        <div class="clock-text">{{ gamesPlayed }} / 7</div>
       </div>
     </div>
     <div class="clock-wrapper" v-if="!allowNextGame">
-      <div class="clock-title">Game progress:</div>
+      <div class="clock-title">Match Num:</div>
       <div class="clock-digits">
-        <div class="clock-text">{{ gamesPlayed }} / 7</div>
+        <div class="clock-text">
+          {{ cardsGameId }}
+        </div>
       </div>
     </div>
     <div class="clock-wrapper" v-else>

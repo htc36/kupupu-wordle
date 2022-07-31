@@ -45,10 +45,10 @@ function onShare() {
     }
   }
 }
-function nextGame() {
-  modalStore.toggleModal(ModalNames.statsModal);
-  apiStore.restartGame = !apiStore.restartGame;
-}
+// function nextGame() {
+//   modalStore.toggleModal(ModalNames.statsModal);
+//   apiStore.restartGame = !apiStore.restartGame;
+// }
 </script>
 <template>
   <div class="footer">
@@ -56,7 +56,7 @@ function nextGame() {
     <div>
       <BuyCoffeeButton />
     </div>
-    <button
+    <!-- <button
       v-if="
         props.forTab === TabNames.KupuStats &&
         modalStore.gamePlaying === GameNames.Kupu
@@ -66,7 +66,7 @@ function nextGame() {
       @click="nextGame"
     >
       Next game
-    </button>
+    </button> -->
   </div>
 </template>
 

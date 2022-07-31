@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onUnmounted, watch, ref } from 'vue';
+import { onUnmounted, watch, ref, onMounted } from 'vue';
 import { getAllWords } from '../../words';
 import {
   getStats,
@@ -9,6 +9,7 @@ import {
   setGameSettings,
   getDefaultGameState,
   getWordleGameState2,
+  getLocalStorage,
 } from '../../helpers/localStorage';
 import Modal from '../layout/Modal.vue';
 import WordDefinition from './WordDefinition.vue';
@@ -22,6 +23,7 @@ import {
   WordleGameStats,
   GameNames,
   ModalNames,
+  WordResponse,
 } from '../../types';
 import { useApiStore } from '../../stores/apiStore';
 import getSuggestion from '../../helpers/suggestion';
@@ -31,7 +33,7 @@ import MessageAlert from '../ui/MessageAlert.vue';
 
 const apiStore = useApiStore();
 const modal = useModalStore();
-const { wordleOfADay, isApiFetching, apiError, restartGame } =
+const { wordleSolution, isApiFetching, apiError, restartGame, wordleGameId } =
   storeToRefs(apiStore);
 
 //Calling API and storing cards in Pinia
@@ -41,34 +43,38 @@ const existingSettings = JSON.parse(
 );
 if (!existingSettings) setGameSettings(defaultGameSettings);
 
-let gameState: WordleGameState = getWordleGameState2();
+let gameState = getWordleGameState2();
 let board = ref<Board[][]>([]);
+let showNextButton = ref<boolean>(false);
 let letterStates = ref<Record<string, LetterState>>({});
 let currentRowIndex = ref<number>(0);
 let allowInput: boolean;
-updateGame();
+
+onMounted(async () => {
+  await apiStore.getWordle(false);
+  console.log('finished api');
+  updateGame();
+});
 
 function updateGame() {
-  if (!gameState.solution) apiStore.getWordle(true);
-  console.log(gameState);
+  console.log(wordleSolution.value);
+  gameState.solution = wordleSolution.value;
+  showNextButton.value = gameState.isGameFinished;
+  console.log('GAMESTATE SOLUTION', gameState.solution);
   board.value = gameState.board;
   letterStates.value = gameState.letterState;
   currentRowIndex.value = gameState.currentRowIndex;
   allowInput = !gameState.isGameFinished;
+  setWorldeGameState(gameState);
+  success.value = false;
 }
 
-watch(restartGame, () => {
+watch(restartGame, async () => {
+  console.log('restarting game');
   gameState = getDefaultGameState();
-  apiStore.getWordle(true);
-});
-
-watch(wordleOfADay, () => {
-  if (wordleOfADay?.value) {
-    console.log('answer:', wordleOfADay?.value);
-    gameState.solution = wordleOfADay.value;
-    setWorldeGameState(gameState);
-    updateGame();
-  }
+  await apiStore.getWordle(true);
+  gameState.solution = wordleSolution.value;
+  updateGame();
 });
 
 const currentLanguage = 'maori';
@@ -165,13 +171,13 @@ function markAbsentRows(tile: Board) {
  */
 function isValidWord() {
   const guess = currentRow.map((tile) => tile.letter).join('');
-  if (!allWords.includes(guess) && guess !== gameState.solution) {
+  if (!allWords.includes(guess) && guess !== wordleSolution.value) {
     shake();
     let guesses = board.value.map((item) => {
       return item.map((letterObj) => letterObj.letter).join('');
     });
     const suggestion = getSuggestion(
-      gameState.solution,
+      wordleSolution.value,
       guesses,
       currentRowIndex.value,
       allWords
@@ -191,7 +197,7 @@ function completeRow() {
   }
   if (!isValidWord()) return;
 
-  let answerLetters: (string | null)[] = gameState.solution.split('');
+  let answerLetters: (string | null)[] = wordleSolution.value.split('');
 
   // Mark correct/present/absent letters
   currentRow.forEach((tile, i) => {
@@ -228,9 +234,10 @@ function completeRow() {
     gameState.isGameFinished = true;
     // game over :(
     setTimeout(() => {
-      messageStore.showMessage(gameState.solution.toUpperCase(), '', 2000);
+      messageStore.showMessage(wordleSolution.value.toUpperCase(), '', 2000);
     }, 1600);
   }
+  gameState.isGameFinished = gameState.isGameFinished;
   gameState.board = board.value;
   gameState.currentRowIndex = currentRowIndex.value;
   gameState.letterState = letterStates.value;
@@ -246,18 +253,40 @@ function shake() {
 </script>
 
 <template>
+  <div
+    style="
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      padding-top: 10px;
+    "
+  >
+    <div style="flex: 1">
+      <button
+        v-if="showNextButton"
+        type="button"
+        id="next"
+        class="next-button"
+        @click="() => (restartGame = !restartGame)"
+      >
+        Next game
+      </button>
+    </div>
+    <h1>Game ID: {{ wordleGameId }}</h1>
+  </div>
   <div class="gameContainer" v-if="isApiFetching">
     <div class="loading"></div>
     <message-alert :message="apiError" v-if="apiError" />
   </div>
-  <div class="gameContainer" v-if="!isApiFetching && gameState.solution">
+  <div class="gameContainer" v-if="!isApiFetching && wordleSolution">
     <Modal :modal-name="ModalNames.wordDefinitionModal">
       <WordDefinition
-        :word="gameState.solution"
+        :word="wordleSolution"
         @has-selected-next="
           () => {
             modal.toggleModal(ModalNames.wordDefinitionModal);
             modal.toggleModal(ModalNames.statsModal);
+            showNextButton = true;
           }
         "
       />
@@ -301,6 +330,24 @@ function shake() {
 </template>
 
 <style scoped>
+.next-button {
+  background-color: var(--key-bg-correct);
+  color: var(--key-evaluated-text-color);
+  font-family: inherit;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
+  width: 20%;
+  font-size: 15px;
+  height: 30px;
+}
 .gameContainer {
   width: 100%;
   height: 100%;
