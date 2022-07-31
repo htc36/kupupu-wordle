@@ -115,7 +115,6 @@ const toggleSwitch = (settingName: keyof GameSettings) => {
     <div class="pdf-container">
       <DownloadWorksheet />
       <div class="bottomContainer">
-        <h3 class="download-icon" style="padding-top: 20px"></h3>
         <Dropdown></Dropdown>
       </div>
     </div>

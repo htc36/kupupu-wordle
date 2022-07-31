@@ -128,6 +128,7 @@ export const useApiStore = defineStore('apiStore', {
             handleCardsApiResponse(apiResponse, localSolutionObject);
           }
         } else if (gameId) {
+          // Want to switch to a particular game
           const apiResponse: ApiResponseCards = await this.fetchApi(
             apiEndpoints.cards,
             gameId
@@ -135,6 +136,12 @@ export const useApiStore = defineStore('apiStore', {
           if (apiResponse) {
             handleCardsApiResponse(apiResponse, localSolutionObject);
           }
+        } else {
+          // Must be refreshing from local storage
+          this.cardsPrepared = localSolutionObject.cardsPrepared;
+          this.apiResponseCards = localSolutionObject.apiResponseCards;
+          this.cardsGameId = localSolutionObject.game_id;
+          this.latestCardsGameId = localSolutionObject.latest_game_id;
         }
       }
       this.cardsPrepared = prepareCards(localSolutionObject.apiResponseCards);

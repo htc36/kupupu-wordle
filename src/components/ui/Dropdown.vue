@@ -2,7 +2,10 @@
 import { useApiStore } from '../../stores/apiStore';
 import { storeToRefs } from 'pinia';
 import { ref, onUnmounted } from 'vue';
+import { useCardGameStore } from '../../stores/cardGame';
 const apiStore = useApiStore();
+const cardStore = useCardGameStore();
+const { resetGamesPlayed, stopCardGame } = cardStore;
 const { getCards } = apiStore;
 const { latestCardsGameId, cardsGameId } = storeToRefs(apiStore);
 const gameNum = ref<number>(cardsGameId.value);
@@ -14,15 +17,17 @@ function decreaseGameID() {
   console.log('hey2');
   gameNum.value = Math.max(gameNum.value - 1, 1, gameNum.value - 10);
 }
-onUnmounted(() => {
+onUnmounted(async () => {
   if (cardsGameId.value != gameNum.value) {
-    getCards(false, gameNum.value);
+    resetGamesPlayed();
+    await getCards(false, gameNum.value);
+    console.log('game should stop');
+    stopCardGame();
   }
 });
 </script>
 <template>
   <div>
-    <h6 class="text-center">Switch Game Number</h6>
     <div class="input-group input-number-group">
       <div class="input-group-button" @click="decreaseGameID()">
         <span class="input-number-decrement">-</span>
@@ -38,11 +43,17 @@ onUnmounted(() => {
         <span class="input-number-increment">+</span>
       </div>
     </div>
+    <h6 class="text-center">Switch Game Number</h6>
   </div>
 </template>
 
 <style scoped>
+.text-center {
+  text-align: center;
+}
 .input-number-group {
+  padding-top: 10px;
+  padding-bottom: 5px;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -58,7 +69,7 @@ onUnmounted(() => {
 }
 
 .input-number-group .input-group-button {
-  line-height: calc(80px / 2 - 5px);
+  line-height: calc(58px / 2 - 5px);
 }
 
 .input-number-group .input-number {
@@ -75,7 +86,7 @@ onUnmounted(() => {
 .input-number-group .input-number-decrement,
 .input-number-group .input-number-increment {
   border: 1px solid #cacaca;
-  height: 40px;
+  height: 30px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
