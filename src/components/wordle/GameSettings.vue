@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import Switch from '../ui/Switch.vue';
-import { useApiStore } from '../../stores/apiStore';
 import { ref } from 'vue';
 import { GameSettings } from '../../types';
 import { storeToRefs } from 'pinia';
 import { setGameSettings, getGameSettings } from '../../helpers/localStorage';
 import DownloadWorksheet from '../globalComponents/DownloadWorksheet.vue';
-import Dropdown from '../ui/Dropdown.vue';
+import GameToggle from '../ui/GameToggle.vue';
+import { useModalStore } from '../../stores/modal';
+import { GameNames } from '../../types';
 
-const apiStore = useApiStore();
-const { cardsGameId } = storeToRefs(apiStore);
+const modal = useModalStore();
+const { gamePlaying } = storeToRefs(modal);
 const settings = ref<GameSettings>(getGameSettings());
 const toggleSwitch = (settingName: keyof GameSettings) => {
   settings.value[settingName] = !settings.value[settingName];
@@ -20,10 +21,6 @@ const toggleSwitch = (settingName: keyof GameSettings) => {
   };
   setGameSettings(settingsToSave);
 };
-// const timeToNext = inject<TimeToNextType>('timeToNext', {
-//   wordleNextTime: '00:00:00',
-//   cardsNextTime: '00:00:00',
-// });
 </script>
 <template>
   <div class="sections">
@@ -114,8 +111,8 @@ const toggleSwitch = (settingName: keyof GameSettings) => {
     </section>
     <div class="pdf-container">
       <DownloadWorksheet />
-      <div class="bottomContainer">
-        <Dropdown></Dropdown>
+      <div class="bottomContainer" v-if="gamePlaying === GameNames.Rerenga">
+        <GameToggle />
       </div>
     </div>
   </div>

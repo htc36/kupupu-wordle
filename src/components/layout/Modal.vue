@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useModalStore } from '../../stores/modal';
-import { ModalNames, TabNames } from '../../types';
+import { ModalNames } from '../../types';
 import '/assets/cardsIcon.svg';
 const props = defineProps<{
   modalName: ModalNames;

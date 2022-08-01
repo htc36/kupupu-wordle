@@ -87,21 +87,21 @@ export const useApiStore = defineStore('apiStore', {
         apiResponse: ApiResponseCards,
         currentLocalSolutionObject: localCardsObject
       ) => {
+        const latestCardGame = currentLocalSolutionObject
+          ? Math.max(
+              apiResponse.kupuhi[0].game_id,
+              currentLocalSolutionObject?.latest_game_id
+            )
+          : apiResponse.kupuhi[0].game_id;
         this.cardsPrepared = prepareCards(apiResponse);
         this.apiResponseCards = apiResponse;
         this.cardsGameId = apiResponse.kupuhi[0].game_id;
-        this.latestCardsGameId = Math.max(
-          apiResponse.kupuhi[0].game_id,
-          currentLocalSolutionObject?.latest_game_id
-        );
+        this.latestCardsGameId = latestCardGame;
         localSolutionObject = {
           cardsPrepared: this.cardsPrepared,
           apiResponseCards: this.apiResponseCards,
           game_id: apiResponse.kupuhi[0].game_id,
-          latest_game_id: Math.max(
-            apiResponse.kupuhi[0].game_id,
-            this.latestCardsGameId
-          ),
+          latest_game_id: latestCardGame,
         };
         setLocalStorage(GameNames.Rerenga, localSolutionObject);
         setCardsGameState(true);

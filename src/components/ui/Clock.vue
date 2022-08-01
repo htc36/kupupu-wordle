@@ -31,7 +31,7 @@ function nextCardGame() {
       </div>
     </div>
     <div class="clock-wrapper" v-if="!allowNextGame">
-      <div class="clock-title">Match Num:</div>
+      <div class="clock-title">Match ID:</div>
       <div class="clock-digits">
         <div class="clock-text">
           {{ cardsGameId }}

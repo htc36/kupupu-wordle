@@ -9,13 +9,23 @@ const { resetGamesPlayed, stopCardGame } = cardStore;
 const { getCards } = apiStore;
 const { latestCardsGameId, cardsGameId } = storeToRefs(apiStore);
 const gameNum = ref<number>(cardsGameId.value);
+const isUpperLimitReached = ref<boolean>(false);
+const isLowerLimitReached = ref<boolean>(false);
 function increaseGameID() {
-  console.log('hey');
-  gameNum.value = Math.min(gameNum.value + 1, latestCardsGameId.value);
+  if (gameNum.value < latestCardsGameId.value) {
+    gameNum.value++;
+  } else {
+    isUpperLimitReached.value = true;
+    setTimeout(() => (isUpperLimitReached.value = false), 100);
+  }
 }
 function decreaseGameID() {
-  console.log('hey2');
-  gameNum.value = Math.max(gameNum.value - 1, 1, gameNum.value - 10);
+  if (gameNum.value > 1 && gameNum.value > latestCardsGameId.value - 10) {
+    gameNum.value--;
+  } else {
+    isLowerLimitReached.value = true;
+    setTimeout(() => (isLowerLimitReached.value = false), 100);
+  }
 }
 onUnmounted(async () => {
   if (cardsGameId.value != gameNum.value) {
@@ -30,7 +40,10 @@ onUnmounted(async () => {
   <div>
     <div class="input-group input-number-group">
       <div class="input-group-button" @click="decreaseGameID()">
-        <span class="input-number-decrement">-</span>
+        <span
+          :class="['input-number-decrement', { alert: isLowerLimitReached }]"
+          >-</span
+        >
       </div>
       <input
         class="input-number"
@@ -40,20 +53,26 @@ onUnmounted(async () => {
         max="1000"
       />
       <div class="input-group-button" @click="increaseGameID()">
-        <span class="input-number-increment">+</span>
+        <span
+          :class="['input-number-increment', { alert: isUpperLimitReached }]"
+          >+</span
+        >
       </div>
     </div>
-    <h6 class="text-center">Switch Game Number</h6>
+    <h6 class="text-center">Switch Match</h6>
   </div>
 </template>
 
 <style scoped>
+.alert {
+  background-color: rgb(255, 95, 89) !important;
+}
 .text-center {
   text-align: center;
 }
 .input-number-group {
   padding-top: 10px;
-  padding-bottom: 5px;
+  padding-bottom: 8px;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -69,6 +88,7 @@ onUnmounted(async () => {
 }
 
 .input-number-group .input-group-button {
+  color: 'red';
   line-height: calc(58px / 2 - 5px);
 }
 

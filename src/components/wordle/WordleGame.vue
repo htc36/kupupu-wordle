@@ -1,35 +1,33 @@
 <script setup lang="ts">
-import { onUnmounted, watch, ref, onMounted } from 'vue';
-import { getAllWords } from '../../words';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import {
-  getStats,
-  setWordleStats,
-  getWordleGameState,
-  setWorldeGameState,
-  setGameSettings,
   getDefaultGameState,
+  getStats,
   getWordleGameState2,
-  getLocalStorage,
+  setGameSettings,
+  setWordleStats,
+  setWorldeGameState,
 } from '../../helpers/localStorage';
+import { getAllWords } from '../../words';
 import Modal from '../layout/Modal.vue';
-import WordDefinition from './WordDefinition.vue';
-import { defaultGameSettings } from '../../helpers/localStorage';
-import Keyboard from './Keyboard.vue';
+
 import { storeToRefs } from 'pinia';
-import {
-  LetterState,
-  Board,
-  WordleGameState,
-  WordleGameStats,
-  GameNames,
-  ModalNames,
-  WordResponse,
-} from '../../types';
-import { useApiStore } from '../../stores/apiStore';
+import { defaultGameSettings } from '../../helpers/localStorage';
 import getSuggestion from '../../helpers/suggestion';
-import { useModalStore } from '../../stores/modal';
+import { useApiStore } from '../../stores/apiStore';
+
 import { useMessageStore } from '../../stores/message';
+import { useModalStore } from '../../stores/modal';
+import {
+  Board,
+  GameNames,
+  LetterState,
+  ModalNames,
+  WordleGameStats,
+} from '../../types';
 import MessageAlert from '../ui/MessageAlert.vue';
+import Keyboard from './Keyboard.vue';
+import WordDefinition from './WordDefinition.vue';
 
 const apiStore = useApiStore();
 const modal = useModalStore();
@@ -272,7 +270,7 @@ function shake() {
         Next game
       </button>
     </div>
-    <h1>Game ID: {{ wordleGameId }}</h1>
+    <h1>Match ID: {{ wordleGameId }}</h1>
   </div>
   <div class="gameContainer" v-if="isApiFetching">
     <div class="loading"></div>

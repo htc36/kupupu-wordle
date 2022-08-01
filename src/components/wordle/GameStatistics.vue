@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { WordleGameStats, Guesses } from '../../types';
-import ModalFooter from '../ui/ModalFooter.vue';
-import { GameNames } from '../../types';
 import { getLocalStorage, getStats } from '../../helpers/localStorage';
+import { GameNames, Guesses, WordleGameStats } from '../../types';
 
 const wordleStats = getStats(GameNames.Kupu) as WordleGameStats;
 const gameId = getLocalStorage(GameNames.Kupu)?.id;
