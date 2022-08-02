@@ -76,7 +76,7 @@ const isMenuActive = ref(false);
           <router-link
             @click="() => (isMenuActive = !isMenuActive)"
             class="nav-link"
-            to="/cards"
+            to="/"
           >
             <img src="/assets/cardsIcon.svg" alt="CardsIcon" class="gameIcon" />
             kupuhi

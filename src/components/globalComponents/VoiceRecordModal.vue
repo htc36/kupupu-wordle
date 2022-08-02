@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import Modal from '../layout/Modal.vue';
 import { ModalNames, CardAudio } from '../../types';
-import { cards } from '../../helpers/assetMapping';
 import { ref } from 'vue';
 import '../../css/tooltip.css';
+import { useApiStore } from '../../stores/apiStore';
+import { storeToRefs } from 'pinia';
+
+const apiStore = useApiStore();
+const { apiResponseCards } = storeToRefs(apiStore);
 
 let mediaRecorder: MediaRecorder,
   chunks: Blob[] = [],
@@ -132,31 +136,31 @@ function download(name?: string) {
           </div>
         </div>
         <ul>
-          <li v-for="card in cards" :key="card.answer">
+          <li v-for="card in apiResponseCards?.kupuhi" :key="card.word_tereo">
             <div class="words-list-item">
-              <p class="word-item">{{ card.answer }}</p>
-              <div v-if="wordRecordingLocation[card.answer]">
+              <p class="word-item">{{ card.word_tereo }}</p>
+              <div v-if="wordRecordingLocation[card.word_tereo]">
                 <img
                   src="/assets/download.svg"
                   class="modal-icon"
                   style="cursor: pointer"
                   alt="Download recording"
-                  @click="download(card.answer)"
+                  @click="download(card.word_tereo)"
                 />
               </div>
               <div v-else-if="isRecordingFailed" class="errorMessageContainer">
                 Recording failed
               </div>
               <img
-                v-else-if="wordBeingRecorded != card.sound"
+                v-else-if="wordBeingRecorded != card.word_aud"
                 src="/assets/record.png"
                 class="modal-icon"
-                @click.prevent="startRecording(card.sound)"
+                @click.prevent="startRecording(card.word_aud)"
                 alt="Start recording"
               />
               <img
                 v-else-if="
-                  wordBeingRecorded == card.sound && !isNewSoundRecorded
+                  wordBeingRecorded == card.word_aud && !isNewSoundRecorded
                 "
                 src="/assets/stopRecording.png"
                 class="modal-icon"
@@ -164,7 +168,7 @@ function download(name?: string) {
                 alt="Stop recording"
               />
               <div v-else class="review-recording-container">
-                <button class="next-button" @click="onSubmit(card.answer)">
+                <button class="next-button" @click="onSubmit(card.word_tereo)">
                   Submit
                 </button>
                 <img
@@ -251,12 +255,6 @@ function download(name?: string) {
   width: 100%;
   justify-content: space-around;
   align-items: center;
-}
-.footer-download {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
 }
 .next-button {
   background-color: var(--blue);

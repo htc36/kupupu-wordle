@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import Switch from '../ui/Switch.vue';
 import { ref } from 'vue';
-import { GameSettings, TimeToNextType } from '../../types';
+import { GameSettings } from '../../types';
+import { storeToRefs } from 'pinia';
 import { setGameSettings, getGameSettings } from '../../helpers/localStorage';
-import { inject } from 'vue';
 import DownloadWorksheet from '../globalComponents/DownloadWorksheet.vue';
+import GameToggle from '../ui/GameToggle.vue';
+import { useModalStore } from '../../stores/modal';
+import { GameNames } from '../../types';
+
+const modal = useModalStore();
+const { gamePlaying } = storeToRefs(modal);
 const settings = ref<GameSettings>(getGameSettings());
 const toggleSwitch = (settingName: keyof GameSettings) => {
   settings.value[settingName] = !settings.value[settingName];
@@ -15,10 +21,6 @@ const toggleSwitch = (settingName: keyof GameSettings) => {
   };
   setGameSettings(settingsToSave);
 };
-const timeToNext = inject<TimeToNextType>('timeToNext', {
-  wordleNextTime: '00:00:00',
-  cardsNextTime: '00:00:00',
-});
 </script>
 <template>
   <div class="sections">
@@ -109,11 +111,8 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
     </section>
     <div class="pdf-container">
       <DownloadWorksheet />
-      <div class="bottomContainer">
-        <h3 class="download-icon" style="padding-top: 20px">
-          {{ timeToNext.cardsNextTime }}
-        </h3>
-        <h3>Time to next game</h3>
+      <div class="bottomContainer" v-if="gamePlaying === GameNames.Rerenga">
+        <GameToggle />
       </div>
     </div>
   </div>

@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { CardGameStats } from '../../types';
+import { CardGameStats, GameNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
-import { inject } from 'vue';
-import { TimeToNextType } from '../../types';
+import { useApiStore } from '../../stores/apiStore';
+import { storeToRefs } from 'pinia';
 
-const timeToNext = inject<TimeToNextType>('timeToNext', {
-  wordleNextTime: '00:00:00',
-  cardsNextTime: '00:00:00',
-});
+const apiStore = useApiStore();
+const { cardsGameId } = storeToRefs(apiStore);
 
 function getAvg(arr: number[]) {
   return arr.reduce((a: number, b: number) => a + b, 0) / arr.length;
@@ -37,7 +35,7 @@ function formatTime(time: number | number[]) {
   return `${timeObj.getMinutes()}:${seconds}`;
 }
 
-const cardStats = getStats('cardStats') as CardGameStats;
+const cardStats = getStats(GameNames.Rerenga) as CardGameStats;
 const cardTimeStats = cardStats.times;
 const cardClickStats = cardStats.clicks;
 </script>
@@ -93,15 +91,12 @@ const cardClickStats = cardStats.clicks;
               cardStats.times.avgTime.value.length
             }}</span>
           </h1>
-          <h1>
-            New Cards In:
-            <span style="font-weight: bold">{{
-              timeToNext.cardsNextTime
-            }}</span>
+          <h1 v-show="cardsGameId">
+            Current Lesson:
+            <span style="font-weight: bold">{{ cardsGameId }}</span>
           </h1>
         </div>
       </div>
-      <!-- <hr /> -->
     </div>
   </div>
 </template>

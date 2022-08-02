@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { useMessageStore } from '../../stores/message';
 import BuyCoffeeButton from './BuyCoffeeButton.vue';
-import { CardGameStats, TabNames } from '../../types';
+import { CardGameStats, GameNames, ModalNames } from '../../types';
+import { TabNames } from '../../types';
 import { getStats } from '../../helpers/localStorage';
 import { useClockStore } from '../../stores/clock';
-const clockStore = useClockStore();
+import { useModalStore } from '../../stores/modal';
+import { useApiStore } from '../../stores/apiStore';
 
 const props = defineProps<{
   forTab: TabNames;
 }>();
+
+const clockStore = useClockStore();
+const modalStore = useModalStore();
+const apiStore = useApiStore();
 
 const messageStore = useMessageStore();
 
@@ -26,24 +32,41 @@ function onShare() {
     }
   }
   if (props.forTab === TabNames.RerengaStats) {
-    const cardStats = getStats('cardStats') as CardGameStats;
+    const cardStats = getStats(GameNames.Rerenga) as CardGameStats;
     const cardMilliseconds = cardStats.times.prevTime.value;
     if (cardMilliseconds === 0) {
       messageStore.showMessage('Nothing To Share!');
     } else {
       const messageToCopy = `#rerenga ${new Date().toLocaleDateString(
         'en-NZ'
-      )}\n\n Last game time: ${clockStore.getGameTime(cardMilliseconds)}`;
+      )}\n\n Last game time: ${clockStore.getGameTime()}`;
       navigator.clipboard.writeText(messageToCopy);
       messageStore.showMessage('Copied To Clipboard!', messageToCopy);
     }
   }
 }
+// function nextGame() {
+//   modalStore.toggleModal(ModalNames.statsModal);
+//   apiStore.restartGame = !apiStore.restartGame;
+// }
 </script>
 <template>
   <div class="footer">
-    <button type="button" class="share-button" @click="onShare()">Share</button>
-    <BuyCoffeeButton />
+    <button type="button" class="share-button" @click="onShare">Share</button>
+    <div>
+      <BuyCoffeeButton />
+    </div>
+    <!-- <button
+      v-if="
+        props.forTab === TabNames.KupuStats &&
+        modalStore.gamePlaying === GameNames.Kupu
+      "
+      type="button"
+      class="share-button"
+      @click="nextGame"
+    >
+      Next game
+    </button> -->
   </div>
 </template>
 
@@ -74,7 +97,7 @@ function onShare() {
   align-items: center;
   text-transform: uppercase;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0.3);
-  width: 50%;
+  width: 30%;
   font-size: 20px;
   height: 37px;
 }

@@ -1,4 +1,3 @@
-import { cards } from './helpers/assetMapping';
 export interface CardAudio {
   [key: string]: string;
 }
@@ -56,21 +55,54 @@ export const enum apiResponseTypes {
 }
 
 export interface CardObj {
-  sound?: string;
-  image?: string;
-  answer: string;
   index?: number;
-  id?: number;
   isTextCard?: boolean;
-  cardLocked?: boolean;
+  game_id: number;
+  pdf_id: string;
+  word_id: string;
+  word_tereo: string;
+  word_eng: string;
+  word_img: string;
+  word_aud: string;
 }
+
+export interface localCardsObject {
+  cardsPrepared: CardObj[];
+  game_id: number;
+  latest_game_id: number;
+  date?: string;
+  apiResponseCards: ApiResponseCards;
+}
+
+export interface ApiResponseWordle {
+  kupupu: {
+    id: number;
+    name_eng: string;
+    name_tereo: string;
+    image: string;
+    audio: string;
+    description: string;
+  }[];
+  count: number;
+}
+
+export interface ApiResponseCards {
+  kupuhi: CardObj[];
+}
+
 export interface Board {
   letter: string;
   state: LetterState;
 }
-export interface GameState {
+
+export interface CardsGameState {
+  gameNumber: number;
+  allowNextGame: boolean;
+  maxGameNumber: boolean;
+}
+export interface WordleGameState {
   solution: string;
-  lastCompleted: string | null;
+  lastCompletedId: number | null;
   isGameFinished: boolean;
   board: Board[][];
   letterState: Record<string, LetterState>;

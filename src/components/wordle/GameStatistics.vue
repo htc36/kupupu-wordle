@@ -1,15 +1,9 @@
 <script setup lang="ts">
-import { WordleGameStats, Guesses } from '../../types';
-import { getStats } from '../../helpers/localStorage';
-// import { timeToNextGame } from '../../helpers';
-import { inject } from 'vue';
-import { TimeToNextType } from '../../types';
+import { getLocalStorage, getStats } from '../../helpers/localStorage';
+import { GameNames, Guesses, WordleGameStats } from '../../types';
 
-const wordleStats = getStats('wordleStats') as WordleGameStats;
-const timeToNext = inject<TimeToNextType>('timeToNext', {
-  wordleNextTime: '00:00:00',
-  cardsNextTime: '00:00:00',
-});
+const wordleStats = getStats(GameNames.Kupu) as WordleGameStats;
+const gameId = getLocalStorage(GameNames.Kupu)?.id;
 </script>
 
 <template>
@@ -42,10 +36,10 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
           <div class="label">Max Streak</div>
           <div class="label number">{{ wordleStats.maxStreak }}</div>
         </div>
-        <div class="stat-group time-group">
-          <h1 class="label">Next Wordle</h1>
+        <div class="stat-group">
+          <h1 class="label">Lesson Number</h1>
           <div class="label number">
-            {{ timeToNext.wordleNextTime }}
+            {{ gameId }}
           </div>
         </div>
       </div>
@@ -67,7 +61,6 @@ const timeToNext = inject<TimeToNextType>('timeToNext', {
           </div>
         </div>
       </div>
-      <!-- <hr /> -->
     </div>
   </div>
 </template>
@@ -77,7 +70,6 @@ export default {
   data() {
     return {
       isOpen: true,
-      // timeToNextGame: { hours: '0', minutes: '0', seconds: '0' },
     };
   },
   methods: {
@@ -116,6 +108,8 @@ export default {
 .statistics-container {
   display: flex;
   align-items: flex-end;
+  width: 80%;
+  justify-content: space-evenly;
 }
 .stat-group {
   display: flex;
@@ -131,14 +125,6 @@ export default {
   .stat-group {
     flex-basis: 100px;
   }
-  .statistics-container {
-    width: 100%;
-  }
-}
-.time-group {
-  justify-content: space-between;
-  border-left: 1px solid var(--color-absent);
-  padding: 0px 15px;
 }
 .label {
   align-self: center;
