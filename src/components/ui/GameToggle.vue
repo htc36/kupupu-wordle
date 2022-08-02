@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useApiStore } from '../../stores/apiStore';
 import { storeToRefs } from 'pinia';
-import { ref, onUnmounted } from 'vue';
+import { onUnmounted, ref } from 'vue';
+import { useApiStore } from '../../stores/apiStore';
 import { useCardGameStore } from '../../stores/cardGame';
 const apiStore = useApiStore();
 const cardStore = useCardGameStore();
@@ -93,7 +93,7 @@ onUnmounted(async () => {
 }
 
 .input-number-group .input-number {
-  width: 80px;
+  width: 45px;
   padding: 0 12px;
   vertical-align: top;
   text-align: center;
@@ -117,7 +117,7 @@ onUnmounted(async () => {
 .input-number-group .input-number-decrement,
 .input-number-group .input-number-increment {
   display: inline-block;
-  width: 40px;
+  width: 25px;
   background: #e6e6e6;
   color: #0a0a0a;
   text-align: center;
