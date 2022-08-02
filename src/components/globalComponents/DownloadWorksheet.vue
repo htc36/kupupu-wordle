@@ -3,7 +3,7 @@
   <a
     class="bottomContainer"
     style="cursor: pointer"
-    href="/assets/tick.svg"
+    onclick="window.open('https:\/\/whanau.tv/aboutus/1.pdf', '_blank')"
     download
   >
     <img src="/assets/download.svg" class="download-icon" alt="Download PDF" />
